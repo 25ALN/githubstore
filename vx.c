@@ -1238,11 +1238,103 @@
 //     return 0;
 // }
 
+// int cmp(const void *a,const void *b){
+//     return (*(int*) a - *(int *)b);
+// }
+// int main(){
+//     int aln[]={4,9,8,1,2,6,7,3,5},len=sizeof(aln)/sizeof(aln[0]);
+//     qsort(aln,len,sizeof(int),cmp);
+//     for(int i=0;i<len;i++){
+//         printf("%d ",aln[i]);
+//     }              
+//     return 0;
+// }
+
+
+// int reverse( int number ){
+//     int y=0;
+//     if(number>0){
+//         while(number>0){
+//             y=y*10+number%10;
+//             number/=10;
+//         }
+//     }else{
+//         number-=2*number;
+//         while(number>0){
+//             y=y*10+number%10;
+//             number/=10;
+//         }
+//         y-=2*y;
+//     }
+//     return y;
+// }
+    
+// int main()
+// {
+//     int n;
+//     scanf("%d", &n);
+//     printf("%d\n", reverse(n));
+//     return 0;
+// }
+
+// int jiec(int a){
+//     if(a==1||a==0) return a;
+//     else{
+//         a=a*jiec(a-1);
+//     }
+//     return a;
+// }
+// double funcos( double e, double x ){
+//     double cos=0;
+//     for(int i=0; ;){
+//         cos+=pow(-1,i/2)*((pow(x,i)*1.0/jiec(i)*1.0));
+//         if((pow(x,i)*1.0/jiec(i)*1.0)<e) break;
+//         i=i+2;
+//     }
+//     return cos;
+// }
+// int main()
+// {    
+//     double e, x;
+//     scanf("%lf %lf", &e, &x);
+//     printf("cos(%.2f) = %.6f\n", x, funcos(e, x));
+//     return 0;
+// }
+
+// int I(int a){
+//     int isprime=1;
+//     if(a==1) return isprime=0;
+//     else{
+//         for(int i=2;i<=sqrt(a);i++){
+//             if(a%i==0){
+//                 isprime=0;
+//                 return isprime;
+//             }
+//         }
+//     }
+//     return isprime; 
+// }
+// int main(){
+//     int cnt=0,n,k,p=0,sum=0;;
+//     scanf("%d %d",&n,&k);
+//     for(int i=n; ;i--){
+//         if(cnt==k||i==1) break;
+//         if(p==0&&I(i)!=0){
+//             sum+=i;
+//             printf("%d",i);
+//             p++;
+//             cnt++;
+//         }else if(p!=0&&I(i)!=0){
+//             sum+=i;
+//             printf("+%d",i);
+//             cnt++;
+//         }
+//     }
+//     printf("=%d",sum);
+//     return 0;
+// }
+
 int main(){
-    FILE*fp;
-    fp=fopen("test.txt","a");
-    char ch='a';
-    fputc(ch,fp);
-    fclose(fp);
+    printf("1-Ball\n2-Cylinder\n3-Cone\nother-Exit\nPlease enter your command:\n");
     return 0;
 }
