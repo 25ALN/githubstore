@@ -1277,19 +1277,18 @@
 //     return 0;
 // }
 
-// int jiec(int a){
-//     if(a==1||a==0) return a;
-//     else{
-//         a=a*jiec(a-1);
-//     }
-//     return a;
-// }
 // double funcos( double e, double x ){
 //     double cos=0;
 //     for(int i=0; ;){
-//         cos+=pow(-1,i/2)*((pow(x,i)*1.0/jiec(i)*1.0));
-//         if((pow(x,i)*1.0/jiec(i)*1.0)<e) break;
+//         double num=1;
+//         for(int j=1;j<=i;j++){
+//             num*=j;
+//         }
+//         cos+=pow(-1,i/2)*((pow(x,i)*1.0/num));
+//         double p=(pow(x,i)*1.0/num);
+//         if(p>0&&p<e||p<0&&-p<e) break;
 //         i=i+2;
+//         num=0;
 //     }
 //     return cos;
 // }
@@ -1334,7 +1333,29 @@
 //     return 0;
 // }
 
+
+#define MAXLENGTH 100
+int isPalindrome(const char* str, char* pch);
 int main(){
-    printf("1-Ball\n2-Cylinder\n3-Cone\nother-Exit\nPlease enter your command:\n");
+    char str[MAXLENGTH],mid;
+    scanf("%s",str);
+    if(isPalindrome(str, &mid))
+        printf("是回文！中间字符是%c\n",mid);
+    else
+        printf("不是回文！中间字符是%c\n",mid);
     return 0;
+}
+int isPalindrome(const char* str, char* pch){
+    int len=strlen(str);
+    if(len%2==0) {
+    *pch=str[len/2-1];
+    return 0;
+    }
+    else *pch=str[len/2];
+    for(int i=0;i<len/2;i++){
+        if(str[i]!=str[len-i-1]){
+            return 0;
+        }
+    }
+    return 1;
 }
