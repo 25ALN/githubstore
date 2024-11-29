@@ -1333,29 +1333,67 @@
 //     return 0;
 // }
 
+// #define MAXLENGTH 100
+// int isPalindrome(const char* str, char* pch);
+// int main(){
+//     char str[MAXLENGTH],mid;
+//     scanf("%s",str);
+//     if(isPalindrome(str, &mid))
+//         printf("是回文！中间字符是%c\n",mid);
+//     else
+//         printf("不是回文！中间字符是%c\n",mid);
+//     return 0;
+// }
+// int isPalindrome(const char* str, char* pch){
+//     int len=strlen(str);
+//     if(len%2==0) {
+//     *pch=str[len/2-1];
+//     return 0;
+//     }
+//     else *pch=str[len/2];
+//     for(int i=0;i<len/2;i++){
+//         if(str[i]!=str[len-i-1]){
+//             return 0;
+//         }
+//     }
+//     return 1;
+// }
 
-#define MAXLENGTH 100
-int isPalindrome(const char* str, char* pch);
-int main(){
-    char str[MAXLENGTH],mid;
-    scanf("%s",str);
-    if(isPalindrome(str, &mid))
-        printf("是回文！中间字符是%c\n",mid);
-    else
-        printf("不是回文！中间字符是%c\n",mid);
-    return 0;
-}
-int isPalindrome(const char* str, char* pch){
-    int len=strlen(str);
-    if(len%2==0) {
-    *pch=str[len/2-1];
-    return 0;
+#include<stdio.h>
+#define p 3.1415926
+int main()
+{
+        int num;
+        double r,h,v;
+        do
+        {	printf("1-Ball\n2-Cylinder\n3-Cone\nother-Exit\nPlease enter your command:\n");
+            scanf("%d",&num);
+            if(!(num==1||num==2||num==3))
+                break;	
+            if(num==1)	
+            {
+                printf("Please enter the radius:\n");
+                scanf("%lf",&r);
+                v=4.0/3*p*(r*r*r);
+                printf("%.2lf\n",v);
+                continue;
+            }
+            if(num==2)	 
+            {	
+                printf("Please enter the radius and the height:\n");
+                scanf("%lf %lf",&r,&h);
+                v=p*(r*r)*h;
+                printf("%.2lf\n",v);
+                continue;
+            }
+            if(num==3)	
+            {
+                printf("Please enter the radius and the height:\n");
+                scanf("%lf %lf",&r,&h);
+                v=1.0/3*p*(r*r)*h;
+                printf("%.2lf\n",v);
+                continue;
+            }
+        }while(1);
+        return 0; 
     }
-    else *pch=str[len/2];
-    for(int i=0;i<len/2;i++){
-        if(str[i]!=str[len-i-1]){
-            return 0;
-        }
-    }
-    return 1;
-}
