@@ -1359,41 +1359,51 @@
 //     return 1;
 // }
 
-#include<stdio.h>
-#define p 3.1415926
-int main()
-{
-        int num;
-        double r,h,v;
-        do
-        {	printf("1-Ball\n2-Cylinder\n3-Cone\nother-Exit\nPlease enter your command:\n");
-            scanf("%d",&num);
-            if(!(num==1||num==2||num==3))
-                break;	
-            if(num==1)	
-            {
-                printf("Please enter the radius:\n");
-                scanf("%lf",&r);
-                v=4.0/3*p*(r*r*r);
-                printf("%.2lf\n",v);
-                continue;
-            }
-            if(num==2)	 
-            {	
-                printf("Please enter the radius and the height:\n");
-                scanf("%lf %lf",&r,&h);
-                v=p*(r*r)*h;
-                printf("%.2lf\n",v);
-                continue;
-            }
-            if(num==3)	
-            {
-                printf("Please enter the radius and the height:\n");
-                scanf("%lf %lf",&r,&h);
-                v=1.0/3*p*(r*r)*h;
-                printf("%.2lf\n",v);
-                continue;
-            }
-        }while(1);
-        return 0; 
+// #define p 3.1415926
+// int main()
+// {
+//         int num;
+//         double r,h,v;
+//         do
+//         {	printf("1-Ball\n2-Cylinder\n3-Cone\nother-Exit\nPlease enter your command:\n");
+//             scanf("%d",&num);
+//             if(!(num==1||num==2||num==3))
+//                 break;	
+//             if(num==1)	
+//             {
+//                 printf("Please enter the radius:\n");
+//                 scanf("%lf",&r);
+//                 v=4.0/3*p*(r*r*r);                                                                                       
+//                 printf("%.2lf\n",v);
+//                 continue;
+//             }
+//             if(num==2)	 
+//             {	
+//                 printf("Please enter the radius and the height:\n");
+//                 scanf("%lf %lf",&r,&h);
+//                 v=p*(r*r)*h;
+//                 printf("%.2lf\n",v);
+//                 continue;
+//             }
+//             if(num==3)	
+//             {
+//                 printf("Please enter the radius and the height:\n");
+//                 scanf("%lf %lf",&r,&h);
+//                 v=1.0/3*p*(r*r)*h;
+//                 printf("%.2lf\n",v);
+//                 continue;
+//             }
+//         }while(1);
+//         return 0; 
+//     }
+
+int main(){
+    char *s="101";
+    int sum=0,len=strlen(s);
+    printf("%d\n",len);
+    for(int i=0;i<len;i++){
+        sum+=(s[i]-48)*pow(2,len-i-1);
     }
+    printf("%d",sum);
+    return 0;
+}
