@@ -1397,13 +1397,20 @@
 //         return 0; 
 //     }
 
+// int main(){
+//     char *s="101";
+//     int sum=0,len=strlen(s);
+//     printf("%d\n",len);
+//     for(int i=0;i<len;i++){
+//         sum+=(s[i]-48)*pow(2,len-i-1);
+//     }
+//     printf("%d",sum);
+//     return 0;
+// }
+
 int main(){
-    char *s="101";
-    int sum=0,len=strlen(s);
-    printf("%d\n",len);
-    for(int i=0;i<len;i++){
-        sum+=(s[i]-48)*pow(2,len-i-1);
-    }
-    printf("%d",sum);
+    char *str="fweasfasefasf";
+    char flag='a';
+    char **str2=(char**)malloc(sizeof(char*)*20);
     return 0;
 }
