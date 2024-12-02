@@ -1408,9 +1408,55 @@
 //     return 0;
 // }
 
+// int main(){
+//     char *str="fweasfasefasf";
+//     char flag='a';
+//     char **str2=(char**)malloc(sizeof(char*)*20);
+//     int len=strlen(str);
+//     for(int i=0;i<len;i++){
+//         while(str[i]==flag){
+            
+//         }
+//     }
+//     return 0;
+// }
+
+// char* addBinary(char* a, char* b) {
+//     int x=0,y=0,lena=strlen(a),lenb=strlen(b);
+//     int max=fmax(lena,lenb);
+//     for(int i=0;i<lena;i++){
+//         x+=(a[i]-48)*pow(2,lena-i-1);
+//     }
+//     for(int i=0;i<lena;i++){
+//         y+=(b[i]-48)*pow(2,lenb-i-1);
+//     }
+//     char str[max+2];
+//     int sum=x,carry=y;
+//     while(carry){
+//         int temp=sum;
+//         sum=temp^carry;
+//         carry=(temp&carry)<<1;
+//     }
+//     sprintf(str,"%d",sum);
+//     return str;
+// }
+// int main(){
+//     char *x="11";
+//     char *y="1";
+//     printf("%s",addBinary(x,y));
+//     return 0;
+// }
+
 int main(){
-    char *str="fweasfasefasf";
-    char flag='a';
-    char **str2=(char**)malloc(sizeof(char*)*20);
+    FILE*fp;
+    char buff[]="asdwec",ch;
+    fp=fopen("test.txt","r");
+    if(fp==NULL){
+        printf("file open fail");
+        exit(0);
+    }
+    ch=fgetc(fp);
+    printf("%c",ch);
+    fclose(fp);
     return 0;
 }
