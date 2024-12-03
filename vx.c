@@ -1447,16 +1447,171 @@
 //     return 0;
 // }
 
+// int main(){
+//     int h,m,s,time;
+//     scanf("%d:%d:%d",&h,&m,&s);
+//     scanf("%d",&time);
+//     int t=time+s;
+//     s=t-60;
+//     if(s<0) s+=60;
+//     t/=60;
+//     m+=t;
+//     int z=m;
+//     z/=60;
+//     h+=z;
+//     m%=60;
+//     if(h==24) h=0;
+//     if(m==60) m=0;
+//     printf("%02d:%02d:%02d",h,m,s);
+//     return 0;
+// }
+
+// struct people{
+//     char name[10];
+//     int birthday;
+//     char phone[17];
+// };
+// void change(struct people *a,struct people *b){
+//     struct people temp=*a;
+//     *a=*b;
+//     *b=temp;
+// }
+// int main(){
+//     int h;
+//     scanf("%d",&h);
+//     struct people s[h];
+//     for(int i=0;i<h;i++){
+//         scanf("%s %d %s",s[i].name,&s[i].birthday,s[i].phone);
+//     }
+//     for(int i=0;i<h;i++){
+//         for(int j=0;j<h-i;j++){
+//             if(s[j].birthday<s[j+1].birthday){
+//                 change(&s[j],&s[j+1]);
+//             }
+//         }
+//     }
+//     int isprime=0;
+//     for(int j=h-1;j>=0;j--){
+//         if(isprime==0){
+//             printf("%s %d %s",s[j].name,s[j].birthday,s[j].phone);
+//             isprime++;
+//         }else{
+//             printf("\n%s %d %s",s[j].name,s[j].birthday,s[j].phone);
+//         }
+//     }
+//     return 0;
+// }
+
+// struct p{
+//     int sex;
+//     char name[8];
+// };
+// int main(){
+//     int people,isprime=0;
+//     scanf("%d",&people);
+//     struct p hh[people];
+//     for(int i=0;i<people;i++){
+//         scanf("%d %s",&hh[i].sex,hh[i].name);
+//     }
+//     for(int i=0;i<people;i++){
+//         for(int j=people-1;j>=0;j--){
+//             if(hh[i].sex+hh[j].sex==1&&i!=j){
+//                 if(isprime==0){
+//                 printf("%s %s",hh[i].name,hh[j].name);
+//                 isprime++;
+//                 }else{
+//                 printf("\n%s %s",hh[i].name,hh[j].name);   
+//                 }
+//                 hh[i].sex=-2,hh[j].sex=-2;
+//             }
+//         }
+//     }
+//     return 0;
+// }
+
+// struct number{
+//     int up;
+//     char c;
+//     int down;
+// };
+// int gys(int a,int b){
+//     int t;
+//     while(b!=0){
+//   	t=a%b;
+// 	a=b;
+// 	b=t; 
+//   }
+//   return a; 
+// }
+// int main(){
+//     struct number chu[2];
+//     for(int i=0;i<2;i++){
+//         scanf("%d%c%d",&chu[i].up,&chu[i].c,&chu[i].down);
+//     }
+//     int fm=gys(chu[0].down,chu[1].down);
+//     int x,s;
+//     x=(chu[0].down*chu[1].down)/fm;
+//     s=chu[0].up*(x/chu[0].down)+chu[1].up*(x/chu[1].down);
+//     int g=gys(x,s);
+//     if(x/g!=1){
+//     printf("%d/%d",s/g,x/g);
+//     }else{
+//         printf("%d",s/g);
+//     }
+//     return 0;
+// }
+
+// struct s{
+//     char name[10];
+//     float basic;
+//     float move;
+//     float out;
+// };
+// int main(){
+//     int n,isprime=0;
+//     scanf("%d",&n);
+//     struct s p[n];
+//     for(int i=0;i<n;i++){
+//         scanf("%s %f %f %f",p[i].name,&p[i].basic,&p[i].move,&p[i].out);
+//     }
+//     for(int i=0;i<n;i++){
+//         if(isprime==0){
+//         printf("%s %.2f",p[i].name,p[i].basic+p[i].move-p[i].out);
+//         isprime++;
+//         }
+//         else
+//         printf("\n%s %.2f",p[i].name,p[i].basic+p[i].move-p[i].out);
+//     }
+//     return 0;
+// }
+
+struct s{
+    char testnumber[16];
+    int sj;
+    int test;
+};
 int main(){
-    FILE*fp;
-    char buff[]="asdwec",ch;
-    fp=fopen("test.txt","r");
-    if(fp==NULL){
-        printf("file open fail");
-        exit(0);
+    int n,isprime=0;
+    scanf("%d",&n);
+    struct s x[n];
+    for(int i=0;i<n;i++){
+        scanf("%s %d %d",x[i].testnumber,&x[i].sj,&x[i].test);
     }
-    ch=fgetc(fp);
-    printf("%c",ch);
-    fclose(fp);
+    int choose;
+    scanf("%d",&choose);
+    int aln[choose];
+    for(int i=0;i<choose;i++){
+        scanf("%d",&aln[i]);
+    }
+    for(int j=0;j<choose;j++){
+        for(int k=0;k<n;k++){
+            if(aln[j]==x[k].sj&&isprime==0){
+                printf("%s %d",x[k].testnumber,x[k].test);
+                isprime++;
+            }else if(aln[j]==x[k].sj&&isprime!=0){
+                printf("\n%s %d",x[k].testnumber,x[k].test);
+            }
+        }
+    }
     return 0;
 }
