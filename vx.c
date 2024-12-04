@@ -1585,33 +1585,81 @@
 //     return 0;
 // }
 
-struct s{
-    char testnumber[16];
-    int sj;
-    int test;
-};
+// struct s{
+//     char testnumber[16];
+//     int sj;
+//     int test;
+// };
+// int main(){
+//     int n,isprime=0;
+//     scanf("%d",&n);
+//     struct s x[n];
+//     for(int i=0;i<n;i++){
+//         scanf("%s %d %d",x[i].testnumber,&x[i].sj,&x[i].test);
+//     }
+//     int choose;
+//     scanf("%d",&choose);
+//     int aln[choose];
+//     for(int i=0;i<choose;i++){
+//         scanf("%d",&aln[i]);
+//     }
+//     for(int j=0;j<choose;j++){
+//         for(int k=0;k<n;k++){
+//             if(aln[j]==x[k].sj&&isprime==0){
+//                 printf("%s %d",x[k].testnumber,x[k].test);
+//                 isprime++;
+//             }else if(aln[j]==x[k].sj&&isprime!=0){
+//                 printf("\n%s %d",x[k].testnumber,x[k].test);
+//             }
+//         }
+//     }
+//     return 0;
+// }
+
+// struct s{
+//     char name[5];
+//     int xuehao;
+//     int score[3];
+// };
+// double average(int a,int b,int c){
+//     return ((a+b+c)/3.0);
+// }
+// int main(){
+//     struct s p[5];
+//     for(int i=0;i<5;i++){
+//         scanf("%s %d",p[i].name,&p[i].xuehao);
+//         for(int j=0;j<3;j++){
+//             scanf("%d",&p[i].score[j]);
+//         }
+//     }
+//     for(int k=0;k<5;k++){
+//         printf("%s %d %.2f\n",p[k].name,p[k].xuehao,average(p[k].score[0],p[k].score[1],p[k].score[2]));
+//     }
+//     return 0;
+// }
+
+// int main(){
+//     char s[]="A man, a plan, a canal: Panama";
+//     int len=strlen(s),j=0;
+//     char n[len];
+//     for(int i=0;i<len;i++){
+//         if(s[i]>='a'&&s[i]<='z'||s[i]>='A'&&s[i]<='Z'||s[i]>='0'&&s[i]<='9'){
+//             n[j]=s[i];
+//             j++;
+//         }
+//     }
+//     for(int k=0;k<=j;k++){
+//         printf("%c",n[k]);
+//     }
+//     return 0;
+// }
+
 int main(){
-    int n,isprime=0;
-    scanf("%d",&n);
-    struct s x[n];
-    for(int i=0;i<n;i++){
-        scanf("%s %d %d",x[i].testnumber,&x[i].sj,&x[i].test);
-    }
-    int choose;
-    scanf("%d",&choose);
-    int aln[choose];
-    for(int i=0;i<choose;i++){
-        scanf("%d",&aln[i]);
-    }
-    for(int j=0;j<choose;j++){
-        for(int k=0;k<n;k++){
-            if(aln[j]==x[k].sj&&isprime==0){
-                printf("%s %d",x[k].testnumber,x[k].test);
-                isprime++;
-            }else if(aln[j]==x[k].sj&&isprime!=0){
-                printf("\n%s %d",x[k].testnumber,x[k].test);
-            }
-        }
+    int *b;
+    b=NULL;
+    if(b==NULL){
+        printf("error");
+        exit(0);
     }
     return 0;
 }
