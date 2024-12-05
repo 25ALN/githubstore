@@ -1654,12 +1654,103 @@
 //     return 0;
 // }
 
-int main(){
-    int *b;
-    b=NULL;
-    if(b==NULL){
-        printf("error");
+// struct film{
+//     char name[20];
+//     int rating;
+//     struct film*next;
+// };
+// int main(){
+//     struct film*head;
+//     struct film*prev,*current;
+//     while()
+//     current=(struct film*)malloc(sizeof(struct film));
+//     if(head==NULL){
+//         head=current;
+//     }else{
+//         prev->next=current;
+//         current->next=NULL;
+//     }
+//     return 0;
+// }
+
+// struct Node {
+//     int data;
+//     struct Node* next;
+// };
+// // 创建链表
+// struct Node* createList() {
+//     struct Node* head = NULL;
+//     return head;
+// }
+// // 插入结点
+// void insertNode(struct Node** head, int data) {
+//     struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
+//     newNode->data = data;
+//     newNode->next = *head;
+//     *head = newNode;
+// }
+// // 删除结点
+// void deleteNode(struct Node** head, int data) {
+//     struct Node* temp = *head, *prev;
+//     if (temp != NULL && temp->data == data) {
+//         *head = temp->next;
+//         free(temp);
+//         return;
+//     }
+//     while (temp != NULL && temp->data != data) {
+//         prev = temp;
+//         temp = temp->next;
+//     }
+//     if (temp == NULL) return;
+//     prev->next = temp->next;
+//     free(temp);
+// } 
+// // 遍历链表
+// void traverseList(struct Node* head) {
+//     struct Node* temp = head;
+//     while (temp != NULL) {
+//         printf("%d ", temp->data);
+//         temp = temp->next;
+//     }
+// }
+
+// int main() {
+//     struct Node* head = createList();
+//     insertNode(&head, 1);
+//     insertNode(&head, 2);
+//     insertNode(&head, 3);
+//     traverseList(head);
+//     deleteNode(&head, 3);
+//     printf("\n");
+//     traverseList(head);
+//     return 0;
+// }
+
+// struct film{
+//     char name[20];
+//     int money;
+//     struct film *next;
+// };
+// struct film* creatlist(struct film *node){
+//     if(node!=NULL){
+//         node=NULL;
+//         return node;
+//     }else  printf("error");
+// }
+// int main(){
+//     struct film *head;
+//     creatlist(head);
+//     return 0;
+// }
+
+int main(int argc,char **argv){
+    if(argc==1){
+        printf("file is not enough");
         exit(0);
+    }else{
+        for(int i=0;i<argc;i++){
+            printf("%s",argv[i]);
+        }
     }
     return 0;
 }
