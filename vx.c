@@ -1726,25 +1726,68 @@
 //     return 0;
 // }
 
-// struct film{
-//     char name[20];
-//     int money;
-//     struct film *next;
-// };
-// struct film* creatlist(struct film *node){
-//     if(node!=NULL){
-//         node=NULL;
-//         return node;
-//     }else  printf("error");
-// }
-// int main(){
-//     struct film *head;
-//     creatlist(head);
-//     return 0;
-// }
-
-int main(int argc,char **argv){
-    int aln[]={9930,9923,9983,9997,9934,9952,9945,9914,9985,9982,9970,9932,9985,9902,9975,9990,9922,9990,9994,9937,9996,9964,9943,9963,9911,9925,9935,9945,9933,9916,9930,9938,10000,9916,9911,9959,9957,9907,9913,9916,9993,9930,9975,9924,9988,9923,9910,9925,9977,9981,9927,9930,9927,9925,9923,9904,9928,9928,9986,9903,9985,9954,9938,9911,9952,9974,9926,9920,9972,9983,9973,9917,9995,9973,9977,9947,9936,9975,9954,9932,9964,9972,9935,9946,9966};
-    printf("%d",sizeof(aln)/sizeof(aln[0]));
+struct film{
+    char name[20];
+    int money;
+    struct film *next;
+};
+struct film* creatlist(struct film *node){
+        node=NULL;
+        return node;
+}
+void insert(struct film**head,int m){
+    struct film*newnode=(struct film*)malloc(sizeof(struct film));
+    newnode->money=m;
+    newnode->next=*head;
+    *head=newnode;
+}
+void printlist(struct film*head){
+    while(head!=NULL){
+        printf("%d ",(head)->money);
+        head=head->next;
+    }
+}
+void dele(struct film**head,int flag){
+    struct film *temp=*head,*front;
+    if(temp==NULL) return;
+    while(temp!=NULL&&temp->money!=flag){
+        front=temp;
+        temp=temp->next;
+    }
+    if(temp->money==flag){
+        if(temp==*head){
+            temp=temp->next;
+        }else{
+            front->next=temp->next;
+        }
+        free(temp);
+    }
+}
+int main(){
+    struct film *head=creatlist(head);
+    insert(&head,1);
+    insert(&head,2);
+    insert(&head,3);
+    printlist(head);
+    dele(&head, 2);
+    printf("\n");
+    printlist(head);
     return 0;
 }
+
+// int main(int argc,char **argv){
+//     int n=0,left=0;
+//     for(int right=0;right<=len;right++){
+//       if(str[right]==terminator||right==len-1){
+//         a[n]->buf=NULL;
+//         a[n]->len=0;
+//         a[n]->alloc=0;
+//         strbuf_add(a[n],str+right,right-left);
+//         left=right+1;
+//         n++;
+//         a[n]=NULL;
+//       }
+//     }
+//     return a;
+//     return 0;
+// }
