@@ -4,6 +4,8 @@
 #include <ctype.h>
 #include <math.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 // typedef int (*Predicate)(int);
 // int *filter(int *array, int length, Predicate predicate,
@@ -1726,54 +1728,54 @@
 //     return 0;
 // }
 
-struct film{
-    char name[20];
-    int money;
-    struct film *next;
-};
-struct film* creatlist(struct film *node){
-        node=NULL;
-        return node;
-}
-void insert(struct film**head,int m){
-    struct film*newnode=(struct film*)malloc(sizeof(struct film));
-    newnode->money=m;
-    newnode->next=*head;
-    *head=newnode;
-}
-void printlist(struct film*head){
-    while(head!=NULL){
-        printf("%d ",(head)->money);
-        head=head->next;
-    }
-}
-void dele(struct film**head,int flag){
-    struct film *temp=*head,*front;
-    if(temp==NULL) return;
-    while(temp!=NULL&&temp->money!=flag){
-        front=temp;
-        temp=temp->next;
-    }
-    if(temp->money==flag){
-        if(temp==*head){
-            temp=temp->next;
-        }else{
-            front->next=temp->next;
-        }
-        free(temp);
-    }
-}
-int main(){
-    struct film *head=creatlist(head);
-    insert(&head,1);
-    insert(&head,2);
-    insert(&head,3);
-    printlist(head);
-    dele(&head, 2);
-    printf("\n");
-    printlist(head);
-    return 0;
-}
+// struct film{
+//     char name[20];
+//     int money;
+//     struct film *next;
+// };
+// struct film* creatlist(struct film *node){
+//         node=NULL;
+//         return node;
+// }
+// void insert(struct film**head,int m){
+//     struct film*newnode=(struct film*)malloc(sizeof(struct film));
+//     newnode->money=m;
+//     newnode->next=*head;
+//     *head=newnode;
+// }
+// void printlist(struct film*head){
+//     while(head!=NULL){
+//         printf("%d ",(head)->money);
+//         head=head->next;
+//     }
+// }
+// void dele(struct film**head,int flag){
+//     struct film *temp=*head,*front;
+//     if(temp==NULL) return;
+//     while(temp!=NULL&&temp->money!=flag){
+//         front=temp;
+//         temp=temp->next;
+//     }
+//     if(temp->money==flag){
+//         if(temp==*head){
+//             temp=temp->next;
+//         }else{
+//             front->next=temp->next;
+//         }
+//         free(temp);
+//     }
+// }
+// int main(){
+//     struct film *head=creatlist(head);
+//     insert(&head,1);
+//     insert(&head,2);
+//     insert(&head,3);
+//     printlist(head);
+//     dele(&head, 2);
+//     printf("\n");
+//     printlist(head);
+//     return 0;
+// }
 
 // int main(int argc,char **argv){
 //     int n=0,left=0;
@@ -1791,3 +1793,14 @@ int main(){
 //     return a;
 //     return 0;
 // }
+
+int main(){
+    int aln[]={1,5,4,31,2};
+    int *kl=(int *)malloc(sizeof(int)*5);
+    kl=aln;
+    for(int i=0;i<5;i++){
+        printf("%d ",kl[i]);
+    }
+    // free(kl);
+    return 0;
+}
