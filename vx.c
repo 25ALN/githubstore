@@ -1794,13 +1794,42 @@
 //     return 0;
 // }
 
+// int main(){
+//     int aln[]={1,5,4,31,2};
+//     int *kl=(int *)malloc(sizeof(int)*5);
+//     kl=aln;
+//     for(int i=0;i<5;i++){
+//         printf("%d ",kl[i]);
+//     }
+//     // free(kl);
+//     return 0;
+// }
+
+// #include <stdio.h>
+// #include <string.h>
+// #include <unistd.h>
+// #include <getopt.h>
+// int main(int argc,char**argv){
+//         int flag;
+//         char *str="a::b:c:d";
+//         while((flag=getopt(argc,argv,str))!=-1){
+//            printf("flag = %c\t\t",flag);
+//            printf("optarg = %s\t\t",optarg);
+//            printf("optind = %d\t\t",optind);
+//            printf("argv[optind] = %s\n",argv[optind]);
+// }
+// return 0;
+// }
+
 int main(){
-    int aln[]={1,5,4,31,2};
-    int *kl=(int *)malloc(sizeof(int)*5);
-    kl=aln;
-    for(int i=0;i<5;i++){
-        printf("%d ",kl[i]);
+    const char *str=(char *)malloc(sizeof(char)*100);
+    *str="A man, a plan, a canal: Panamad!";
+    while (*str) {
+        *str = tolower(*str);
+        str++;
     }
-    // free(kl);
+    printf("%s",str);
+    free(str);
     return 0;
 }
+
