@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <dirent.h>
+
 
 // typedef int (*Predicate)(int);
 // int *filter(int *array, int length, Predicate predicate,
@@ -1821,15 +1823,26 @@
 // return 0;
 // }
 
+// void toLowerString(char *str) {
+//     while (*str) {
+//         *str = tolower(*str);
+//         str++;
+//     }
+// }
+// int main() {
+//     char str = "HELLO, WORLD!";
+//     toLowerString(str);
+//     printf("Lowercase: %sn", str);
+//     return 0;
+// }
+
 int main(){
-    const char *str=(char *)malloc(sizeof(char)*100);
-    *str="A man, a plan, a canal: Panamad!";
-    while (*str) {
-        *str = tolower(*str);
-        str++;
-    }
-    printf("%s",str);
-    free(str);
+    // printf("color\n");
+    // printf("color\n");
+    // printf("\033[32;1m color\033[0m\n");//  粗体和绿色
+    char str1[]="abc";
+    char str2[]="def";
+    strncat(str1,str2,3);
+    printf("%s",str1);
     return 0;
 }
-
