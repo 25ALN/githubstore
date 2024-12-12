@@ -1836,13 +1836,122 @@
 //     return 0;
 // }
 
-int main(){
-    // printf("color\n");
-    // printf("color\n");
-    // printf("\033[32;1m color\033[0m\n");//  粗体和绿色
-    char str1[]="abc";
-    char str2[]="def";
-    strncat(str1,str2,3);
-    printf("%s",str1);
+// int main(){
+//     // printf("color\n");
+//     // printf("color\n");
+//     // printf("\033[32;1m color\033[0m\n");//  粗体和绿色
+//     char str1[]="abc";
+//     char str2[]="def";
+//     strncat(str1,str2,3);
+//     printf("%s",str1);
+//     return 0;
+// }
+
+// typedef struct con con;
+// struct con{
+//     int xh;
+//     char name[20];
+//     char tel[20];
+//     struct con *next;
+// };
+// con* creatList(){
+//     con*node=(con*)malloc(sizeof(con));
+//     int n;
+//     scanf("%d",&n);
+//     for(int i=0;i<n;i++){
+//         scanf("%d",&node->xh);
+//         scanf("%s",node->name);
+//         scanf("%s",node->tel);
+//         node=node->next;
+//     }
+//     node->next=NULL;
+//     return node;
+// }
+// int main(){
+//     con *head,*p;
+//     head=creatList();
+//     for(p=head;p!=NULL;p=p->next )
+//         printf("%d %s %s\n",p->xh ,p->name ,p->tel );
+//     return 0;
+// }
+
+// struct ListNode {
+//     int data;
+//     struct ListNode *next;
+// };
+
+// struct ListNode *Createlist(int n);
+// struct ListNode *Del_absrepeat( struct ListNode **head );
+// void Printlist(struct ListNode *head);
+// int main()
+// {
+//     struct ListNode *head = NULL,*head2=NULL;
+//     int n;
+//     scanf("%d",&n);
+//     head = Createlist(n);
+//     printf("原始链表：");
+//     Printlist(head);
+        
+//    head2=Del_absrepeat( &head );
+//    printf("删除重复结点的链表：");
+//    Printlist(head);
+    
+//    printf("被删除的结点组成的链表：");
+//    Printlist(head2);
+//    return 0;
+// }
+// void Printlist(struct ListNode *head)
+// {
+//     struct ListNode *p;
+//     for ( p = head; p != NULL; p = p->next )
+//             printf("%d ", p->data);
+//         printf("\n");
+// }
+// struct ListNode *Createlist(int n){
+//     struct ListNode*node=(struct ListNode*)malloc(sizeof(struct ListNode));
+//     struct ListNode*b;
+//     b->next=NULL;
+//     for(int i=0;i<n;i++){
+//         scanf("%d",&node->data);
+//         b->next=node;
+//         node=b;
+//     }
+//     return node;
+// }
+// struct ListNode *Del_absrepeat( struct ListNode **head ){
+//     struct ListNode*Node=(struct ListNode*)malloc(sizeof(struct ListNode));
+//     Node=*head;
+//     while(Node->data==Node->next->data&&Node->next!=NULL){
+//         Node=Node->next->next;
+//     }
+//     return Node;
+// }
+
+
+typedef struct ListNode {
+    int num;
+    struct ListNode *next;
+}Node;
+Node *createlist();
+Node* list_reverse(Node* head);
+void display(Node *head);
+int main(void)
+{
+    Node  *head,*p;
+    head = createlist();    
+    head = list_reverse(head);
+    display(head);
     return 0;
+}
+Node* list_reverse(Node* head){
+    Node*be,*end,*Head;
+    Head=head;
+    while(head->next!=NULL){
+        be=head->next;
+        end=head->next->next;
+        Head=be;
+        Head->next=end;
+        head=head->next;
+    }
+    return head;
 }
