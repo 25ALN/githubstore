@@ -1909,12 +1909,14 @@
 // }
 // struct ListNode *Createlist(int n){
 //     struct ListNode*node=(struct ListNode*)malloc(sizeof(struct ListNode));
-//     struct ListNode*b;
-//     b->next=NULL;
 //     for(int i=0;i<n;i++){
-//         scanf("%d",&node->data);
-//         b->next=node;
-//         node=b;
+//         struct ListNode*tail;
+//         int a;
+//         scanf("%d",&a);
+//         node->data=a;
+//         tail->next=node;
+//         node->next=NULL;
+//         tail=node;
 //     }
 //     return node;
 // }
@@ -1927,31 +1929,117 @@
 //     return Node;
 // }
 
+// typedef struct ListNode {
+//     int num;
+//     struct ListNode *next;
+// }Node;
+// Node* list_reverse(Node* head);
+// void display(Node *head);
+// int main(void)
+// {
+//     Node  *head,*p;
+//     head = createlist();    
+//     head = list_reverse(head);
+//     display(head);
+//     return 0;
+// }
+// Node* list_reverse(Node* head){
+//     Node*pre,*cur,*next;
+//     cur=head;
+//     pre=NULL,next=NULL;
+//     while(cur!=NULL){
+//         next=cur->next;
+//         cur->next=pre;
+//         pre=cur;
+//         cur=next;
+//     }
+//     return pre;
+// }
 
-typedef struct ListNode {
-    int num;
-    struct ListNode *next;
-}Node;
-Node *createlist();
-Node* list_reverse(Node* head);
-void display(Node *head);
-int main(void)
-{
-    Node  *head,*p;
-    head = createlist();    
-    head = list_reverse(head);
-    display(head);
-    return 0;
-}
-Node* list_reverse(Node* head){
-    Node*be,*end,*Head;
-    Head=head;
-    while(head->next!=NULL){
-        be=head->next;
-        end=head->next->next;
-        Head=be;
-        Head->next=end;
-        head=head->next;
+
+//  pta4
+
+// typedef struct con con;
+// struct con{
+//     int xh;
+//     char name[20];
+//     char tel[20];
+//     struct con *next;
+// };
+// con* creatList(){
+//     con *list,*tail=NULL,*head=NULL;
+//     int n;
+//     scanf("%d",&n);
+//     while(n>0){
+//     list=(con *)malloc(sizeof(con));
+//     scanf("%d %s %s",&list->xh,list->name,list->tel);
+//     list->next=NULL;
+//     if (head == NULL) {
+//         head = list;
+//     } else {
+//         tail->next = list;
+//     }
+//     tail = list;  
+//     n--;
+//     }
+//     return head;
+// }
+// int main(){
+//     con *head,*p;
+//     head=creatList();
+//     for(p=head;p!=NULL;p=p->next )
+//         printf("%d %s %s\n",p->xh ,p->name ,p->tel );
+//     return 0;
+// }
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+/* 建立单链表并返回单链表的头指针 */
+struct Node* buildLinkedList(int* arr, int n){
+    struct Node*news=NULL,*head=NULL,*tail=NULL;
+    for(int i=0;i<n;i++){
+        news=(struct Node*)malloc(sizeof(struct Node));
+        news->data=arr[i];
+        news->next=NULL;
+        if(head==NULL) head=news;
+        else{
+            tail->next=news;
+        }
+        tail=news;
     }
     return head;
+}
+/* 求单链表值最大的结点 */
+struct Node* getMax(struct Node* head){
+    struct Node*max=head,*find=NULL;
+    find=head;
+    while(find!=NULL){
+        if(max->data<find->data){
+            max=find;
+        }
+        find=find->next;
+    }
+    return max;
+}
+
+int main(int argc, char const *argv[]) 
+{
+    int *a, n, i;
+    scanf("%d", &n);
+    a = (int*)malloc(n * sizeof(int));
+    for (i = 0; i < n; ++i) {
+        scanf("%d", &a[i]);
+    }
+    struct Node* head = NULL;
+    head = buildLinkedList(a, n);
+    struct Node* pMax = getMax(head);
+    if (pMax)
+        printf("%d\n", pMax->data);
+    else
+        printf("-1\n");
+    free(a);
+    return 0;
 }
