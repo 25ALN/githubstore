@@ -2099,7 +2099,7 @@ int main(){
 //     }
 //     return head->next;
 // }
-struct List *cl(struct List *head){
+struct List *cl(struct List *head){   //尾插法，数据顺序不变
     head=(struct List*)malloc(sizeof(struct List));
     struct List*cur=head,*tail;
     int n,x;
