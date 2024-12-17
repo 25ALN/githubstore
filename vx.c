@@ -2122,268 +2122,53 @@
 //     }
 // }
 
-void a_()
-{
-    // int main(int argc,char*argv[]){
-    const char *dir_path = "/home/aln/桌面/";
-    DIR *dirr = opendir(dir_path);
-    if (dirr == NULL)
-    {
-        perror("fail open dir");
-        return EXIT_FAILURE;
-    }
-    int i = 0;
-    struct dirent *r;
-    struct stat filestat;
-    while ((r = readdir(dirr)) != NULL)
-    {
-        i++;
-        char path[1024];
-        strcpy(path, dir_path);
-        strncat(path, r->d_name, strlen(r->d_name));
-        if (stat(path, &filestat) == -1)
-        {
-            perror("files fail");
-            continue;
-        }
-        if (i % 5 == 0)
-        {
-            printf("\n");
-        }
-        else if (S_ISDIR(filestat.st_mode))
-        {
-            printf("\033[34;1m %-15s\033[0m", r->d_name);
-        }
-        else if (S_ISREG(filestat.st_mode) && access(path, X_OK))
-        {
-            printf("\033[37;1m %-15s\033[0m", r->d_name);
-        }
-        else
-        {
-            printf("\033[32;1m %-15s\033[0m", r->d_name);
-        }
-    }
-    closedir(dirr);
+struct List{
+    int val;
+    struct List*next;
+};
+struct List *creatlist(struct List*head);
+void printlist(struct List*head);
+struct List *turnlist(struct List*head);
+int main(){
+    struct List *head;
+    head=creatlist(head);
+    printlist(head);
+    head=turnlist(head);
+    printf("\n");
+    printlist(head);
+    return 0;
 }
-void l_()
-{
-    const char *dir_path = "/home/aln/桌面/";
-    DIR *dirr = opendir(dir_path);
-    char rwx[11];
-    if (dirr == NULL)
-    {
-        perror("fail open dir");
-        return EXIT_FAILURE;
+struct List *creatlist(struct List*head){
+    int n=0,x;
+    head=(struct List*)malloc(sizeof(struct List));
+    head->next=NULL;
+    struct List*r,*cur=head;
+    scanf("%d",&n);
+    while(n){
+        r=(struct List*)malloc(sizeof(struct List));
+        scanf("%d",&x);
+        r->val=x;
+        r->next=NULL;
+        cur->next=r;
+        cur=r;
+        n--;
     }
-    int i = 0;
-    struct dirent *r;
-    struct stat filestat;
-    while ((r = readdir(dirr)) != NULL)
-    {
-        if (strcmp(r->d_name, ".") == 0 || strcmp(r->d_name, "..") == 0)
-        {
-            continue;
-        }
-        char path[1024];
-        strcpy(path, dir_path);
-        strncat(path, r->d_name, strlen(r->d_name));
-        if (stat(path, &filestat) == -1)
-        {
-            perror("files fail");
-            continue;
-        }
-        mode_t file = filestat.st_mode;
-        if (S_ISDIR(file))
-            rwx[0] = 'd';
-        else if (S_ISLNK(file))
-            rwx[0] = 'l';
-        else
-            rwx[0] = '-';
-        rwx[1] = (file & S_IRUSR) ? 'r' : '-';
-        rwx[2] = (file & S_IWUSR) ? 'w' : '-';
-        rwx[3] = (file & S_IXUSR) ? 'x' : '-';
-        rwx[4] = (file & S_IRGRP) ? 'r' : '-';
-        rwx[5] = (file & S_IWGRP) ? 'w' : '-';
-        rwx[6] = (file & S_IXGRP) ? 'x' : '-';
-        rwx[7] = (file & S_IROTH) ? 'r' : '-';
-        rwx[8] = (file & S_IWOTH) ? 'w' : '-';
-        rwx[9] = (file & S_IXOTH) ? 'x' : '-';
-        rwx[10] = '\0';
-        struct passwd *user = getpwuid(filestat.st_uid);
-        struct group *gro = getgrgid(filestat.st_gid);
-        time_t mod_time = filestat.st_mtime;
-        struct tm *tt = localtime(&mod_time);
-        char ctime[100];
-        strftime(ctime, sizeof(ctime), "%m月 %d %H:%M", tt);
-        printf("%-s %2ld %-s %-s %5ld %s ", rwx, filestat.st_nlink, user->pw_name, gro->gr_name, filestat.st_size, ctime);
-        if (S_ISDIR(filestat.st_mode))
-        {
-            printf("\033[34;1m %-15s\033[0m\n", r->d_name);
-        }
-        else if (S_ISREG(filestat.st_mode) && access(path, X_OK))
-        {
-            printf("\033[37;1m %-15s\033[0m\n", r->d_name);
-        }
-        else
-        {
-            printf("\033[32;1m %-15s\033[0m\n", r->d_name);
-        }
+    return head->next;
+}
+void printlist(struct List*head){
+    struct List*newl=head;
+    while(newl){
+        printf("%d ",newl->val);
+        newl=newl->next;
     }
 }
-void i_()
-{
-    const char *dir_path = "/home/aln/桌面/";
-    DIR *dirr = opendir(dir_path);
-    if (dirr == NULL)
-    {
-        perror("fail open dir");
-        return EXIT_FAILURE;
+struct List *turnlist(struct List *head){
+    struct List *prv=NULL,*cur=head,*xia=NULL;
+    while(cur){
+        xia=cur->next;
+        cur->next=prv;
+        prv=cur;
+        cur=xia;
     }
-    int i = 0;
-    struct dirent *r;
-    struct stat filestat;
-    while ((r = readdir(dirr)) != NULL)
-    {
-        if (strcmp(r->d_name, ".") == 0 || strcmp(r->d_name, "..") == 0)
-        {
-            continue;
-        }
-        i++;
-        char path[1024];
-        strcpy(path, dir_path);
-        strncat(path, r->d_name, strlen(r->d_name));
-        if (stat(path, &filestat) == -1)
-        {
-            perror("files fail");
-            continue;
-        }
-        stat(path, &filestat);
-        printf("%ld ", (long)filestat.st_ino);
-        if (S_ISDIR(filestat.st_mode))
-        {
-            printf("\033[34;1m %-15s\033[0m", r->d_name);
-        }
-        else if (S_ISREG(filestat.st_mode) && access(path, X_OK))
-        {
-            printf("\033[37;1m %-15s\033[0m", r->d_name);
-        }
-        else
-        {
-            printf("\033[32;1m %-15s\033[0m", r->d_name);
-        }
-        if (i == 3)
-        {
-            printf("\n");
-            i = 0;
-        }
-    }
-}
-void s_()
-{
-    const char *dir_path = "/home/aln/桌面/";
-    DIR *dirr = opendir(dir_path);
-    if (dirr == NULL)
-    {
-        perror("fail open dir");
-        return EXIT_FAILURE;
-    }
-    int i = 0;
-    struct dirent *r;
-    struct stat filestat;
-    while ((r = readdir(dirr)) != NULL)
-    {
-        if (strcmp(r->d_name, ".") == 0 || strcmp(r->d_name, "..") == 0)
-        {
-            continue;
-        }
-        i++;
-        char path[1024];
-        strcpy(path, dir_path);
-        strncat(path, r->d_name, strlen(r->d_name));
-        if (stat(path, &filestat) == -1)
-        {
-            perror("files fail");
-            continue;
-        }
-        stat(path, &filestat);
-        printf("%2ld ", filestat.st_blocks / 2);
-        if (i == 5)
-        {
-            printf("\n");
-            i = 0;
-        }
-        if (S_ISDIR(filestat.st_mode))
-        {
-            printf("\033[34;1m %-14s\033[0m", r->d_name);
-        }
-        else if (S_ISREG(filestat.st_mode) && access(path, X_OK))
-        {
-            printf("\033[37;1m %-14s\033[0m", r->d_name);
-        }
-        else
-        {
-            printf("\033[32;1m %-14s\033[0m", r->d_name);
-        }
-    }
-}
-int cmp(const void *a, const void *b)
-{
-    return strcmp(*(const char **)a, *(const char **)b);
-}
-void r_()
-{
-    const char *dir_path = "/home/aln/桌面/";
-    DIR *dirr = opendir(dir_path);
-    if (dirr == NULL)
-    {
-        perror("fail open dir");
-        return EXIT_FAILURE;
-    }
-    char *file_num[1024];
-    int j = 0, i = 0, filenum = 0;
-    struct dirent *r;
-    struct stat filestat;
-    while ((r = readdir(dirr)) != NULL)
-    {
-        if (strcmp(r->d_name, ".") == 0 || strcmp(r->d_name, "..") == 0)
-        {
-            continue;
-        }
-        char path[1024];
-        strcpy(path, dir_path);
-        strncat(path, r->d_name, strlen(r->d_name));
-        if (stat(path, &filestat) == -1)
-        {
-            perror("files fail");
-            continue;
-        }
-        file_num[filenum] = strdup(r->d_name);
-        filenum++;
-    }
-    qsort(file_num, filenum, sizeof(char *), cmp);
-    int x = 0;
-    for (j = filenum - 1; j >= 0; j--)
-    {
-        if (S_ISDIR(filestat.st_mode))
-        {
-            printf("\033[34;1m %-14s\033[0m", file_num[j]);
-        }
-        else if (S_ISREG(filestat.st_mode) && access(file_num[j], X_OK))
-        {
-            printf("\033[37;1m %-14s\033[0m", file_num[j]);
-        }
-        else
-        {
-            printf("\033[32;1m %-14s\033[0m", file_num[j]);
-        }
-        x++;
-        if (x == 5)
-        {
-            printf("\n");
-            x = 0;
-        }
-        free(file_num[j]);
-    }
-    closedir(dirr);
-    return EXIT_SUCCESS;
+    return prv;
 }
