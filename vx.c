@@ -7,7 +7,9 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <dirent.h>
-
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <signal.h>
 
 // typedef int (*Predicate)(int);
 // int *filter(int *array, int length, Predicate predicate,
@@ -88,15 +90,13 @@
 //     return 0;
 // }
 
-
-
 // union data {
 //     int a;
 //     double b;
 //     short c;
 // };
 // typedef struct node {
-//     long long a;      
+//     long long a;
 //     union data b;
 //     void (*change)( struct node *n);
 //     char string[0];
@@ -177,7 +177,7 @@
 // while(b!=0){
 //     t=a%b;
 // 	a=b;
-// 	b=t; 
+// 	b=t;
 // }
 //  m=x*y/a;
 // printf("%d,%d",a,m);
@@ -452,7 +452,7 @@
 //       x=i;
 //       while(x>0){
 //         sum+=x%10;
-//         x/=10; 
+//         x/=10;
 //       }
 //       if(sum==n){
 //         printf("%8d",i);
@@ -467,20 +467,20 @@
 //     return 0;
 // }
 
-//菱形
-// int main(){
-//     int n;
-//     char x='*';
-//     scanf("%d",&n);
-//     for(int i=1;i<=n;i+2){
-//         printf("%*c ",n-i,x);
-//         for(int j=1;j<=(n-i)/2;j++){
-//             printf("* ");
-//         }
-//         printf("\n");
-//     }
-//     return 0;
-// }
+// 菱形
+//  int main(){
+//      int n;
+//      char x='*';
+//      scanf("%d",&n);
+//      for(int i=1;i<=n;i+2){
+//          printf("%*c ",n-i,x);
+//          for(int j=1;j<=(n-i)/2;j++){
+//              printf("* ");
+//          }
+//          printf("\n");
+//      }
+//      return 0;
+//  }
 
 // int jiec(int n){
 //     if(n==1){
@@ -531,7 +531,7 @@
 // int main(){
 //     char ch[100];
 //     int h=0,aln[1000],k=0,cnt=0;
-    
+
 //     for(int i=0; ;i++){
 //        scanf("%c",&ch[i]);
 //        if(ch[i]!=' '&&ch[i]!='.'){
@@ -540,13 +540,13 @@
 //         if(k==0&&cnt!=0){
 //             printf("%d",cnt);
 //             k++;
-//         }else if(cnt!=0){ 
+//         }else if(cnt!=0){
 //         printf(" %d",cnt);
 //         k++;
 //         }
 //         cnt=0;
 //        }
-//        if(ch[i]=='.') break;  
+//        if(ch[i]=='.') break;
 //     }
 //     return 0;
 // }
@@ -590,9 +590,9 @@
 // }
 
 // struct strbuf {
-//   int len;     
-//   int alloc;   
-//   char *buf;   
+//   int len;
+//   int alloc;
+//   char *buf;
 // };
 // void strbuf_insert(struct strbuf *sb, size_t pos, const void *data, size_t len){
 //     strncat(sb->buf,(char*)data,len);
@@ -602,12 +602,11 @@
 //     struct strbuf *sn;
 //     char *str;
 //     sn->buf="loveforvevr";
-//     scanf("%s",str);    
+//     scanf("%s",str);
 //     int len=strlen(str);
 //     strbuf_insert(sn,4,str,len);
 //     return 0;
 // }
-
 
 // int main(){
 //     int a,b;
@@ -622,7 +621,6 @@
 //     }
 //     return 0;
 // }
-
 
 // int main(){
 //     int n,aln1,aln2,i=0;
@@ -640,7 +638,7 @@
 //         if(j==0){
 //           printf("%s",*(aln+j));
 //         }else{
-//          printf("\n%s",*(aln+j)); 
+//          printf("\n%s",*(aln+j));
 //         }
 //       }
 //     return 0;
@@ -657,13 +655,13 @@
 //         scanf("%s %d %d", name, &a, &b);
 //         if (a < 15 || a > 20 || b < 50 || b > 70) {
 //             snprintf(names[count], sizeof(names[count]), "%s", name);
-//             count++;  
+//             count++;
 //         }
 //     }
 //     for (int i = 0; i < count; i++) {
 //         printf("%s\n", names[i]);
 //     }
-    
+
 //     return 0;
 // }
 
@@ -699,7 +697,6 @@
 //     return 0;
 // }
 
-
 // int main(){
 //     char *s;
 //     s=(char*)malloc(100*sizeof(char));
@@ -719,7 +716,7 @@
 // int main()
 // {
 //    FILE *fp = NULL;
- 
+
 //    fp = fopen("/tmp/test.txt", "w+");
 //    fprintf(fp, "This is testing for fprintf...\n");
 //    fputs("This is testing for fputs...\n", fp);
@@ -760,7 +757,7 @@
 //       for(int j=i;j<x-i;j++){
 //          aln[i][j]=ch;
 //       }
-//       for(int z=i+1;z<x-i-1;z++){                      
+//       for(int z=i+1;z<x-i-1;z++){
 //          aln[z][i]=ch;
 //          aln[z][x-1-i]=ch;
 //       }
@@ -839,7 +836,7 @@
 //        if(max<aln[j]){
 //         max=aln[j];
 //         b=j;
-//        } 
+//        }
 //     }
 //     printf("min=%d max=%d\n",min,max);
 //     printf("a=%d b=%d\n",a,b);
@@ -852,7 +849,7 @@
 //        if(max<aln[j]){
 //         max=aln[j];
 //         b=j;
-//        } 
+//        }
 //     }
 //     swap(&aln[n-1],&aln[b]);
 //     }
@@ -884,8 +881,7 @@
 //     return 0;
 // }
 
-
-//pta5
+// pta5
 
 // int main(){
 //     int aln1[20]={0},aln2[20]={0},c[20]={0},a=0,cnt=0;
@@ -1050,24 +1046,23 @@
 //    return 0;
 // }
 
-// //二阶 fun1 
+// //二阶 fun1
 // int fun1(int arr[2][2],int i,int m,int n)
 // {
 //     int res2;
 //     //i=0,n=1,m=0
 //     res2=arr[i][m]*arr[i+1][n]-arr[i][n]*arr[i+1][m];
 //     return res2;
-//  } 
- 
-// //从三阶行列式中框选出二阶行列式 
-// int (*cut(int arr2[3][3], int x, int y,int arr3[2][2]))[2] //x表示需要删除的行数，y表示需要删除的列数 
+//  }
+
+// //从三阶行列式中框选出二阶行列式
+// int (*cut(int arr2[3][3], int x, int y,int arr3[2][2]))[2] //x表示需要删除的行数，y表示需要删除的列数
 //  {
 //      static int static_arr3[2][2];
-     
+
 //      int a=0;
 //      int b=0;
 //      int i,j;
-     
 
 //      for(i=0;i<3;i++){
 //          if(i==x){
@@ -1081,10 +1076,10 @@
 //         b++;
 //         }
 //     a++;
-//     b=0; //处理完一行后，将索引重置为0 
+//     b=0; //处理完一行后，将索引重置为0
 //     if(a==2){
 //         break;
-//     } 
+//     }
 //     }
 //     int (*arr4)[2]=static_arr3;
 //     return arr4;
@@ -1093,22 +1088,21 @@
 //  //三阶 fun2
 // int fun2(int arr1[3][3])
 //  {    int arrA[2][2],arrB[2][2],arrC[2][2];
-//      cut(arr1,0,0,arrA); //分别表示出对应的二阶行列式 //  a00 a01 a02 
+//      cut(arr1,0,0,arrA); //分别表示出对应的二阶行列式 //  a00 a01 a02
 //     cut(arr1,0,1,arrB);                                   //  a10 a11 a12
 //     cut(arr1,0,2,arrC);                                 //  a20 a21 a22
 //      int n[3];
 //      n[0]=fun1(arrA,1,1,2);        //j=0:m=1,n=2
 //     n[1]=fun1(arrB,1,0,2);        //j=1:m=0,n=2
 //     n[2]=fun1(arrC,1,0,1);        //j=2:m=0,n=1
-    
-    
+
 //     int res3=0;
 //     int j;
 //      for(j=0;j<3;j++){
 //          res3+=(int)pow(-1, j)*n[j]*arr1[0][j];
 //      }
 //     return res3;
-     
+
 //    }
 
 // int reverse(int x) {
@@ -1250,10 +1244,9 @@
 //     qsort(aln,len,sizeof(int),cmp);
 //     for(int i=0;i<len;i++){
 //         printf("%d ",aln[i]);
-//     }              
+//     }
 //     return 0;
 // }
-
 
 // int reverse( int number ){
 //     int y=0;
@@ -1272,7 +1265,7 @@
 //     }
 //     return y;
 // }
-    
+
 // int main()
 // {
 //     int n;
@@ -1297,7 +1290,7 @@
 //     return cos;
 // }
 // int main()
-// {    
+// {
 //     double e, x;
 //     scanf("%lf %lf", &e, &x);
 //     printf("cos(%.2f) = %.6f\n", x, funcos(e, x));
@@ -1315,7 +1308,7 @@
 //             }
 //         }
 //     }
-//     return isprime; 
+//     return isprime;
 // }
 // int main(){
 //     int cnt=0,n,k,p=0,sum=0;;
@@ -1372,24 +1365,24 @@
 //         {	printf("1-Ball\n2-Cylinder\n3-Cone\nother-Exit\nPlease enter your command:\n");
 //             scanf("%d",&num);
 //             if(!(num==1||num==2||num==3))
-//                 break;	
-//             if(num==1)	
+//                 break;
+//             if(num==1)
 //             {
 //                 printf("Please enter the radius:\n");
 //                 scanf("%lf",&r);
-//                 v=4.0/3*p*(r*r*r);                                                                                       
+//                 v=4.0/3*p*(r*r*r);
 //                 printf("%.2lf\n",v);
 //                 continue;
 //             }
-//             if(num==2)	 
-//             {	
+//             if(num==2)
+//             {
 //                 printf("Please enter the radius and the height:\n");
 //                 scanf("%lf %lf",&r,&h);
 //                 v=p*(r*r)*h;
 //                 printf("%.2lf\n",v);
 //                 continue;
 //             }
-//             if(num==3)	
+//             if(num==3)
 //             {
 //                 printf("Please enter the radius and the height:\n");
 //                 scanf("%lf %lf",&r,&h);
@@ -1398,7 +1391,7 @@
 //                 continue;
 //             }
 //         }while(1);
-//         return 0; 
+//         return 0;
 //     }
 
 // int main(){
@@ -1419,7 +1412,7 @@
 //     int len=strlen(str);
 //     for(int i=0;i<len;i++){
 //         while(str[i]==flag){
-            
+
 //         }
 //     }
 //     return 0;
@@ -1524,7 +1517,7 @@
 //                 printf("%s %s",hh[i].name,hh[j].name);
 //                 isprime++;
 //                 }else{
-//                 printf("\n%s %s",hh[i].name,hh[j].name);   
+//                 printf("\n%s %s",hh[i].name,hh[j].name);
 //                 }
 //                 hh[i].sex=-2,hh[j].sex=-2;
 //             }
@@ -1543,9 +1536,9 @@
 //     while(b!=0){
 //   	t=a%b;
 // 	a=b;
-// 	b=t; 
+// 	b=t;
 //   }
-//   return a; 
+//   return a;
 // }
 // int main(){
 //     struct number chu[2];
@@ -1708,7 +1701,7 @@
 //     if (temp == NULL) return;
 //     prev->next = temp->next;
 //     free(temp);
-// } 
+// }
 // // 遍历链表
 // void traverseList(struct Node* head) {
 //     struct Node* temp = head;
@@ -1891,11 +1884,11 @@
 //     head = Createlist(n);
 //     printf("原始链表：");
 //     Printlist(head);
-        
+
 //    head2=Del_absrepeat( &head );
 //    printf("删除重复结点的链表：");
 //    Printlist(head);
-    
+
 //    printf("被删除的结点组成的链表：");
 //    Printlist(head2);
 //    return 0;
@@ -1920,7 +1913,7 @@
 //     return head;
 // }
 // struct ListNode *Del_absrepeat(struct ListNode **head) {
-//     if (*head == NULL) return NULL;  
+//     if (*head == NULL) return NULL;
 //     struct ListNode *current = *head;
 //     struct ListNode *prev = NULL;
 //     struct ListNode *deleted_head = NULL;
@@ -1961,7 +1954,7 @@
 // int main(void)
 // {
 //     Node  *head,*p;
-//     head = createlist();    
+//     head = createlist();
 //     head = list_reverse(head);
 //     display(head);
 //     return 0;
@@ -1978,7 +1971,6 @@
 //     }
 //     return pre;
 // }
-
 
 //  pta4
 
@@ -2002,7 +1994,7 @@
 //     } else {
 //         tail->next = list;
 //     }
-//     tail = list;  
+//     tail = list;
 //     n--;
 //     }
 //     return head;
@@ -2014,7 +2006,6 @@
 //         printf("%d %s %s\n",p->xh ,p->name ,p->tel );
 //     return 0;
 // }
-
 
 // pta 10
 // struct Node {
@@ -2050,7 +2041,7 @@
 //     return max;
 // }
 
-// int main(int argc, char const *argv[]) 
+// int main(int argc, char const *argv[])
 // {
 //     int *a, n, i;
 //     scanf("%d", &n);
@@ -2122,53 +2113,100 @@
 //     }
 // }
 
-struct List{
-    int val;
-    struct List*next;
+struct List
+{
+	int val;
+	struct List *next;
 };
-struct List *creatlist(struct List*head);
-void printlist(struct List*head);
-struct List *turnlist(struct List*head);
-int main(){
-    struct List *head;
-    head=creatlist(head);
-    printlist(head);
-    head=turnlist(head);
-    printf("\n");
-    printlist(head);
-    return 0;
+struct List *creatlist(struct List *head);
+void printlist(struct List *head);
+struct List *turnlist(struct List *head);
+void freelist(struct List *head);
+int main()
+{
+	struct List *head;
+	head = creatlist(head);
+	printlist(head);
+	head = turnlist(head);
+	printf("\n");
+	printlist(head);
+	freelist(head);
+	return 0;
 }
-struct List *creatlist(struct List*head){
-    int n=0,x;
-    head=(struct List*)malloc(sizeof(struct List));
-    head->next=NULL;
-    struct List*r,*cur=head;
-    scanf("%d",&n);
-    while(n){
-        r=(struct List*)malloc(sizeof(struct List));
-        scanf("%d",&x);
-        r->val=x;
-        r->next=NULL;
-        cur->next=r;
-        cur=r;
-        n--;
-    }
-    return head->next;
+struct List *creatlist(struct List *head)
+{
+	int n = 0, x;
+	head = (struct List *)malloc(sizeof(struct List));
+	head->next = NULL;
+	struct List *r, *cur = head;
+	scanf("%d", &n);
+	while (n)
+	{
+		r = (struct List *)malloc(sizeof(struct List));
+		scanf("%d", &x);
+		r->val = x;
+		r->next = NULL;
+		cur->next = r;
+		cur = r;
+		n--;
+	}
+	return head->next;
 }
-void printlist(struct List*head){
-    struct List*newl=head;
-    while(newl){
-        printf("%d ",newl->val);
-        newl=newl->next;
-    }
+void printlist(struct List *head)
+{
+	struct List *newl = head;
+	while (newl)
+	{
+		printf("%d ", newl->val);
+		newl = newl->next;
+	}
 }
-struct List *turnlist(struct List *head){
-    struct List *prv=NULL,*cur=head,*xia=NULL;
-    while(cur){
-        xia=cur->next;
-        cur->next=prv;
-        prv=cur;
-        cur=xia;
-    }
-    return prv;
+struct List *turnlist(struct List *head)
+{
+	struct List *prv = NULL, *cur = head, *xia = NULL;
+	while (cur)
+	{
+		xia = cur->next;
+		cur->next = prv;
+		prv = cur;
+		cur = xia;
+	}
+	return prv;
 }
+void freelist(struct List *head)
+{
+	struct List *current = head;
+	struct List *ne;
+	while (current != NULL)
+	{
+		ne=current->next;
+		free(current);
+		current=ne;
+	}
+	head = NULL;
+}
+
+// int main()
+// {
+//     FILE *fp;
+// 	char ch;
+// 	if((fp=fopen("test.txt","r"))==NULL){
+// 		printf("cannot open file.\n");
+// 		exit(0);
+// 	}
+// 	while((ch=fgetc(fp))!=EOF){
+// 		if(ch>='a'&&ch<='z'){
+// 			ch=ch-32;
+// 		}
+// 		putchar(ch);
+// 	}
+// 	fclose(fp);
+// 	return 0;
+//  }
+
+// int main(int argc,char *argv[]){
+//     struct winsize info;
+//     ioctl(STDIN_FILENO,TIOCGWINSZ,&info);
+//     printf("当前终端为%d行%d列\n",info.ws_row,info.ws_col);
+//     return 0;
+// }
