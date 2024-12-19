@@ -2113,78 +2113,78 @@
 //     }
 // }
 
-struct List
-{
-	int val;
-	struct List *next;
-};
-struct List *creatlist(struct List *head);
-void printlist(struct List *head);
-struct List *turnlist(struct List *head);
-void freelist(struct List *head);
-int main()
-{
-	struct List *head;
-	head = creatlist(head);
-	printlist(head);
-	head = turnlist(head);
-	printf("\n");
-	printlist(head);
-	freelist(head);
-	return 0;
-}
-struct List *creatlist(struct List *head)
-{
-	int n = 0, x;
-	head = (struct List *)malloc(sizeof(struct List));
-	head->next = NULL;
-	struct List *r, *cur = head;
-	scanf("%d", &n);
-	while (n)
-	{
-		r = (struct List *)malloc(sizeof(struct List));
-		scanf("%d", &x);
-		r->val = x;
-		r->next = NULL;
-		cur->next = r;
-		cur = r;
-		n--;
-	}
-	return head->next;
-}
-void printlist(struct List *head)
-{
-	struct List *newl = head;
-	while (newl)
-	{
-		printf("%d ", newl->val);
-		newl = newl->next;
-	}
-}
-struct List *turnlist(struct List *head)
-{
-	struct List *prv = NULL, *cur = head, *xia = NULL;
-	while (cur)
-	{
-		xia = cur->next;
-		cur->next = prv;
-		prv = cur;
-		cur = xia;
-	}
-	return prv;
-}
-void freelist(struct List *head)
-{
-	struct List *current = head;
-	struct List *ne;
-	while (current != NULL)
-	{
-		ne=current->next;
-		free(current);
-		current=ne;
-	}
-	head = NULL;
-}
+// struct List
+// {
+// 	int val;
+// 	struct List *next;
+// };
+// struct List *creatlist(struct List *head);
+// void printlist(struct List *head);
+// struct List *turnlist(struct List *head);
+// void freelist(struct List *head);
+// int main()
+// {
+// 	struct List *head;
+// 	head = creatlist(head);
+// 	printlist(head);
+// 	head = turnlist(head);
+// 	printf("\n");
+// 	printlist(head);
+// 	freelist(head);
+// 	return 0;
+// }
+// struct List *creatlist(struct List *head)
+// {
+// 	int n = 0, x;
+// 	head = (struct List *)malloc(sizeof(struct List));
+// 	head->next = NULL;
+// 	struct List *r, *cur = head;
+// 	scanf("%d", &n);
+// 	while (n)
+// 	{
+// 		r = (struct List *)malloc(sizeof(struct List));
+// 		scanf("%d", &x);
+// 		r->val = x;
+// 		r->next = NULL;
+// 		cur->next = r;
+// 		cur = r;
+// 		n--;
+// 	}
+// 	return head->next;
+// }
+// void printlist(struct List *head)
+// {
+// 	struct List *newl = head;
+// 	while (newl)
+// 	{
+// 		printf("%d ", newl->val);
+// 		newl = newl->next;
+// 	}
+// }
+// struct List *turnlist(struct List *head)
+// {
+// 	struct List *prv = NULL, *cur = head, *xia = NULL;
+// 	while (cur)
+// 	{
+// 		xia=cur->next;
+// 		cur->next=prv;
+// 		prv=cur;
+// 		cur=xia;
+// 	}
+// 	return prv;
+// }
+// void freelist(struct List *head)
+// {
+// 	struct List *current=head;
+// 	struct List *ne;
+// 	while (current!=NULL)
+// 	{
+// 		ne=current->next;
+// 		free(current);
+// 		current=ne;
+// 	}
+// 	head = NULL;
+// }
 
 // int main()
 // {
@@ -2210,3 +2210,27 @@ void freelist(struct List *head)
 //     printf("当前终端为%d行%d列\n",info.ws_row,info.ws_col);
 //     return 0;
 // }
+
+// int fb(int a){
+// 	if(a==0) return 0;
+// 	else if(a==1)return 1;
+// 	else return fb(a-1)+fb(a-2);
+// }
+int fb(int n) {
+    // 递归的基准条件
+    if (n == 0) {
+        return 0;
+    } else if (n == 1) {
+        return 1;
+    } else {
+        return fb(n - 1) + fb(n - 2); // 递归调用
+    }
+}
+int main(){
+	int x;
+	scanf("%d",&x);
+	printf("%d",fb(x));
+	return 0;
+}
+// 1 1 2 3 5
+// 1 2 4 7 12
