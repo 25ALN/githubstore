@@ -2216,21 +2216,37 @@
 // 	else if(a==1)return 1;
 // 	else return fb(a-1)+fb(a-2);
 // }
-int fb(int n) {
-    // 递归的基准条件
-    if (n == 0) {
-        return 0;
-    } else if (n == 1) {
-        return 1;
-    } else {
-        return fb(n - 1) + fb(n - 2); // 递归调用
-    }
-}
+// int fb(int n) {
+//     // 递归的基准条件
+//     if (n == 0) {
+//         return 0;
+//     } else if (n == 1) {
+//         return 1;
+//     } else {
+//         return fb(n - 1) + fb(n - 2); // 递归调用
+//     }
+// }
+// int main(){
+// 	int x;
+// 	scanf("%d",&x);
+// 	printf("%d",fb(x));
+// 	return 0;
+// }
+
 int main(){
-	int x;
-	scanf("%d",&x);
-	printf("%d",fb(x));
-	return 0;
+    int aln[]={4,1,5,6,9,8,2,3,7};
+    int n=sizeof(aln)/sizeof(aln[0]);
+    for(int i=0;i<n;i++){
+        for(int j=i;j<n;j++){
+            if(aln[j]<=aln[i]){
+                int temp=aln[j];
+                aln[j]=aln[i];
+                aln[i]=temp;
+            }
+        }
+    }
+    for(int i=0;i<n;i++){
+        printf("%d ",aln[i]);
+    }
+    return 0;
 }
-// 1 1 2 3 5
-// 1 2 4 7 12
