@@ -2233,20 +2233,12 @@
 // 	return 0;
 // }
 
+void x(char op[1024]){
+    printf("%s",op);
+}
 int main(){
-    int aln[]={4,1,5,6,9,8,2,3,7};
-    int n=sizeof(aln)/sizeof(aln[0]);
-    for(int i=0;i<n;i++){
-        for(int j=i;j<n;j++){
-            if(aln[j]<=aln[i]){
-                int temp=aln[j];
-                aln[j]=aln[i];
-                aln[i]=temp;
-            }
-        }
-    }
-    for(int i=0;i<n;i++){
-        printf("%d ",aln[i]);
-    }
+    char aln[1024];
+    scanf("%s",aln);
+    x(aln);
     return 0;
 }
