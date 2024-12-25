@@ -2211,34 +2211,53 @@
 //     return 0;
 // }
 
-// int fb(int a){
-// 	if(a==0) return 0;
-// 	else if(a==1)return 1;
-// 	else return fb(a-1)+fb(a-2);
+// struct s{
+//     int val;
+//     struct s *next;
+// };
+// struct s *suru(struct s *head){
+//     struct s *cur;
+//     head=(struct s*)malloc(sizeof(struct s));
+//     cur=head;
+//     int n;
+//     scanf("%d",&n);
+//     while(n){
+//         struct s*list;
+//         list=(struct s*)malloc(sizeof(struct s));
+//         int x;
+//         scanf("%d",&x);
+//         list->val=x;
+//         cur->next=list;
+//         cur=list;
+//         n--;
+//     }
+//     return head->next;
 // }
-// int fb(int n) {
-//     // 递归的基准条件
-//     if (n == 0) {
-//         return 0;
-//     } else if (n == 1) {
-//         return 1;
-//     } else {
-//         return fb(n - 1) + fb(n - 2); // 递归调用
+// void print(struct s*p){
+//     while(p){
+//         printf("%d ",p->val);
+//         p=p->next;
+//     }
+// }
+// void f(struct s*pr){
+//     struct s*cur;
+//     while(pr){
+//         cur=pr->next;
+//         free(pr);
+//         pr=cur;
 //     }
 // }
 // int main(){
-// 	int x;
-// 	scanf("%d",&x);
-// 	printf("%d",fb(x));
-// 	return 0;
+//     struct s *head;
+//     head=suru(head);  
+//     print(head);
+//     f(head);
+//     return 0;
 // }
 
-void x(char op[1024]){
-    printf("%s",op);
-}
 int main(){
-    char aln[1024];
-    scanf("%s",aln);
-    x(aln);
-    return 0;
+    FILE*fp=fopen("stu.txt","w");
+    char ch='x';
+    fprintf(fp,"%c",ch);
+    fclose(fp);
 }
