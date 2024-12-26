@@ -2249,15 +2249,167 @@
 // }
 // int main(){
 //     struct s *head;
-//     head=suru(head);  
+//     head=suru(head);
 //     print(head);
 //     f(head);
 //     return 0;
 // }
 
+// int main()
+// {
+//     double weight;
+//     double sum=0;
+//     scanf("%lf",&weight);
+//     if(weight<0){
+//         printf("Error!");
+//     }
+//     if(weight<=10){
+//         sum=weight*1.3;
+//     }else if(weight>10&&weight<=50){
+//         sum=10*1.3+(weight-10)*1.8;
+//     }else if(weight>50&&weight<=200){
+//         sum=10*1.3+40*1.8+(weight-50)*2.4;
+//     }else{
+//         sum=10*1.3+40*1.8+150*2.4+(weight-200)*4.5;
+//     }
+//     printf("%.2f",sum);
+//     return 0;
+// }
+
+// int main(){
+//     double z,sum=1.0;
+//     scanf("%lf",&z);
+//     z*=0.01;
+//     int cnt=0;
+//     while(sum<2){
+//         sum=sum+sum*z;
+//         cnt++;
+//     }
+//     printf("%d",cnt);
+//     return 0;
+// }
+
+// int main()
+// {
+//     int m, n, cnt = 1, temp;
+//     scanf("%d %d", &m, &n);
+//     int aln[7][7];
+//     for (int i = 1; i <= n; i++)
+//     {
+//         for (int j = 1; j <= n; j++)
+//         {
+//             scanf("%d", &aln[i][j]);
+//         }
+//     }
+//     for (int i = 1; i < n; i++)
+//     {
+//         if (m + 1 > n)
+//         {
+//             temp = aln[1][(m + 1) % n];
+//         }
+//         else
+//         {
+//             temp = aln[1][m + 1];
+//         }
+//         while (cnt < n)
+//         {
+//             if (m + 1 > n)
+//             {
+//                 aln[i][(m + 1) % n] = aln[i][cnt];
+//             }
+//             else
+//             {
+//                 aln[i][m + 1] = aln[i][cnt];
+//             }
+//             cnt++;
+//             if (cnt == n)
+//             {
+//                 aln[n][m + 1] = temp;
+//             }
+//         }
+//     }
+
+//     for (int i = 1; i <= n; i++)
+//     {
+//         for (int j = 1; j <= n; j++)
+//         {
+//             printf("%d ", aln[i][j]);
+//         }
+//         printf("\n");
+//     }
+//     return 0;
+// }
+
+// void findmax( int *px, int *py, int *pmax );
+// int main()
+// {    
+//     int max, x, y; 
+
+//     scanf("%d %d", &x, &y);
+//     findmax( &x, &y, &max );
+//     printf("%d\n", max);
+
+//     return 0;
+//     } 
+// void findmax( int *px, int *py, int *pmax ){
+//     *pmax=(*px>*py?*px:*py);
+// }
+
+// struct ListNode {
+//     int data;
+//     struct ListNode *next;
+// };
+
+// struct ListNode *createlist();
+
+// int main()
+// {
+//     struct ListNode *p, *head = NULL;
+//     head = createlist();
+//     for ( p = head; p != NULL; p = p->next )
+//         printf("%d ", p->data);
+//     printf("\n");
+//     return 0;
+// }
+// struct ListNode *createlist(){
+// struct ListNode *prv=NULL,*head;
+//     int x;
+//     head=(struct ListNode*)malloc(sizeof(struct ListNode));
+//     head->next=NULL;
+//     do{
+//         prv=(struct ListNode*)malloc(sizeof(struct ListNode));
+//         scanf("%d",&x);
+//         if(x==-1) break;
+//         prv->data=x;
+//         prv->next=head->next;
+//         head->next=prv;
+//     }while(x!=-1);
+//     head=head->next;
+//     return head;
+// }
+
+
+// int main(){
+//     int p=0,a,b,sum=0;
+//     scanf("%d %d",&a,&b);
+//     for(int i=a;i<=b;i++){
+//         for(int j=1;j<=i/2;j++){
+//             if(i%j==0&&i!=1){
+//                 sum+=j;
+//             }
+//         }
+//         if(sum==i){
+//             p=1;
+//         printf("%d\n",i);
+//         }
+//         sum=0;
+//     }
+//     if(p==0) printf("None");
+//     return 0;
+// }
+
 int main(){
-    FILE*fp=fopen("stu.txt","w");
-    char ch='x';
-    fprintf(fp,"%c",ch);
-    fclose(fp);
+    int a[2][3]={2,4,6,8,10,12};
+    printf("%d",*(*(a+1)+0));
+    return 0;
 }
