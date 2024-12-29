@@ -2327,6 +2327,7 @@
 //                 aln[n][m + 1] = temp;
 //             }
 //         }
+//         cnt=1;
 //     }
 
 //     for (int i = 1; i <= n; i++)
@@ -2408,8 +2409,131 @@
 //     return 0;
 // }
 
+// int main() {
+//     int m, n;
+//     scanf("%d %d", &m, &n);
+//     int matrix[n][n];
+//     for (int i = 0; i < n; i++) {
+//         for (int j = 0; j < n; j++) {
+//             scanf("%d", &matrix[i][j]);
+//         }
+//     }
+//     for (int i = 0; i < n; i++) {
+//         int temp[n];
+//         for (int j = 0; j < n; j++) {
+//             temp[(j + m) % n] = matrix[i][j];
+//         }
+//         for (int j = 0; j < n; j++) {
+//             printf("%d ", temp[j]);
+//         }
+//         printf("\n");  
+//     }
+//     return 0;
+// }
+
+// void factorize(long int N) {
+//     int first = 1;  
+//     if (N % 2 == 0) {
+//         int count = 0;
+//         while (N % 2 == 0) {
+//             count++;
+//             N /= 2;
+//         }
+//         if (!first) {
+//             printf("*");
+//         }
+//         printf("2");
+//         if (count > 1) {
+//             printf("^%d", count);
+//         }
+//         first = 0;
+//     }
+//     for (long int i = 3; i * i <= N; i += 2) {
+//         if (N % i == 0) {
+//             int count = 0;
+//             while (N % i == 0) {
+//                 count++;
+//                 N /= i;
+//             }
+//             if (!first) {
+//                 printf("*");
+//             }
+//             printf("%ld", i);
+//             if (count > 1) {
+//                 printf("^%d", count);
+//             }
+//             first = 0;
+//         }
+//     }
+//     if (N > 1) {
+//         if (!first) {
+//             printf("*");
+//         }
+//         printf("%ld", N);
+//     }
+//     printf("\n");
+// }
+// int main() {
+//     long int N;
+//     scanf("%ld", &N);  
+//     printf("%ld=",N);
+//     factorize(N); 
+//     return 0;
+// }
+
+struct list{
+    int val;
+    struct list*next;
+};
+struct list*tou(struct list*head){
+    struct list *prv=NULL;
+    head=(struct list*)malloc(sizeof(struct list));
+    head->next=NULL;
+    int n;
+    scanf("%d",&n);
+    while(n){
+        prv=(struct list*)malloc(sizeof(struct list));
+        scanf("%d",&prv->val);
+        prv->next=head->next;
+        head->next=prv;
+        n--;
+    }
+    head=head->next;
+    return head;
+}
+void print(struct list *p)
+{
+    while(p){
+        printf("%d ",p->val);
+        p=p->next;
+    }
+}
+void f(struct list *fr){
+    struct list *cur;
+    while(fr){
+        cur=fr->next;
+        free(fr);
+        fr=cur;
+    }
+}
+struct list*turn(struct list*head){
+    struct list*cur,*prv=NULL,*Next;
+    cur=head;
+    while(cur){
+        Next=cur->next;
+        cur->next=prv;
+        prv=cur;
+        cur=Next;
+    }
+    return prv;
+}
 int main(){
-    int a[2][3]={2,4,6,8,10,12};
-    printf("%d",*(*(a+1)+0));
+    struct list *head;
+    head=tou(head);
+    print(head);
+    printf("\n");
+    head=turn(head);
+    print(head);
+    f(head);
     return 0;
 }
