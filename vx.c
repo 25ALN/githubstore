@@ -2481,59 +2481,82 @@
 //     return 0;
 // }
 
-struct list{
-    int val;
-    struct list*next;
-};
-struct list*tou(struct list*head){
-    struct list *prv=NULL;
-    head=(struct list*)malloc(sizeof(struct list));
-    head->next=NULL;
-    int n;
-    scanf("%d",&n);
-    while(n){
-        prv=(struct list*)malloc(sizeof(struct list));
-        scanf("%d",&prv->val);
-        prv->next=head->next;
-        head->next=prv;
-        n--;
-    }
-    head=head->next;
-    return head;
-}
-void print(struct list *p)
-{
-    while(p){
-        printf("%d ",p->val);
-        p=p->next;
-    }
-}
-void f(struct list *fr){
-    struct list *cur;
-    while(fr){
-        cur=fr->next;
-        free(fr);
-        fr=cur;
-    }
-}
-struct list*turn(struct list*head){
-    struct list*cur,*prv=NULL,*Next;
-    cur=head;
-    while(cur){
-        Next=cur->next;
-        cur->next=prv;
-        prv=cur;
-        cur=Next;
-    }
-    return prv;
-}
+// struct list{
+//     int val;
+//     struct list*next;
+// };
+// // struct list*tou(struct list*head){
+// //     struct list *prv;
+// //     head=(struct list*)malloc(sizeof(struct list));
+// //     head->next=NULL;
+// //     int n;
+// //     scanf("%d",&n);
+// //     while(n){
+// //         prv=(struct list*)malloc(sizeof(struct list));
+// //         scanf("%d",&prv->val);
+// //         prv->next=head->next;
+// //         head->next=prv;
+// //         n--;
+// //     }
+// //     head=head->next;
+// //     return head;
+// // }
+
+// struct list *tail(struct list*head){
+//     struct list*pre,*cur=head;
+//     int n;
+//     scanf("%d",&n);
+//     while(n){
+//         pre=(struct list*)malloc(sizeof(struct list));
+//         scanf("%d",&pre->val);
+//         cur->next=pre;
+//         cur=pre;
+//         n--;
+//     }
+//     return head->next;
+// }
+// void print(struct list *p)
+// {
+//     while(p){
+//         printf("%d ",p->val);
+//         p=p->next;
+//     }
+// }
+// void f(struct list *fr){
+//     struct list *cur;
+//     while(fr){
+//         cur=fr->next;
+//         free(fr);
+//         fr=cur;
+//     }
+// }
+// struct list*turn(struct list*head){
+//     struct list*cur,*prv,*Next;
+//     cur=head;
+//     while(cur){
+//         Next=cur->next;
+//         cur->next=prv;
+//         prv=cur;
+//         cur=Next;
+//     }
+//     return prv;
+// }
+// int main(){
+//     struct list *head;
+//     head=tail(head);
+//     //head=tou(head);
+//     print(head);
+//     printf("\n");
+//     head=turn(head);
+//     print(head);
+//     f(head);
+//     return 0;
+// }
+
 int main(){
-    struct list *head;
-    head=tou(head);
-    print(head);
-    printf("\n");
-    head=turn(head);
-    print(head);
-    f(head);
+    int a,b,c;
+    c=2;
+    a=b=c;
+    printf("a=%d b=%d c=%d",a,b,c);
     return 0;
 }
