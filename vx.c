@@ -2553,10 +2553,9 @@
 //     return 0;
 // }
 
-int main(){
-    int a,b,c;
-    c=2;
-    a=b=c;
-    printf("a=%d b=%d c=%d",a,b,c);
+int main(int argc,char *argv[])
+{
+    printf("%d\n",argc);
+    printf("%s",argv[0]);
     return 0;
 }
