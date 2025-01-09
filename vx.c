@@ -2553,9 +2553,12 @@
 //     return 0;
 // }
 
-int main(int argc,char *argv[])
-{
-    printf("%d\n",argc);
-    printf("%s",argv[0]);
+int multiply(int A, int B) {
+    if(B==1) return A;
+    return A+multiply(A,B-1);
+}
+int main(){
+    int a=3,b=4;
+    printf("%d",multiply(a,b));
     return 0;
 }
