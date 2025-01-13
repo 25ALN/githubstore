@@ -2553,12 +2553,20 @@
 //     return 0;
 // }
 
-int multiply(int A, int B) {
-    if(B==1) return A;
-    return A+multiply(A,B-1);
-}
-int main(){
-    int a=3,b=4;
-    printf("%d",multiply(a,b));
+// int multiply(int A, int B) {
+//     if(B==1) return A;
+//     return A+multiply(A,B-1);
+// }
+// int main(){
+//     int a=3,b=4;
+//     printf("%d",multiply(a,b));
+//     return 0;
+// }
+
+int main(int argc,char *argv[]){
+    char stl[1024]="finsh it/";
+    char *ui;
+    ui=stl;
+    printf("%s",ui);
     return 0;
 }
