@@ -2563,10 +2563,22 @@
 //     return 0;
 // }
 
-int main(int argc,char *argv[]){
-    char stl[1024]="finsh it/";
-    char *ui;
-    ui=stl;
-    printf("%s",ui);
+#define r 100
+struct Stack{
+    int *top;
+    int *base;
+    int capacity;
+};
+int creatstack(struct Stack *s);
+int main(){
+    struct Stack *stack;
+    
+
     return 0;
+}
+int creatstack(struct Stack *s){
+    if(s!=NULL){
+        s->capacity=r;
+    }
+    
 }
