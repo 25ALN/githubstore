@@ -2570,15 +2570,44 @@ struct Stack{
     int capacity;
 };
 int creatstack(struct Stack *s);
+int stackempty(struct Stack *s);
+int stackfull(struct Stack *s);
+int getstack(struct Stack *s);
+int instack(struct Stack *s,int data);
 int main(){
+    int num;
     struct Stack *stack;
-    
+    creatstack(stack);
+    if(!stackempty(stack)) 
+    printf("stack is empty");
+    if(!stackfull(stack))
+    printf("stack is full");
 
+    num=getstack(stack);
     return 0;
 }
 int creatstack(struct Stack *s){
-    if(s!=NULL){
-        s->capacity=r;
+    s->base=(int *)malloc(sizeof(int)*r);
+    if(!s->base) return 0;
+    s->base=s->top;
+    s->capacity=r;
+}
+int stackempty(struct Stack *s){
+    return s->base==s->top;
+}
+int stackfull(struct Stack *s){
+    return s->top-s->base==s->capacity;
+}
+int getstack(struct Stack *s){
+    int val;
+    if(s->top==s->base) return 0;
+    val=s->top--;
+    return val;
+}
+int instack(struct Stack *s,int data){
+    if(s->top-s->base>=s->capacity){
+        s->top=(int*)realloc(s->top,sizeof(int)*(s->capacity+1));
+        
     }
-    
+
 }
