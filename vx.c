@@ -2627,38 +2627,60 @@
 //     return num;
 // }
 
-// struct Stack{
-//     int capacity;
-//     int top;
-//     int *move;
-// };
-// void stackcreat(struct Stack *s);
-// void stackin(struct Stack *s,int data);
-// int main(){
-//     struct Stack *stack;
-//     return 0;   
-// }
-// void stackcreat(struct Stack *s){
-//     s->top=0;
-//     s->capacity=0;
-//     s->move=NULL;
-// }
-// void stackpush(struct Stack *s,int data){
-//     if(s->top>=s->capacity){
-//         s->move=(int *)realloc(s->move,sizeof(int)*(s->capacity*2));
-//         if(s->move==NULL){
-//             perror("realloc fail");
-//             return;
-//         }
-//         s->capacity=s->capacity*2;
-//     }
-
-// }
-
+struct Stack{
+    int capacity;
+    int top;
+    int *move;
+};
+void stackcreat(struct Stack *s);
+void StackPush(struct Stack *s,int data);
+int stackout(struct Stack *s);
+void stackdestroy(struct Stack *s);
+int stackempty(struct Stack *s);
 int main(){
-    char p[1024];
-    char op[1024];
-    op[0]='c';
-    printf("%d\n%d",sizeof(p),sizeof(op));
-    return 0;
+    struct Stack stack;
+    stackcreat(&stack);
+    StackPush(&stack, 1);
+	StackPush(&stack, 2);
+    StackPush(&stack, 3);
+    StackPush(&stack, 4);
+    StackPush(&stack, 5);
+    while(!stackempty(&stack)){
+        printf("%d ",stackout(&stack));
+    }
+    stackdestroy(&stack);
+    return 0;   
+}
+int stackempty(struct Stack *s){
+    return s->top==0;
+}
+void stackcreat(struct Stack *s){
+    s->top=0;
+    s->capacity=4;
+    s->move=(int *)malloc(sizeof(int)*4);
+    //s->move=NULL;
+}
+void StackPush(struct Stack *s,int data){
+    if(s->top>=s->capacity){
+        int *tmp;
+        tmp=(int *)realloc(s->move,sizeof(int)*(s->capacity*2));
+        if(tmp==NULL){
+            perror("realloc fail");
+            return;
+        }
+        s->move=tmp;
+        s->capacity=s->capacity*2;
+    }
+    s->move[s->top]=data;
+    s->top++;
+}
+int stackout(struct Stack *s){
+    return s->move[--s->top];
+}
+void stackdestroy(struct Stack *s){
+    if(s->move==NULL) return;
+    free(s->move);
+    s->move=NULL;
+    s->capacity=0;
+    s->top=0;
 }
