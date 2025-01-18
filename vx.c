@@ -2627,60 +2627,90 @@
 //     return num;
 // }
 
-struct Stack{
-    int capacity;
-    int top;
-    int *move;
-};
-void stackcreat(struct Stack *s);
-void StackPush(struct Stack *s,int data);
-int stackout(struct Stack *s);
-void stackdestroy(struct Stack *s);
-int stackempty(struct Stack *s);
+// struct Stack{
+//     int capacity;
+//     int top;
+//     int *move;
+// };
+// void stackcreat(struct Stack *s);
+// void StackPush(struct Stack *s,int data);
+// int stackout(struct Stack *s);
+// void stackdestroy(struct Stack *s);
+// int stackempty(struct Stack *s);
+// int main(){
+//     struct Stack stack;
+//     stackcreat(&stack);
+//     StackPush(&stack, 1);
+// 	StackPush(&stack, 2);
+//     StackPush(&stack, 3);
+//     StackPush(&stack, 4);
+//     StackPush(&stack, 5);
+//     while(!stackempty(&stack)){
+//         printf("%d ",stackout(&stack));
+//     }
+//     stackdestroy(&stack);
+//     return 0;   
+// }
+// int stackempty(struct Stack *s){
+//     return s->top==0;
+// }
+// void stackcreat(struct Stack *s){
+//     s->top=0;
+//     s->capacity=4;
+//     s->move=(int *)malloc(sizeof(int)*4);
+//     //s->move=NULL;
+// }
+// void StackPush(struct Stack *s,int data){
+//     if(s->top>=s->capacity){
+//         int *tmp;
+//         tmp=(int *)realloc(s->move,sizeof(int)*(s->capacity*2));
+//         if(tmp==NULL){
+//             perror("realloc fail");
+//             return;
+//         }
+//         s->move=tmp;
+//         s->capacity=s->capacity*2;
+//     }
+//     s->move[s->top]=data;
+//     s->top++;
+// }
+// int stackout(struct Stack *s){
+//     return s->move[--s->top];
+// }
+// void stackdestroy(struct Stack *s){
+//     if(s->move==NULL) return;
+//     free(s->move);
+//     s->move=NULL;
+//     s->capacity=0;
+//     s->top=0;
+// }
+
+// void turn(char *aln[]){
+//     int end=2;
+//     for(int i=0;i<3/2;i++){
+//         char *temp=aln[i];
+//         aln[i]=aln[end];
+//         aln[end]=temp;
+//         end--;
+//     }
+// }
+// int main(){
+//     char *aln[]={"asg","heqh","qtet"};
+//     for(int i=0;i<3;i++){
+//         printf("%s ",aln[i]);
+//     }
+//     turn(aln);
+//     printf("\n");
+//     for(int i=0;i<3;i++){
+//         printf("%s ",aln[i]);
+//     }
+//     return 0;
+// }
+
 int main(){
-    struct Stack stack;
-    stackcreat(&stack);
-    StackPush(&stack, 1);
-	StackPush(&stack, 2);
-    StackPush(&stack, 3);
-    StackPush(&stack, 4);
-    StackPush(&stack, 5);
-    while(!stackempty(&stack)){
-        printf("%d ",stackout(&stack));
-    }
-    stackdestroy(&stack);
-    return 0;   
-}
-int stackempty(struct Stack *s){
-    return s->top==0;
-}
-void stackcreat(struct Stack *s){
-    s->top=0;
-    s->capacity=4;
-    s->move=(int *)malloc(sizeof(int)*4);
-    //s->move=NULL;
-}
-void StackPush(struct Stack *s,int data){
-    if(s->top>=s->capacity){
-        int *tmp;
-        tmp=(int *)realloc(s->move,sizeof(int)*(s->capacity*2));
-        if(tmp==NULL){
-            perror("realloc fail");
-            return;
-        }
-        s->move=tmp;
-        s->capacity=s->capacity*2;
-    }
-    s->move[s->top]=data;
-    s->top++;
-}
-int stackout(struct Stack *s){
-    return s->move[--s->top];
-}
-void stackdestroy(struct Stack *s){
-    if(s->move==NULL) return;
-    free(s->move);
-    s->move=NULL;
-    s->capacity=0;
-    s->top=0;
+    char name[1024]="/home";
+    const char *s="/";
+    strncat(name,s,1);
+    printf("%s",name);
+    return 0;
 }
