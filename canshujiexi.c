@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -149,7 +148,7 @@ void listpanduan(int mark,char *dir, int depth,int max) {
         snprintf(path, sizeof(path), "%s/%s", dir, r->d_name); 
         const char *a="/";
         strncat(path,a,1);
-        if(r->d_name=="."||r->d_name=="..") break;      
+        if (strcmp(r->d_name, ".") == 0 || strcmp(r->d_name, "..") == 0) continue;    
         if(mark%2!=0){
             if (r->d_name[0]=='.')
             {
@@ -184,6 +183,7 @@ void print(int mark,char *dir_path)
     struct store *s = malloc(sizeof(struct store) *10000);  
     while ((r = readdir(dirr)) != NULL)
     {
+        if(r->d_name=="."||r->d_name=="..") break;
         if(mark%2!=0){
             if (r->d_name[0]=='.')
             {
