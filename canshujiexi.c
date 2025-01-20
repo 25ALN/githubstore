@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -147,7 +148,8 @@ void listpanduan(int mark,char *dir, int depth,int max) {
         char path[1024];
         snprintf(path, sizeof(path), "%s/%s", dir, r->d_name); 
         const char *a="/";
-        strncat(path,a,1);      
+        strncat(path,a,1);
+        if(r->d_name=="."||r->d_name=="..") break;      
         if(mark%2!=0){
             if (r->d_name[0]=='.')
             {
