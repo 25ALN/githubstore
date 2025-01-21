@@ -2711,6 +2711,8 @@ int main(){
     char name[1024]="/home";
     const char *s="/";
     strncat(name,s,1);
-    printf("%s",name);
+    printf("%s\n",name);
+    printf("%d",name[strlen(name)]);
     return 0;
 }
+
