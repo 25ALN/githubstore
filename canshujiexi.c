@@ -29,6 +29,8 @@ int cmpe(const void *a, const void *b)
         return 1;
     return 0;
 }
+int yasuofile(const char *filename);
+int image(const char *filename);
 void print(int mark,char *dir_path);
 void listpanduan(int mark,char *dir, int depth,int max);
 int main(int argc, char *argv[])
@@ -144,11 +146,11 @@ void listpanduan(int mark,char *dir, int depth,int max) {
     struct dirent *r;
     struct stat filestat;
     while ((r = readdir(dirr)) != NULL) {
+        if (strcmp(r->d_name, ".") == 0 || strcmp(r->d_name, "..") == 0) continue;
         char path[1024];
-        snprintf(path, sizeof(path), "%s/%s", dir, r->d_name); 
+        snprintf(path, sizeof(path), "%s%s", dir, r->d_name); 
         const char *a="/";
-        strncat(path,a,1);
-        if (strcmp(r->d_name, ".") == 0 || strcmp(r->d_name, "..") == 0) continue;    
+        strncat(path,a,1);   
         if(mark%2!=0){
             if (r->d_name[0]=='.')
             {
@@ -179,8 +181,9 @@ void print(int mark,char *dir_path)
     char rwx[11];
     int j = 0,filenum = 0;
     struct dirent *r;
-    struct stat *filestat = malloc(sizeof(struct stat) *10000); 
-    struct store *s = malloc(sizeof(struct store) *10000);  
+    int size=5000;
+    struct stat *filestat = malloc(sizeof(struct stat) *size); 
+    struct store *s = malloc(sizeof(struct store) *size);  
     while ((r = readdir(dirr)) != NULL)
     {
         if(r->d_name=="."||r->d_name=="..") break;
@@ -192,7 +195,7 @@ void print(int mark,char *dir_path)
         }
         strcpy(path, dir_path);
         strncat(path, r->d_name, strlen(r->d_name));
-        if (stat(path, &filestat[filenum]) == -1)
+        if (lstat(path, &filestat[filenum]) == -1)
         {
             perror("files fail");
             continue;
@@ -201,6 +204,15 @@ void print(int mark,char *dir_path)
         s[filenum].time = filestat[filenum].st_mtime;
         s[filenum].index = filenum;
         filenum++;
+        if (filenum >= size) {
+                size *= 2; 
+                filestat = realloc(filestat, sizeof(struct stat) *size);
+                s = realloc(s, sizeof(struct store) *size);
+                if (filestat == NULL || s == NULL) {
+                    perror("realloc failed");
+                    return;
+                }
+        }
     }
     if(mark%7==0){
         qsort(s, filenum, sizeof(struct store), cmpe);
@@ -256,17 +268,26 @@ void print(int mark,char *dir_path)
             strftime(ctime, sizeof(ctime), "%m月 %d %H:%M", tt);
             printf("%-s %2ld %-s %-s %5ld %s ", rwx, filestat[i].st_nlink, user->pw_name, gro->gr_name, filestat[i].st_size, ctime);
         }
-        if (S_ISDIR(filestat[i].st_mode))
+        if (s[i].name[0]=='.'&&strcmp(s[i].name,".")!=0&&strcmp(s[i].name,"..")!=0) {
+            printf("\033[90;1m %-15s\033[0m", s[i].name);
+        }else if(image(s[i].name)){
+            printf("\033[35;1m %-15s\033[0m", s[i].name);
+        }else if(yasuofile(s[i].name)){
+            printf("\033[31;1m %-15s\033[0m", s[i].name);
+        }else if (S_ISLNK(filestat[i].st_mode))
         {
-            printf("\033[34;1m %-15s\033[0m", s[i].name);
+            printf("\033[36;1m %-15s\033[0m", s[i].name);
         }
         else if (S_ISREG(filestat[i].st_mode) && access(s[i].name, X_OK))
         {
-            printf("\033[37;1m %-15s\033[0m", s[i].name);
-        }
-        else
-        {
             printf("\033[32;1m %-15s\033[0m", s[i].name);
+        }
+        else if (S_ISDIR(filestat[i].st_mode)){
+            printf("\033[34;1m %-15s\033[0m", s[i].name);
+        }
+        else 
+        {
+            printf("%-15s", s[i].name);
         }
         if(mark%3==0) printf("\n");
         else{
@@ -281,4 +302,26 @@ void print(int mark,char *dir_path)
     if (filestat != NULL) free(filestat);
     if (s != NULL) free(s);
     closedir(dirr);
+}
+int image(const char *filename) {
+    const char *imagename[] = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff", ".webp", NULL};
+    int len = strlen(filename);
+    for (int i = 0; imagename[i] != NULL; i++) {
+        int len2 = strlen(imagename[i]);
+        if (len >=len2 && strncmp(filename + len - len2, imagename[i],len2) == 0) {
+            return 1; 
+        }
+    }
+    return 0; 
+}
+int yasuofile(const char *filename) {
+    const char *yasuoname[] = {".tar", ".gz", ".bz2", ".xz", ".zip", ".7z", ".rar", NULL};
+    int len = strlen(filename);
+    for (int i = 0; yasuoname[i] != NULL; i++) {
+        int len2 = strlen(yasuoname[i]);
+        if (len >= len2&&strcmp(filename + len-len2, yasuoname[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
 }
