@@ -42,17 +42,18 @@ int main(int argc, char *argv[]) {
             if (argv[i][cnt - 1] != '/') {   
                 strncat(diir, a, 1);
             }
-            dir_path = strdup(diir);
+           dir_path = strdup(diir);
+           dir_path=diir;
         } else if (argv[i][0] == '.') {
             char *extl = malloc(sizeof(char) * 1024);
             if (extl == NULL) {
-                perror("malloc failed for ext");
+                perror("malloc failed");
                 return 1;
             }
             getcwd(extl, 1024);
             char *path = malloc(sizeof(char) * 1024);
             if (path == NULL) {
-                perror("malloc failed for path");
+                perror("malloc failed");
                 free(extl);
                 return 1;
             }
@@ -297,7 +298,7 @@ int yasuofile(const char *filename) {
     int len = strlen(filename);
     for (int i = 0; yasuoname[i] != NULL; i++) {
         int len2 = strlen(yasuoname[i]);
-        if (len >= len2 && strcmp(filename + len - len2, yasuoname[i]) == 0) {
+        if (len >= len2 && strncmp(filename + len - len2, yasuoname[i],len2) == 0) {
             return 1;
         }
     }
