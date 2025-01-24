@@ -2707,12 +2707,64 @@
 //     return 0;
 // }
 
+#define qmax 10
+typedef struct{
+    int front;
+    int rear;
+    int *element;
+}Queqe;
+void qinit(Queqe *q);
+void qpush(int val,Queqe*q);
+int qout(Queqe*q,int *value);
+int qempty(Queqe *s);
+void qtravel(Queqe *s);
 int main(){
-    char name[1024]="/home";
-    const char *s="/";
-    strncat(name,s,1);
-    printf("%s\n",name);
-    printf("%d",name[strlen(name)]);
+    Queqe q;
+    qinit(&q);
+    qpush(1,&q);
+    qpush(2,&q);
+    qpush(3,&q);
+    qpush(4,&q);
+    qtravel(&q);
+    printf("\n");
+    int value;
+    qout(&q,&value);
+    printf("%d\n",value);
+    qtravel(&q);
+    free(q.element);
     return 0;
 }
-
+void qinit(Queqe *q){
+    q->element=(int*)malloc(sizeof(Queqe)*qmax);
+    q->front=0;
+    q->rear=0;
+}
+void qpush(int val,Queqe*q){
+    if(qempty(q)){
+        printf("q is full");
+        return;
+    }
+    q->element[q->rear]=val;
+    q->rear=(q->rear+1)%qmax;
+}
+int qout(Queqe*q,int *value){
+    if(q->front==q->rear){
+        printf("q is empty");
+        return 0;
+    }
+    *value=q->element[q->front];
+    q->front=(q->front+1)%qmax;
+    return 1;
+}
+void qtravel(Queqe *s){
+    if(s->rear==s->front){
+        printf("q is empty");
+        return;
+    }
+    for(int i=s->front;i!=s->rear;i=(i+1)%qmax){
+        printf("%d ",s->element[i]);
+    }
+}
+int qempty(Queqe *s){
+    return (s->rear+1)%qmax-s->front==0;
+}
