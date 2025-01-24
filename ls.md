@@ -62,20 +62,29 @@ struct stat {
 getpwuid(file_stat.st_uid)：根据文件的用户 ID (st_uid) 获取对应的用户名。如果获取失败，返回 NULL。
 getgrgid(file_stat.st_gid)：根据文件的组 ID (st_gid) 获取对应的组名。如果获取失败，返回 NULL。
 
-## 终端大小的获取
-
+## getopt
 ```c
-#include<stdio.h>
-#include<stdlib.h>
-#include<sys/ioctl.h>
-#include<termios.h>
-#include<signal.h>
 #include<unistd.h>
-
-int main(int argc,char *argv[]){                                                         
-  struct winsize info;
-  ioctl(STDIN_FILENO,TIOCGWINSZ,&info);
-  printf("当前终端为%d行%d列\n",info.ws_row,info.ws_col);
-  return 0;
-}
+#include<getopt.h>  
+int getopt(int argc, char * const argv[], const char *optstring);
 ```
+char*optstring = “ab:c::”;
+单个字符a         表示选项a没有参数            格式：-a即可，不加参数
+单字符加冒号b:     表示选项b有且必须加参数      格式：-b 100或-b100,但-b=100错
+单字符加2冒号c::   表示选项c可以有，也可以无     格式：-c200，其它格式错误
+
+## color
+- 字背景颜色范围:40 - 49      - 字颜色:30 - 39
+40:黑                         30:黑
+41:深红                       31:红
+42:绿                         32:绿
+43:黄色                       33:黄
+44:蓝色                       34:蓝色
+45:紫色                       35:紫色
+46:深绿                       36:深绿
+47:白色                       37:白色
+
+1：粗体 4：下划线 
+- 格式
+```c
+ "\033[ ; m 内容 \033[0m " 
