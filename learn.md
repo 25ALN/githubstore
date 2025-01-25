@@ -10,6 +10,7 @@
 ## gcc use
 编译文件 例：gcc test.c -o test.o
 运行文件 ./test.o (此处可传入命令行参数)
+在编译时加入 -fsanitize=address 可检查内存泄露 如 gcc -fsanitize=address test.c -o test
 
 ## 文件
 - 文件句柄
