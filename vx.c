@@ -2707,64 +2707,104 @@
 //     return 0;
 // }
 
-#define qmax 10
-typedef struct{
-    int front;
-    int rear;
-    int *element;
-}Queqe;
-void qinit(Queqe *q);
-void qpush(int val,Queqe*q);
-int qout(Queqe*q,int *value);
-int qempty(Queqe *s);
-void qtravel(Queqe *s);
+// #define qmax 10
+// typedef struct{
+//     int front;
+//     int rear;
+//     int *element;
+// }Queqe;
+// void qinit(Queqe *q);
+// void qpush(int val,Queqe*q);
+// int qout(Queqe*q,int *value);
+// int qempty(Queqe *s);
+// void qtravel(Queqe *s);
+// int main(){
+//     Queqe q;
+//     qinit(&q);
+//     qpush(1,&q);
+//     qpush(2,&q);
+//     qpush(3,&q);
+//     qpush(4,&q);
+//     qtravel(&q);
+//     printf("\n");
+//     int value;
+//     qout(&q,&value);
+//     printf("%d\n",value);
+//     qtravel(&q);
+//     free(q.element);
+//     return 0;
+// }
+// void qinit(Queqe *q){
+//     q->element=(int*)malloc(sizeof(Queqe)*qmax);
+//     q->front=0;
+//     q->rear=0;
+// }
+// void qpush(int val,Queqe*q){
+//     if(qempty(q)){
+//         printf("q is full");
+//         return;
+//     }
+//     q->element[q->rear]=val;
+//     q->rear=(q->rear+1)%qmax;
+// }
+// int qout(Queqe*q,int *value){
+//     if(q->front==q->rear){
+//         printf("q is empty");
+//         return 0;
+//     }
+//     *value=q->element[q->front];
+//     q->front=(q->front+1)%qmax;
+//     return 1;
+// }
+// void qtravel(Queqe *s){
+//     if(s->rear==s->front){
+//         printf("q is empty");
+//         return;
+//     }
+//     for(int i=s->front;i!=s->rear;i=(i+1)%qmax){
+//         printf("%d ",s->element[i]);
+//     }
+// }
+// int qempty(Queqe *s){
+//     return (s->rear+1)%qmax-s->front==0;
+// }
+
+typedef struct list{
+    int val;
+    struct list *next;
+}node;
+void creatlist(node **head,int num);
+node*cyclelist(node*head,int aln[]);
+void travellist(node *head);
 int main(){
-    Queqe q;
-    qinit(&q);
-    qpush(1,&q);
-    qpush(2,&q);
-    qpush(3,&q);
-    qpush(4,&q);
-    qtravel(&q);
-    printf("\n");
-    int value;
-    qout(&q,&value);
-    printf("%d\n",value);
-    qtravel(&q);
-    free(q.element);
-    return 0;
+    node *head;
+    creatlist(&head,1);
+    int aln[]={2,3,4,5};
+    cyclelist(head,aln);
+    travellist(head);
 }
-void qinit(Queqe *q){
-    q->element=(int*)malloc(sizeof(Queqe)*qmax);
-    q->front=0;
-    q->rear=0;
+void creatlist(node**head,int num){
+    *head=(node*)malloc(sizeof(node));
+    (*head)->val=num;
+    (*head)->next=NULL;
 }
-void qpush(int val,Queqe*q){
-    if(qempty(q)){
-        printf("q is full");
-        return;
+node*cyclelist(node*head,int aln[]){
+    node* cur = head;
+    for (int i = 0; i <=sizeof(aln)/sizeof(aln[0]); i++) {
+        node* newNode = (node*)malloc(sizeof(node));
+        newNode->val = aln[i];
+        newNode->next = NULL;
+        cur->next = newNode;
+        cur = newNode;
     }
-    q->element[q->rear]=val;
-    q->rear=(q->rear+1)%qmax;
+    cur->next = head;
+    return head;
 }
-int qout(Queqe*q,int *value){
-    if(q->front==q->rear){
-        printf("q is empty");
-        return 0;
+void travellist(node *head){
+    node *cur=head;
+    node *pre;
+    for(int i=0;i<5;i++){
+        printf("%d ",cur->val);
+        cur=cur->next;
     }
-    *value=q->element[q->front];
-    q->front=(q->front+1)%qmax;
-    return 1;
-}
-void qtravel(Queqe *s){
-    if(s->rear==s->front){
-        printf("q is empty");
-        return;
-    }
-    for(int i=s->front;i!=s->rear;i=(i+1)%qmax){
-        printf("%d ",s->element[i]);
-    }
-}
-int qempty(Queqe *s){
-    return (s->rear+1)%qmax-s->front==0;
 }
