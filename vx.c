@@ -2769,47 +2769,42 @@
 //     return (s->rear+1)%qmax-s->front==0;
 // }
 
-// typedef struct list{
-//     int val;
-//     struct list *next;
-// }node;
-// void creatlist(node **head,int num);
-// node*cyclelist(node*head,int aln[]);
-// void travellist(node *head);
-// int main(){
-//     node *head;
-//     creatlist(&head,1);
-//     int aln[]={2,3,4,5};
-//     cyclelist(head,aln);
-//     travellist(head);
-// }
-// void creatlist(node**head,int num){
-//     *head=(node*)malloc(sizeof(node));
-//     (*head)->val=num;
-//     (*head)->next=NULL;
-// }
-// node*cyclelist(node*head,int aln[]){
-//     node* cur=head;
-//     for (int i =0; i<=2;i++) {
-//         node* newNode=(node*)malloc(sizeof(node));
-//         newNode->val=aln[i];
-//         newNode->next=NULL;
-//         cur->next=newNode;
-//         cur=newNode;
-//     }
-//     cur->next=head;
-//     return head;
-// }
-// void travellist(node *head){
-//     node *cur=head;
-//     node *pre;
-//     for(int i=0;i<5;i++){
-//         printf("%d ",cur->val);
-//         cur=cur->next;
-//     }
-// }
-
+typedef struct list{
+    int val;
+    struct list *next;
+}node;
+void creatlist(node **head,int num);
+node*cyclelist(node*head,int aln[]);
+void travellist(node *head);
 int main(){
-    printf("%d",2000000000%3);
-    return 0;
+    node *head;
+    creatlist(&head,1);
+    int aln[]={2,3,4,5};
+    cyclelist(head,aln);
+    travellist(head);
+}
+void creatlist(node**head,int num){
+    *head=(node*)malloc(sizeof(node));
+    (*head)->val=num;
+    (*head)->next=NULL;
+}
+node*cyclelist(node*head,int aln[]){
+    node* cur=head;
+    for (int i =0;i<=2;i++) {
+        node* newNode=(node*)malloc(sizeof(node));
+        newNode->val=aln[i];
+        newNode->next=NULL;
+        cur->next=newNode;
+        cur=newNode;
+    }
+    cur->next=head;
+    return head;
+}
+void travellist(node *head){
+    node *cur=head;
+    node *pre;
+    for(int i=0;i<10;i++){
+        printf("%d ",cur->val);
+        cur=cur->next;
+    }
 }
