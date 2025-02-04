@@ -2814,3 +2814,46 @@
 //         cur=cur->next;
 //     }
 // }
+
+struct Listnode{
+    int val;
+    struct Listnode *next;
+};
+struct Listnode *creat(struct Listnode *head,int aln[],int len);
+void travellist(struct Listnode *head);
+int main(){
+    struct Listnode *head;
+    head=(struct Listnode *)malloc(sizeof(struct Listnode));
+    int aln[]={1,2,3,4};
+    int len=sizeof(aln)/sizeof(aln[0]);
+    head=creat(head,aln,len);
+    travellist(head);
+    int i=0;
+    struct Listnode *curr=head;
+    for(;curr!=NULL;){
+        curr=curr->next;
+        i++;
+    }
+    printf("  %d",i);
+    return 0;
+}
+struct Listnode *creat(struct Listnode *head,int aln[],int len){
+    struct Listnode dummp={0,head};
+    struct Listnode *cur=head;
+    printf("%d\n",len);
+    for(int i=0;i<len;i++){
+        struct Listnode *newnode;
+        newnode=(struct Listnode*)malloc(sizeof(struct Listnode));
+        newnode->val=aln[i];
+        newnode->next=NULL;
+        cur->next=newnode;
+        cur=newnode;
+    }
+    return dummp.next->next;
+}
+void travellist(struct Listnode *head){
+    while(head){
+        printf("%d ",head->val);
+        head=head->next;
+    }
+}
