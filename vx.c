@@ -2821,6 +2821,7 @@ struct Listnode{
 };
 struct Listnode *creat(struct Listnode *head,int aln[],int len);
 void travellist(struct Listnode *head);
+void listfree(struct Listnode *head);
 int main(){
     struct Listnode *head;
     head=(struct Listnode *)malloc(sizeof(struct Listnode));
@@ -2855,5 +2856,13 @@ void travellist(struct Listnode *head){
     while(head){
         printf("%d ",head->val);
         head=head->next;
+    }
+}
+void listfree(struct Listnode *head){
+    struct Listnode *f=head;
+    if(f!=NULL){
+        struct Listnode *Next=f->next; 
+        free(f);
+        f=Next;
     }
 }
