@@ -78,3 +78,7 @@ int fscanf(FILE* stream, const char* format, ...);
 可以利用
 
 ## 数据结构
+- 栈 (stack)
+先进后出
+- 队列 (queue)
+先进先出
