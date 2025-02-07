@@ -82,3 +82,4 @@ int fscanf(FILE* stream, const char* format, ...);
 先进后出
 - 队列 (queue)
 先进先出
+- 二叉树
