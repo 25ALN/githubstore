@@ -2815,54 +2815,108 @@
 //     }
 // }
 
-struct Listnode{
-    int val;
-    struct Listnode *next;
-};
-struct Listnode *creat(struct Listnode *head,int aln[],int len);
-void travellist(struct Listnode *head);
-void listfree(struct Listnode *head);
-int main(){
-    struct Listnode *head;
-    head=(struct Listnode *)malloc(sizeof(struct Listnode));
-    int aln[]={1,2,3,4};
-    int len=sizeof(aln)/sizeof(aln[0]);
-    head=creat(head,aln,len);
-    travellist(head);
-    int i=0;
-    struct Listnode *curr=head;
-    for(;curr!=NULL;){
-        curr=curr->next;
-        i++;
-    }
-    printf("  %d",i);
-    return 0;
+// struct Listnode{
+//     int val;
+//     struct Listnode *next;
+// };
+// struct Listnode *creat(struct Listnode *head,int aln[],int len);
+// void travellist(struct Listnode *head);
+// void listfree(struct Listnode *head);
+// int main(){
+//     struct Listnode *head;
+//     head=(struct Listnode *)malloc(sizeof(struct Listnode));
+//     int aln[]={1,2,3,4};
+//     int len=sizeof(aln)/sizeof(aln[0]);
+//     head=creat(head,aln,len);
+//     travellist(head);
+//     int i=0;
+//     struct Listnode *curr=head;
+//     for(;curr!=NULL;){
+//         curr=curr->next;
+//         i++;
+//     }
+//     printf("  %d",i);
+//     return 0;
+// }
+// struct Listnode *creat(struct Listnode *head,int aln[],int len){
+//     struct Listnode dummp={0,head};
+//     struct Listnode *cur=head;
+//     printf("%d\n",len);
+//     for(int i=0;i<len;i++){
+//         struct Listnode *newnode;
+//         newnode=(struct Listnode*)malloc(sizeof(struct Listnode));
+//         newnode->val=aln[i];
+//         newnode->next=NULL;
+//         cur->next=newnode;
+//         cur=newnode;
+//     }
+//     return dummp.next->next;
+// }
+// void travellist(struct Listnode *head){
+//     while(head){
+//         printf("%d ",head->val);
+//         head=head->next;
+//     }
+// }
+// void listfree(struct Listnode *head){
+//     struct Listnode *f=head;
+//     if(f!=NULL){
+//         struct Listnode *Next=f->next; 
+//         free(f);
+//         f=Next;
+//     }
+// }
+
+// 栈实现队列
+
+#define MAX 100
+typedef struct Stack
+{
+    int top;
+    int num[MAX];
+}S;
+void stackinit(S *stack){
+    stack->top=-1;
 }
-struct Listnode *creat(struct Listnode *head,int aln[],int len){
-    struct Listnode dummp={0,head};
-    struct Listnode *cur=head;
-    printf("%d\n",len);
-    for(int i=0;i<len;i++){
-        struct Listnode *newnode;
-        newnode=(struct Listnode*)malloc(sizeof(struct Listnode));
-        newnode->val=aln[i];
-        newnode->next=NULL;
-        cur->next=newnode;
-        cur=newnode;
-    }
-    return dummp.next->next;
+int stackempty(S *stack){
+    return stack->top==-1;
 }
-void travellist(struct Listnode *head){
-    while(head){
-        printf("%d ",head->val);
-        head=head->next;
+void stackpush(S *stack,int val){
+    if(stack->top<MAX-1){
+        stack->num[++(stack->top)]=val;
+    }else{
+        printf("stack is full\n");
     }
 }
-void listfree(struct Listnode *head){
-    struct Listnode *f=head;
-    if(f!=NULL){
-        struct Listnode *Next=f->next; 
-        free(f);
-        f=Next;
+int stackpop(S *stack){
+    if(stackempty(stack)){
+        printf("stack is empty\n");
+        return -1;
+    }else{
+        return stack->num[(stack->top)--];
     }
+}
+int stacktoppop(S *stack){
+    if(stackempty(stack)){
+        printf("stack is empty\n");
+        return -1;
+    }else{
+        return stack->num[stack->top];
+    }
+}
+
+typedef struct queue{
+    S stack1; // 入队
+    S stack2; // 出队
+}Q;
+
+void queueinit(Q *queue){
+    stackinit(&queue->stack1);
+    stackinit(&queue->stack2);
+}
+void queuepush(Q *queue,int val){
+    stackpush(&queue->stack1,val);
+}
+int queuepop(Q *queue){
+    
 }
