@@ -2918,5 +2918,31 @@ void queuepush(Q *queue,int val){
     stackpush(&queue->stack1,val);
 }
 int queuepop(Q *queue){
-    
+    if(stackempty(&queue->stack2)){
+        while(!stackempty(&queue->stack1)){
+            stackpush(&queue->stack2,stackpop(&queue->stack1));
+        }
+    }
+    if(stackempty(&queue->stack2)){
+        printf("queue is empty\n");
+        return -1;
+    }
+    return stackpop(&queue->stack2);
+}
+int queueempty(Q *queue){
+    return stackempty(&queue->stack1)&&stackempty(&queue->stack2);
+}
+int main(){
+    Q queue;
+    queueinit(&queue);
+    queuepush(&queue,1);
+    queuepush(&queue,2);
+    queuepush(&queue,3);
+    printf("%d ",queuepop(&queue));
+    printf("%d ",queuepop(&queue));
+    printf("%d ",queuepop(&queue));
+    if(queueempty(&queue)){
+        printf("empty\n");
+    }
+    return 0;
 }
