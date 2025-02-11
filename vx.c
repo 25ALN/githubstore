@@ -2869,80 +2869,98 @@
 
 // 栈实现队列
 
-#define MAX 100
-typedef struct Stack
-{
-    int top;
-    int num[MAX];
-}S;
-void stackinit(S *stack){
-    stack->top=-1;
-}
-int stackempty(S *stack){
-    return stack->top==-1;
-}
-void stackpush(S *stack,int val){
-    if(stack->top<MAX-1){
-        stack->num[++(stack->top)]=val;
-    }else{
-        printf("stack is full\n");
-    }
-}
-int stackpop(S *stack){
-    if(stackempty(stack)){
-        printf("stack is empty\n");
-        return -1;
-    }else{
-        return stack->num[(stack->top)--];
-    }
-}
-int stacktoppop(S *stack){
-    if(stackempty(stack)){
-        printf("stack is empty\n");
-        return -1;
-    }else{
-        return stack->num[stack->top];
-    }
-}
+// #define MAX 100
+// typedef struct Stack
+// {
+//     int top;
+//     int num[MAX];
+// }S;
+// void stackinit(S *stack){
+//     stack->top=-1;
+// }
+// int stackempty(S *stack){
+//     return stack->top==-1;
+// }
+// void stackpush(S *stack,int val){
+//     if(stack->top<MAX-1){
+//         stack->num[++(stack->top)]=val;
+//     }else{
+//         printf("stack is full\n");
+//     }
+// }
+// int stackpop(S *stack){
+//     if(stackempty(stack)){
+//         printf("stack is empty\n");
+//         return -1;
+//     }else{
+//         return stack->num[(stack->top)--];
+//     }
+// }
+// int stacktoppop(S *stack){
+//     if(stackempty(stack)){
+//         printf("stack is empty\n");
+//         return -1;
+//     }else{
+//         return stack->num[stack->top];
+//     }
+// }
 
-typedef struct queue{
-    S stack1; // 入队
-    S stack2; // 出队
-}Q;
+// typedef struct queue{
+//     S stack1; // 入队
+//     S stack2; // 出队
+// }Q;
 
-void queueinit(Q *queue){
-    stackinit(&queue->stack1);
-    stackinit(&queue->stack2);
-}
-void queuepush(Q *queue,int val){
-    stackpush(&queue->stack1,val);
-}
-int queuepop(Q *queue){
-    if(stackempty(&queue->stack2)){
-        while(!stackempty(&queue->stack1)){
-            stackpush(&queue->stack2,stackpop(&queue->stack1));
-        }
-    }
-    if(stackempty(&queue->stack2)){
-        printf("queue is empty\n");
-        return -1;
-    }
-    return stackpop(&queue->stack2);
-}
-int queueempty(Q *queue){
-    return stackempty(&queue->stack1)&&stackempty(&queue->stack2);
-}
+// void queueinit(Q *queue){
+//     stackinit(&queue->stack1);
+//     stackinit(&queue->stack2);
+// }
+// void queuepush(Q *queue,int val){
+//     stackpush(&queue->stack1,val);
+// }
+// int queuepop(Q *queue){
+//     if(stackempty(&queue->stack2)){
+//         while(!stackempty(&queue->stack1)){
+//             stackpush(&queue->stack2,stackpop(&queue->stack1));
+//         }
+//     }
+//     if(stackempty(&queue->stack2)){
+//         printf("queue is empty\n");
+//         return -1;
+//     }
+//     return stackpop(&queue->stack2);
+// }
+// int queueempty(Q *queue){
+//     return stackempty(&queue->stack1)&&stackempty(&queue->stack2);
+// }
+// int main(){
+//     Q queue;
+//     queueinit(&queue);
+//     queuepush(&queue,1);
+//     queuepush(&queue,2);
+//     queuepush(&queue,3);
+//     printf("%d ",queuepop(&queue));
+//     printf("%d ",queuepop(&queue));
+//     printf("%d ",queuepop(&queue));
+//     if(queueempty(&queue)){
+//         printf("empty\n");
+//     }
+//     return 0;
+// }
+
+// long long j(int a){
+//     if(a==0) return 0;
+//     if(a==1) return 1;
+//     return a*j(a-1);
+// }
+// int main(){
+//     printf("%d",j(5));
+//     return 0;
+// }
+
 int main(){
-    Q queue;
-    queueinit(&queue);
-    queuepush(&queue,1);
-    queuepush(&queue,2);
-    queuepush(&queue,3);
-    printf("%d ",queuepop(&queue));
-    printf("%d ",queuepop(&queue));
-    printf("%d ",queuepop(&queue));
-    if(queueempty(&queue)){
-        printf("empty\n");
+    int aln[5]={};
+    for(int i=0;i<5;i++){
+        printf("%d ",aln[i]);
     }
     return 0;
 }
