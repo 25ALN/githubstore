@@ -82,4 +82,11 @@ int fscanf(FILE* stream, const char* format, ...);
 先进后出
 - 队列 (queue)
 先进先出
+- 哈希表
+*uthash* 使用时所需头文件
+```c
+#include "uthash.h"
+```
+首先要定义一个结构体
+
 - 二叉树
