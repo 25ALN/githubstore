@@ -2968,17 +2968,18 @@
 //     return 0;
 // }
 
-int main(){
-    int aln[][3]={{1},{2,3,4}};
-    int aln1[]={1,2,3,4};
-    int row=2,line=3;
-    for(int i=0;i<row;i++){
-        for(int j=0;j<line;j++){
-            if(aln[i][j+1]=='\0'||j==line-1){
-            printf("%d ",aln[i][j]);
-            break;
-            }
-        }
-    }
-    return 0;
-}
+// int main(){
+//     int aln[][3]={{1},{2,3,4}};
+//     int aln1[]={1,2,3,4};
+//     int row=2,line=3;
+//     for(int i=0;i<row;i++){
+//         for(int j=0;j<line;j++){
+//             if(aln[i][j+1]=='\0'||j==line-1){
+//             printf("%d ",aln[i][j]);
+//             break;
+//             }
+//         }
+//     }
+//     return 0;
+// }
+
