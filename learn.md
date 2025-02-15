@@ -88,5 +88,8 @@ int fscanf(FILE* stream, const char* format, ...);
 #include "uthash.h"
 ```
 首先要定义一个结构体
+实现见vx.c 2988行
 
 - 二叉树
+1.链式二叉树
+每个节点最多有两个节点
