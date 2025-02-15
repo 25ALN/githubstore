@@ -2985,124 +2985,180 @@
 
 // uthash的使用
 
-struct hash{
-    int id;
-    char name[10];
-    UT_hash_handle hh;
-};
-struct hash *user=NULL; //每一次使用时都必须将其初始化为零，很重要
-   /*  HASH_ADD_INT表示添加的键值为int类型
-   HASH_ADD_STR表示添加的键值为字符串类型
-    HASH_ADD_PTR表示添加的键值为指针类型
-    HASH_ADD表示添加的键值可以是任意类型*/
-void add_user(int user_id,char *name){
-    struct hash *check;
-    HASH_FIND_INT(user,&user_id,check); //检查哈希表中不存在这个id，防止重复添加
-    if(!check){
-        check=(struct hash*)malloc(sizeof(*check));
-        check->id=user_id;
-        HASH_ADD_INT(user,id,check);
+// struct hash{
+//     int id;
+//     char name[10];
+//     UT_hash_handle hh;
+// };
+// struct hash *user=NULL; //每一次使用时都必须将其初始化为零，很重要
+//    /*  HASH_ADD_INT表示添加的键值为int类型
+//    HASH_ADD_STR表示添加的键值为字符串类型
+//     HASH_ADD_PTR表示添加的键值为指针类型
+//     HASH_ADD表示添加的键值可以是任意类型*/
+// void add_user(int user_id,char *name){
+//     struct hash *check;
+//     HASH_FIND_INT(user,&user_id,check); //检查哈希表中不存在这个id，防止重复添加
+//     if(!check){
+//         check=(struct hash*)malloc(sizeof(*check));
+//         check->id=user_id;
+//         HASH_ADD_INT(user,id,check);
+//     }
+//     strcpy(check->name,name);
+// }
+// // HASH_ADD_INT函数中，第一个参数users是哈希表，第二个参数id是键字段的名称。最后一个参数s是指向要添加的结构的指针
+// struct hash *find(int user_id){
+//     struct hash *s;
+//     HASH_FIND_INT(user,&user_id,s);
+//     return s;
+// }
+// void deleteh(struct hash *u){
+//     HASH_DEL(user,u);
+//     free(u);
+// }
+// void deleteall(){ //将哈希表中所有数据删除但不会释放相应的内存
+//     struct hash *tmp,*curr;
+//     HASH_ITER(hh,user,curr,tmp){
+//     HASH_DEL(user,curr);
+//     free(curr); //如果想释放内存就加上这一行
+//     }
+// }
+// //  如果只想删除所有项目，但不释放它们或进行每个元素的清理，则用下面这一行会更简洁
+// // HASH_CLEAR(hh,users); 此后users将被设置为NULL
+// void printhash(){
+//     struct hash *s;
+//     for(s=user;s!=NULL;s=(struct hash*)(s->hh.next)){
+//         printf("user id is %d name:%s",s->id,s->name);
+//     }
+// }
+// // 哈希表的排序(与qsort相同的使用)
+// int name_sort(struct hash *a,struct hash *b){
+//     return strcmp(a->name,b->name);
+// }
+// int id_sort(struct hash *a,struct hash *b){
+//     return (a->id-b->id);
+// }
+// void namesort(){
+//     HASH_SORT(user,name_sort);
+// }
+// void idsort(){
+//     HASH_SORT(user,id_sort);
+// }
+// int main(){
+//     char in[10];
+//     int id=1, running=1;
+//     struct hash *s;
+//     unsigned num_users;
+//     while (running) {
+//         printf(" 1. add user\n");
+//         printf(" 2. add/rename user by id\n");
+//         printf(" 3. find user\n");
+//         printf(" 4. delete user\n");
+//         printf(" 5. delete all users\n");
+//         printf(" 6. sort items by name\n");
+//         printf(" 7. sort items by id\n");
+//         printf(" 8. print users\n");
+//         printf(" 9. count users\n");
+//         printf("10. quit\n");
+//         gets(in);
+//         switch(atoi(in)) {
+//             case 1:
+//                 printf("name?\n");
+//                 add_user(id++, gets(in));
+//                 break;
+//             case 2:
+//                 printf("id?\n");
+//                 gets(in); id = atoi(in);
+//                 printf("name?\n");
+//                 add_user(id, gets(in));
+//                 break;
+//             case 3:
+//                 printf("id?\n");
+//                 s = find(atoi(gets(in)));
+//                 printf("user: %s\n", s ? s->name : "unknown");
+//                 break;
+//             case 4:
+//                 printf("id?\n");
+//                 s = find(atoi(gets(in)));
+//                 if (s) deleteh(s);
+//                 else printf("id unknown\n");
+//                 break;
+//             case 5:
+//                 deleteall();
+//                 break;
+//             case 6:
+//                 namesort();
+//                 break;
+//             case 7:
+//                 idsort();
+//                 break;
+//             case 8:
+//                 printhash();
+//                 break;
+//             case 9:
+//                 num_users=HASH_COUNT(user);
+//                 printf("there are %u users\n", num_users);
+//                 break;
+//             case 10:
+//                 running=0;
+//                 break;
+//         }
+//     }
+//     deleteall();  /* free any structures */
+//     return 0;
+// }
+
+
+//链式二叉树
+
+typedef struct ecs{
+    char data;
+    struct ecs *lchild;
+    struct ecs *rchild;
+}tree,node;
+char str[24] = {19, 'A','B','D','G','#','#','H','#','#','#','C','E','#','I','#','#','F','#','#'}; //用作测试
+int index=1;
+// 前序遍历 
+// 规则:二叉树为空，则返回，否则先访问根结点，然后前序遍历左子树，再前序遍历右子树
+
+void fronttravel(tree *T){
+    if(!T) return;
+    printf("%c ",T->data);
+    fronttravel(T->lchild);
+    fronttravel(T->rchild);
+}
+
+// 中序遍历
+// 规则:若树为空，则空操作返回，否则从根结点开始（注意并不是先访问根结点），
+// 中序遍历根结点的左子树，然后是访问根结点，最后中序遍历右子树
+
+void middletravel(tree *T){
+    if(!T) return;
+    middletravel(T->lchild);
+    printf("%c ",T->data);
+    middletravel(T->rchild);
+}
+
+// 后序遍历
+// 规则:若树为空，则空操作返回，否则从左到右先叶子后结点的方式遍历访问左右子树，最后是访问根结点
+
+void reartravel(tree *T){
+    if(!T) return;
+    reartravel(T->lchild);
+    reartravel(T->rchild);
+    printf("%c ",T->data);
+}
+
+void creatrtree(tree **T){
+    char ch;
+    ch=str[index++];
+    if(ch!='#'){
+        *T=(tree *)malloc(sizeof(tree));
+        if(!*T) return;
+        (*T)->data=ch;
+        creatrtree(&(*T)->lchild);
+        creatrtree(&(*T)->rchild);
+    }else{
+        (*T)=NULL;
     }
-    strcpy(check->name,name);
-}
-// HASH_ADD_INT函数中，第一个参数users是哈希表，第二个参数id是键字段的名称。最后一个参数s是指向要添加的结构的指针
-struct hash *find(int user_id){
-    struct hash *s;
-    HASH_FIND_INT(user,&user_id,s);
-    return s;
-}
-void deleteh(struct hash *u){
-    HASH_DEL(user,u);
-    free(u);
-}
-void deleteall(){ //将哈希表中所有数据删除但不会释放相应的内存
-    struct hash *tmp,*curr;
-    HASH_ITER(hh,user,curr,tmp){
-    HASH_DEL(user,curr);
-    free(curr); //如果想释放内存就加上这一行
-    }
-}
-//  如果只想删除所有项目，但不释放它们或进行每个元素的清理，则用下面这一行会更简洁
-// HASH_CLEAR(hh,users); 此后users将被设置为NULL
-void printhash(){
-    struct hash *s;
-    for(s=user;s!=NULL;s=(struct hash*)(s->hh.next)){
-        printf("user id is %d name:%s",s->id,s->name);
-    }
-}
-// 哈希表的排序(与qsort相同的使用)
-int name_sort(struct hash *a,struct hash *b){
-    return strcmp(a->name,b->name);
-}
-int id_sort(struct hash *a,struct hash *b){
-    return (a->id-b->id);
-}
-void namesort(){
-    HASH_SORT(user,name_sort);
-}
-void idsort(){
-    HASH_SORT(user,id_sort);
-}
-int main(){
-    char in[10];
-    int id=1, running=1;
-    struct hash *s;
-    unsigned num_users;
-    while (running) {
-        printf(" 1. add user\n");
-        printf(" 2. add/rename user by id\n");
-        printf(" 3. find user\n");
-        printf(" 4. delete user\n");
-        printf(" 5. delete all users\n");
-        printf(" 6. sort items by name\n");
-        printf(" 7. sort items by id\n");
-        printf(" 8. print users\n");
-        printf(" 9. count users\n");
-        printf("10. quit\n");
-        gets(in);
-        switch(atoi(in)) {
-            case 1:
-                printf("name?\n");
-                add_user(id++, gets(in));
-                break;
-            case 2:
-                printf("id?\n");
-                gets(in); id = atoi(in);
-                printf("name?\n");
-                add_user(id, gets(in));
-                break;
-            case 3:
-                printf("id?\n");
-                s = find(atoi(gets(in)));
-                printf("user: %s\n", s ? s->name : "unknown");
-                break;
-            case 4:
-                printf("id?\n");
-                s = find(atoi(gets(in)));
-                if (s) deleteh(s);
-                else printf("id unknown\n");
-                break;
-            case 5:
-                deleteall();
-                break;
-            case 6:
-                namesort();
-                break;
-            case 7:
-                idsort();
-                break;
-            case 8:
-                printhash();
-                break;
-            case 9:
-                num_users=HASH_COUNT(user);
-                printf("there are %u users\n", num_users);
-                break;
-            case 10:
-                running=0;
-                break;
-        }
-    }
-    deleteall();  /* free any structures */
-    return 0;
+
 }
