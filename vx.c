@@ -3110,55 +3110,111 @@
 
 //链式二叉树
 
-typedef struct ecs{
-    char data;
-    struct ecs *lchild;
-    struct ecs *rchild;
-}tree,node;
-char str[24] = {19, 'A','B','D','G','#','#','H','#','#','#','C','E','#','I','#','#','F','#','#'}; //用作测试
-int index=1;
-// 前序遍历 
-// 规则:二叉树为空，则返回，否则先访问根结点，然后前序遍历左子树，再前序遍历右子树
+// typedef struct ecs{
+//     char data;
+//     struct ecs *lchild;
+//     struct ecs *rchild;
+// }tree,node;
+// char str[24] = {19, 'A','B','D','G','#','#','H','#','#','#','C','E','#','I','#','#','F','#','#'}; //用作测试
+// int index=1;
+// // 前序遍历 
+// // 规则:二叉树为空，则返回，否则先访问根结点，然后前序遍历左子树，再前序遍历右子树
 
-void fronttravel(tree *T){
-    if(!T) return;
-    printf("%c ",T->data);
-    fronttravel(T->lchild);
-    fronttravel(T->rchild);
+// void fronttravel(tree *T){
+//     if(!T) return;
+//     printf("%c ",T->data);
+//     fronttravel(T->lchild);
+//     fronttravel(T->rchild);
+// }
+
+// // 中序遍历
+// // 规则:若树为空，则空操作返回，否则从根结点开始（注意并不是先访问根结点），
+// // 中序遍历根结点的左子树，然后是访问根结点，最后中序遍历右子树
+
+// void middletravel(tree *T){
+//     if(!T) return;
+//     middletravel(T->lchild);
+//     printf("%c ",T->data);
+//     middletravel(T->rchild);
+// }
+
+// // 后序遍历
+// // 规则:若树为空，则空操作返回，否则从左到右先叶子后结点的方式遍历访问左右子树，最后是访问根结点
+
+// void reartravel(tree *T){
+//     if(!T) return;
+//     reartravel(T->lchild);
+//     reartravel(T->rchild);
+//     printf("%c ",T->data);
+// }
+
+// void creatrtree(tree **T){
+//     char ch;
+//     ch=str[index++];
+//     if(ch!='#'){
+//         *T=(tree *)malloc(sizeof(tree));
+//         if(!*T) return;
+//         (*T)->data=ch;
+//         creatrtree(&(*T)->lchild);
+//         creatrtree(&(*T)->rchild);
+//     }else{
+//         (*T)=NULL;
+//     }
+
+// }
+
+struct list{
+    int val;
+    struct list *next;
+};
+void listtc(int aln[],struct list **head,int len);
+void listtravel(struct list *head);
+void listfree(struct list **head);
+struct list *listturn(struct list *head);
+int main(){
+    struct list *head;
+    head=(struct list *)malloc(sizeof(struct list));
+    int a[]={1,2,3,4,5};
+    listtc(a,&head,5);
+    listtravel(head);
+    head=listturn(head);
+    printf("\n");
+    listtravel(head);
+    listfree(&head);
+    return 0;
 }
-
-// 中序遍历
-// 规则:若树为空，则空操作返回，否则从根结点开始（注意并不是先访问根结点），
-// 中序遍历根结点的左子树，然后是访问根结点，最后中序遍历右子树
-
-void middletravel(tree *T){
-    if(!T) return;
-    middletravel(T->lchild);
-    printf("%c ",T->data);
-    middletravel(T->rchild);
-}
-
-// 后序遍历
-// 规则:若树为空，则空操作返回，否则从左到右先叶子后结点的方式遍历访问左右子树，最后是访问根结点
-
-void reartravel(tree *T){
-    if(!T) return;
-    reartravel(T->lchild);
-    reartravel(T->rchild);
-    printf("%c ",T->data);
-}
-
-void creatrtree(tree **T){
-    char ch;
-    ch=str[index++];
-    if(ch!='#'){
-        *T=(tree *)malloc(sizeof(tree));
-        if(!*T) return;
-        (*T)->data=ch;
-        creatrtree(&(*T)->lchild);
-        creatrtree(&(*T)->rchild);
-    }else{
-        (*T)=NULL;
+struct list *listturn(struct list *head){
+    struct list *cur=head;
+    struct list *pre=NULL,*N=NULL;
+    while(cur){
+        N=cur->next;
+        cur->next=pre;
+        pre=cur;
+        cur=N;
     }
-
+    return pre;
+}
+void listtc(int aln[],struct list **head,int len){
+    struct list *cur=*head;
+    for(int i=0;i<len;i++){
+        struct list *pre;
+        pre=(struct list *)malloc(sizeof(struct list));
+        pre->val=aln[i];
+        cur->next=pre;
+        cur=pre;
+    }
+}
+void listtravel(struct list *head){
+    while(head){
+        printf("%d ",head->val);
+        head=head->next;
+    }
+}
+void listfree(struct list **head){
+    struct list *cur=*head;
+    while(cur){
+        struct list *p=cur->next;
+        free(cur);
+        cur=p;
+    }
 }
