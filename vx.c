@@ -3160,61 +3160,95 @@
 //     }else{
 //         (*T)=NULL;
 //     }
-
 // }
 
-struct list{
-    int val;
-    struct list *next;
-};
-void listtc(int aln[],struct list **head,int len);
-void listtravel(struct list *head);
-void listfree(struct list **head);
-struct list *listturn(struct list *head);
+
+// struct list{
+//     int val;
+//     struct list *next;
+// };
+// void listtc(int aln[],struct list **head,int len);
+// void listtravel(struct list *head);
+// void listfree(struct list **head);
+// struct list *listturn(struct list *head);
+// int main(){
+//     struct list *head;
+//     head=(struct list *)malloc(sizeof(struct list));
+//     int a[]={1,2,3,4,5};
+//     listtc(a,&head,5);
+//     listtravel(head);
+//     head=listturn(head);
+//     printf("\n");
+//     listtravel(head);
+//     listfree(&head);
+//     return 0;
+// }
+// struct list *listturn(struct list *head){
+//     struct list *cur=head;
+//     struct list *pre=NULL,*N=NULL;
+//     while(cur){
+//         N=cur->next;
+//         cur->next=pre;
+//         pre=cur;
+//         cur=N;
+//     }
+//     return pre;
+// }
+// void listtc(int aln[],struct list **head,int len){
+//     struct list *cur=*head;
+//     for(int i=0;i<len;i++){
+//         struct list *pre;
+//         pre=(struct list *)malloc(sizeof(struct list));
+//         pre->val=aln[i];
+//         cur->next=pre;
+//         cur=pre;
+//     }
+// }
+// void listtravel(struct list *head){
+//     while(head){
+//         printf("%d ",head->val);
+//         head=head->next;
+//     }
+// }
+// void listfree(struct list **head){
+//     struct list *cur=*head;
+//     while(cur){
+//         struct list *p=cur->next;
+//         free(cur);
+//         cur=p;
+//     }
+// }
+
+bool backspaceCompare(char* s, char* t) {
+    int lens=strlen(s),lent=strlen(t);
+    char *stks,*stkt;
+    stks=(char *)malloc(sizeof(char)*lens);
+    stkt=(char *)malloc(sizeof(char)*lent);
+    int tops=0,topt=0;
+    for(int i=0;i<lens;i++){
+        if(stks[tops]!='#'){
+            printf("%c\n",stks[tops]);
+            stks[tops++]=s[i];
+            stks[tops]='\0';
+            printf("后 %s\n",stks);
+        }else{
+            stks[tops--]='\0';
+            printf("%s\n",stks);
+        }
+    }
+    for(int i=0;i<tops;i++){
+        printf("%c ",stks[i]);
+    }
+    for(int i=0;i<lent;i++){
+        if(stkt[topt]!='#'){
+            stkt[topt++]=t[i];
+        }
+    }
+    return !strcmp(stks,stkt);
+}
 int main(){
-    struct list *head;
-    head=(struct list *)malloc(sizeof(struct list));
-    int a[]={1,2,3,4,5};
-    listtc(a,&head,5);
-    listtravel(head);
-    head=listturn(head);
-    printf("\n");
-    listtravel(head);
-    listfree(&head);
-    return 0;
-}
-struct list *listturn(struct list *head){
-    struct list *cur=head;
-    struct list *pre=NULL,*N=NULL;
-    while(cur){
-        N=cur->next;
-        cur->next=pre;
-        pre=cur;
-        cur=N;
-    }
-    return pre;
-}
-void listtc(int aln[],struct list **head,int len){
-    struct list *cur=*head;
-    for(int i=0;i<len;i++){
-        struct list *pre;
-        pre=(struct list *)malloc(sizeof(struct list));
-        pre->val=aln[i];
-        cur->next=pre;
-        cur=pre;
-    }
-}
-void listtravel(struct list *head){
-    while(head){
-        printf("%d ",head->val);
-        head=head->next;
-    }
-}
-void listfree(struct list **head){
-    struct list *cur=*head;
-    while(cur){
-        struct list *p=cur->next;
-        free(cur);
-        cur=p;
-    }
+    char *s="a#c";
+    char *t="ab#c";
+    backspaceCompare(s,t);
+    printf("\n%d",strcmp(s,t));
 }
