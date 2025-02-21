@@ -3219,36 +3219,44 @@
 //     }
 // }
 
-bool backspaceCompare(char* s, char* t) {
-    int lens=strlen(s),lent=strlen(t);
-    char *stks,*stkt;
-    stks=(char *)malloc(sizeof(char)*lens);
-    stkt=(char *)malloc(sizeof(char)*lent);
-    int tops=0,topt=0;
-    for(int i=0;i<lens;i++){
-        if(stks[tops]!='#'){
-            printf("%c\n",stks[tops]);
-            stks[tops++]=s[i];
-            stks[tops]='\0';
-            printf("后 %s\n",stks);
-        }else{
-            stks[tops--]='\0';
-            printf("%s\n",stks);
-        }
-    }
-    for(int i=0;i<tops;i++){
-        printf("%c ",stks[i]);
-    }
-    for(int i=0;i<lent;i++){
-        if(stkt[topt]!='#'){
-            stkt[topt++]=t[i];
-        }
-    }
-    return !strcmp(stks,stkt);
-}
+// bool backspaceCompare(char* s, char* t) {
+//     int lens=strlen(s),lent=strlen(t);
+//     char *stks,*stkt;
+//     stks=(char *)malloc(sizeof(char)*(lens+1));
+//     stkt=(char *)malloc(sizeof(char)*(lent+1));
+//     stks[0]='1',stkt[0]='1';
+//     int tops=0,topt=0;
+//     for(int i=lens-1;i>=0;i--){
+//         if(stks[tops]!='#'){
+//             tops++;
+//             stks[tops]=s[i];
+//         }
+//     }
+//     stks[tops]='\0';
+//     for(int i=lent-1;i>=0;i--){
+//         if(stkt[topt]!='#'){
+//             topt++;
+//             stkt[topt]=t[i];
+//         }
+//     }
+//     stkt[topt]='\0';
+//     printf("%s\n%s",stks,stkt);
+//     stkt[topt]='\0';
+//     int x=strcmp(stks,stkt);
+//     if(x==0)
+//     return true;
+//     else return false;
+// }
+// int main(){
+//     char *s="xyw\0rrmp";
+//     char *t="xyw\0rrmp";
+//     backspaceCompare(s,t);
+//     printf("\n%d",strcmp(s,t));
+// }
+
 int main(){
-    char *s="a#c";
-    char *t="ab#c";
-    backspaceCompare(s,t);
-    printf("\n%d",strcmp(s,t));
+    char str[20]="123";
+    int val=atoi(str);
+    printf("%d ",val);
+    return 0;
 }
