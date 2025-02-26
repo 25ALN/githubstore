@@ -3254,9 +3254,31 @@
 //     printf("\n%d",strcmp(s,t));
 // }
 
+// int main(){
+//     char str[20]="123";
+//     int val=atoi(str);
+//     printf("%d ",val);
+//     return 0;
+// }
+
+
 int main(){
-    char str[20]="123";
-    int val=atoi(str);
-    printf("%d ",val);
+    int x,y;
+    scanf("%d %d",&x,&y);
+    char s[x+1];
+    int sum=1,zhi=1;
+    int i,j;
+    for( i=0;i<y;i++)
+	{
+        scanf("%s",s);
+        for( j=x-1;j>=0;j--)
+		{
+            if (s[j]=='n') 
+			sum+=zhi;
+            zhi*=2;
+        }
+        printf("%d\n",sum);
+        zhi=1;sum=1;
+    }
     return 0;
 }
