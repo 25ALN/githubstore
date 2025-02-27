@@ -3262,23 +3262,29 @@
 // }
 
 
-int main(){
-    int x,y;
-    scanf("%d %d",&x,&y);
-    char s[x+1];
-    int sum=1,zhi=1;
-    int i,j;
-    for( i=0;i<y;i++)
-	{
-        scanf("%s",s);
-        for( j=x-1;j>=0;j--)
-		{
-            if (s[j]=='n') 
-			sum+=zhi;
-            zhi*=2;
-        }
-        printf("%d\n",sum);
-        zhi=1;sum=1;
-    }
+// int main(){
+//     int x,y;
+//     scanf("%d %d",&x,&y);
+//     char s[x+1];
+//     int sum=1,zhi=1;
+//     int i,j;
+//     for( i=0;i<y;i++)
+// 	{
+//         scanf("%s",s);
+//         for( j=x-1;j>=0;j--)
+// 		{
+//             if (s[j]=='n') 
+// 			sum+=zhi;
+//             zhi*=2;
+//         }
+//         printf("%d\n",sum);
+//         zhi=1;sum=1;
+//     }
+//     return 0;
+// }
+
+int main(int argc,char *argv[]){
+    printf("%s\n%s",argv[0],argv[1]);
+    
     return 0;
 }

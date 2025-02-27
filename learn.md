@@ -141,4 +141,12 @@ while(waitpid(-1,NULL,WNOHAGN)>0)
   continue;
 ```
 使用上述代码运行至waitpid返回0,表明僵尸进程不再存在(若返回-1则是有错误存在)
-461
+SIGCHLD:这个信号通常由操作系统发送给父进程，用来通知它子进程的退出或者停止，或者子进程被暂停或者恢复
+
+8.程序的执行
+execve(): 可以将新程序加载到某一进程的内存空间
+```c
+#include <unistd.h>
+int execve(const char *pathname,char *const argv[],char *const envp[]);
+// return -1 on error
+```
