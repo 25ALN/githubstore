@@ -150,3 +150,13 @@ execve(): 可以将新程序加载到某一进程的内存空间
 int execve(const char *pathname,char *const argv[],char *const envp[]);
 // return -1 on error
 ```
+
+环境变量 PATH
+```
+函数 execvp()和 execlp()允许调用者只提供欲执行程序的文件名。二者均使用环境变量
+PATH 来搜索文件  
+PATH 中指定的路径名既可以是绝对路径名（以/开始），也可以是相对路径名。对相对路
+径名的诠释是基于调用进程的当前工作目录
+
+```
+477
