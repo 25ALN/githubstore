@@ -3284,7 +3284,13 @@
 // }
 
 int main(int argc,char *argv[]){
-    printf("%s\n%s",argv[0],argv[1]);
-    
+    char aln[]="hello    das igew weg qeg";
+    char *token = strtok(aln, " ");  // 以空格 " " 作为分隔符
+
+    while (token != NULL) {
+        printf("%s\n", token);  // 逐个打印子字符串
+        token = strtok(NULL, " ");  // 获取下一个子字符串
+    }
+
     return 0;
 }

@@ -157,6 +157,30 @@ int execve(const char *pathname,char *const argv[],char *const envp[]);
 PATH 来搜索文件  
 PATH 中指定的路径名既可以是绝对路径名（以/开始），也可以是相对路径名。对相对路
 径名的诠释是基于调用进程的当前工作目录
+```  
+getenv  
+定义在 <stdlib.h> 头文件中，作用是获取环境变量的值。
+- execve
+最底层的，其他的exec都是他的变式
+```c
+#include <unistd.h>
 
-```
-477
+int execve(const char *pathname, char *const argv[], char *const envp[]);
+```  
+其中需要注意的参数
+pathname：要执行的程序的完整路径（如 /bin/ls）。
+argv[]：命令行参数数组（类似 main 函数的 argv）。
+argv[0] 通常是程序名（如 "ls"）。
+argv 的最后一个元素必须是 NULL。
+envp[]：环境变量数组（如 {"PATH=/bin", "HOME=/root", NULL}）。
+envp 传递新进程的环境变量，如果使用当前进程的环境变量，可以传 environ。
+envp 的最后一个元素必须是 NULL
+    
+- int execl (const char *path, const char *arg, ..., (char *)NULL);
+用于执行另一个程序。它属于 进程替换 机制，调用后不会返回，而是直接用新的程序替换当前进程
+使用例子: execl("/bin/ls", "ls", "-l", (char *)NULL); 
+485
+
+- clone
+因为克隆产生的子进程可能（类似 vfork()）共享父进程的内存，所以它不能使用父进程
+的栈
