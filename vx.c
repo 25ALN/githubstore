@@ -11,6 +11,7 @@
 #include <termios.h>
 #include <signal.h>
 #include "uthash.h"
+#include <fcntl.h>
 
 // typedef int (*Predicate)(int);
 // int *filter(int *array, int length, Predicate predicate,
@@ -3283,14 +3284,34 @@
 //     return 0;
 // }
 
-int main(int argc,char *argv[]){
-    char aln[]="hello    das igew weg qeg";
-    char *token = strtok(aln, " ");  // 以空格 " " 作为分隔符
 
-    while (token != NULL) {
-        printf("%s\n", token);  // 逐个打印子字符串
-        token = strtok(NULL, " ");  // 获取下一个子字符串
-    }
+// void canshujiexi(char *buf,char **out){
+//     char *ch=strtok(buf," ");
+//     int i=0;
+//     while(ch!=NULL&&i<63){
+//         printf("ch=%s\n",ch);
+//         ch=strtok(NULL," ");
+//     }
+// }
+// int main(int argc,char *argv[]){
+//     //char aln[]="cat < 1.txt";
+//     char *out[64];
+//     char aln[]="cat < 1.txt | grep -C 10 abc | grep -Lefd | tac >> 2.txt";
+//     char *token = strtok(aln, "|");  // 以空格 " " 作为分隔符
+//     while (token != NULL) {
+//         printf("%s\n", token);  // 逐个打印子字符串
+//         canshujiexi(token,out);
+//         token = strtok(NULL, "|");  // 获取下一个子字符串
+//     }
+//     printf("剩下的：%s",aln);
+//     return 0;
+// }
 
+#define zorq(a) a>0 ? O_APPEND : O_TRUNC
+#define MAX(a,b) a>b ? a:b
+int main(){
+    int a=1,b=2;
+    char *s;
+    printf("%c",zorq(a));
     return 0;
 }
