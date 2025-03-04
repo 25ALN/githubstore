@@ -3296,7 +3296,7 @@
 // int main(int argc,char *argv[]){
 //     //char aln[]="cat < 1.txt";
 //     char *out[64];
-//     char aln[]="cat < 1.txt | grep -C 10 abc | grep -Lefd | tac >> 2.txt";
+//     char aln[]="ls | grep .c > test.txt";
 //     char *token = strtok(aln, "|");  // 以空格 " " 作为分隔符
 //     while (token != NULL) {
 //         printf("%s\n", token);  // 逐个打印子字符串
@@ -3307,11 +3307,18 @@
 //     return 0;
 // }
 
-#define zorq(a) a>0 ? O_APPEND : O_TRUNC
-#define MAX(a,b) a>b ? a:b
-int main(){
-    int a=1,b=2;
-    char *s;
-    printf("%c",zorq(a));
+// #define zorq(a) a>0 ? O_APPEND : O_TRUNC
+// #define MAX(a,b) a>b ? a:b
+// int main(){
+//     int a=1,b=2;
+//     char *s;
+//     printf("%c",zorq(a));
+//     return 0;
+// }
+
+int main() {
+    char *extl="cd qfeqfe";
+    char *p=extl+3;
+    printf("%s",p);
     return 0;
 }
