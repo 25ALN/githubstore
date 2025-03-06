@@ -3345,33 +3345,98 @@
 // }
 
 
-void can(char *buf, int *num);
+// void can(char *buf, int *num);
+
+// int main() {
+//     int cnt = 0;
+//     char str[] = "ls -a | wc -l | ls -l";  
+//     char *token;
+//     char *saveptr;
+//     token = strtok_r(str, "|", &saveptr);
+//     while (token != NULL) {
+//         cnt++;
+//         char zjml[1024];
+//         strncpy(zjml, token, sizeof(zjml) - 1);
+//         zjml[sizeof(zjml) - 1] = '\0';  
+//         can(zjml, &cnt);
+//         token = strtok_r(NULL, "|", &saveptr); 
+//     }
+//     return 0;
+// }
+// void can(char *buf, int *num) {
+//     printf("buf=%s\n", buf);
+//     char *ch;
+//     char *saveptr;
+//     printf("第%d个\n", *num);
+//     ch = strtok_r(buf, " ", &saveptr);
+//     while (ch != NULL) {
+//         printf("ch= %s\n", ch);
+//         ch = strtok_r(NULL, " ", &saveptr);
+//     }
+// }
+
+// int main() {
+//     char s[1024] = "awk 'print{ as}'   feqqe ls -l";
+//     char *out[100];
+//     int cnt = 0;
+//     char *p = s;
+//     int len=strlen(p),right=0;
+//     for(int left=0;left<len,right<len;left++){
+//         if(p[right+1]=='\''){
+//             left++,right+=2;
+//             while(p[right]!='\''){
+//                 right++;
+//             }
+//             p[right++]='\0';
+//             out[cnt++]=p+left;
+//         }else{
+//             while(p[left]==' '||p[left]=='\0') {
+//                 left++;
+//             }
+//             if(p[right]==' '&&right<len-1){
+//             right++;
+//             }
+//             while(p[right]!=' '){
+//                 right++;
+//             }
+//             p[right]='\0';
+//             out[cnt++]=p+left;
+//         }
+//         left=right;
+//     }
+//     for (int i = 0; i < cnt; i++) {
+//         printf("Arg %d: %s\n", i, out[i]);
+//     }
+//     return 0;
+// }
 
 int main() {
-    int cnt = 0;
-    char str[] = "ls -a | wc -l | ls -l";  
-    char *token;
-    char *saveptr;
-    token = strtok_r(str, "|", &saveptr);
-    while (token != NULL) {
-        printf("tnow = %s\n", token); 
-        cnt++;
-        char zjml[1024];
-        strncpy(zjml, token, sizeof(zjml) - 1);
-        //zjml[sizeof(zjml) - 1] = '\0';  
-        can(zjml, &cnt);
-        token = strtok_r(NULL, "|", &saveptr); 
+    char s[1024] = "ls -a | wc -l";
+    char *out[100]; 
+    int cnt=0;
+    int left=0,right=0,len=strlen(s);
+    while (left<len) {
+        while (left<len&&s[left]==' ') left++;
+        if (left>=len) break;
+        if (s[left]=='\'') {
+            left++; 
+            right=left;
+            while (right<len&&s[right]!='\'') right++; 
+            if (right>=len) {
+                return 1;
+            }
+            s[right++]= '\0'; 
+        }
+        else {
+            right=left;
+            while (right<len&&s[right]!=' ') right++;  
+            if (right<len) s[right++]= '\0';  
+        }
+        out[cnt++]=s+left;
+        left=right;  
+    }
+    for (int i = 0; i < cnt; i++) {
+        printf("Arg %d: %s\n", i, out[i]);
     }
     return 0;
-}
-void can(char *buf, int *num) {
-    printf("buf=%s\n", buf);
-    char *ch;
-    char *saveptr;
-    printf("第%d个\n", *num);
-    ch = strtok_r(buf, " ", &saveptr);
-    while (ch != NULL) {
-        printf("ch= %s\n", ch);
-        ch = strtok_r(NULL, " ", &saveptr);
-    }
 }
