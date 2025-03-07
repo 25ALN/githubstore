@@ -18,9 +18,6 @@ struct k
 {
     char *a[maxcanshu];
 };
-void sighandler(int sig)
-{
-}
 void getmessage(char *buf);
 void canshujiexi(char *buf, struct k *out);
 void canshujiexi2(char *buf, struct k *out);
