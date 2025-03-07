@@ -27,6 +27,7 @@ void changedir(char *dirpath);
 
 int main(int argc, char *argv[])
 {
+    signal(SIGQUIT, SIG_IGN);
     signal(SIGINT, SIG_IGN);
     while (1)
     {
