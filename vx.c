@@ -3410,33 +3410,81 @@
 //     return 0;
 // }
 
-int main() {
-    char s[1024] = "ls -a | wc -l";
-    char *out[100]; 
-    int cnt=0;
-    int left=0,right=0,len=strlen(s);
-    while (left<len) {
-        while (left<len&&s[left]==' ') left++;
-        if (left>=len) break;
-        if (s[left]=='\'') {
-            left++; 
-            right=left;
-            while (right<len&&s[right]!='\'') right++; 
-            if (right>=len) {
-                return 1;
+// int main() {
+//     char s[1024] = "ls -a | wc -l";
+//     char *out[100]; 
+//     int cnt=0;
+//     int left=0,right=0,len=strlen(s);
+//     while (left<len) {
+//         while (left<len&&s[left]==' ') left++;
+//         if (left>=len) break;
+//         if (s[left]=='\'') {
+//             left++; 
+//             right=left;
+//             while (right<len&&s[right]!='\'') right++; 
+//             if (right>=len) {
+//                 return 1;
+//             }
+//             s[right++]= '\0'; 
+//         }
+//         else {
+//             right=left;
+//             while (right<len&&s[right]!=' ') right++;  
+//             if (right<len) s[right++]= '\0';  
+//         }
+//         out[cnt++]=s+left;
+//         left=right;  
+//     }
+//     for (int i = 0; i < cnt; i++) {
+//         printf("Arg %d: %s\n", i, out[i]);
+//     }
+//     return 0;
+// }
+
+#define MAXLEN 101  
+
+void cxzl(char *s, char *op) {
+    char test[MAXLEN]; 
+    int right = strlen(s);
+    strcpy(test, s); 
+    int len = right; 
+    char *token = strtok(op, " "); 
+    while (token) {
+        if (strcmp(token, "LEFT") == 0) {
+            if (right > 0) right--; 
+        } else if (strcmp(token, "RIGHT") == 0) {
+            if (right < len) right++; 
+        } else if (strcmp(token, "CTRL") == 0) {
+            token = strtok(NULL, " "); 
+            if (!token) break;
+            if (strcmp(token, "S") == 0) {
+                test[len] = '\0';  
+                printf("%s\n", test);
+            } else if (token[0] == 'D') {
+                int x = atoi(token + 1); 
+                if (right > 0) { 
+                    char ch = test[right - 1];
+                    memmove(test + right + x, test + right, len - right + 1);
+                    for (int i = 0; i < x; i++) {
+                        test[right + i] = ch;
+                    }
+                    right += x; 
+                    len += x;    
+                }
             }
-            s[right++]= '\0'; 
         }
-        else {
-            right=left;
-            while (right<len&&s[right]!=' ') right++;  
-            if (right<len) s[right++]= '\0';  
-        }
-        out[cnt++]=s+left;
-        left=right;  
+        token = strtok(NULL, " "); 
     }
-    for (int i = 0; i < cnt; i++) {
-        printf("Arg %d: %s\n", i, out[i]);
-    }
+    test[len] = '\0';  
+    printf("%s\n", test); 
+}
+int main() {
+    char s[MAXLEN];  
+    char op[100001];  
+    fgets(s, sizeof(s), stdin); 
+    fgets(op, sizeof(op), stdin); 
+    s[strcspn(s, "\n")] = 0; 
+    op[strcspn(op, "\n")] = 0;
+    cxzl(s, op); 
     return 0;
 }

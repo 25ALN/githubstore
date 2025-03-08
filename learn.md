@@ -192,6 +192,10 @@ dup2(fd, STDOUT_FILENO) 将标准输出重定向到文件fd相应的文件，之
 - strtok
 使用后如将得到的所分割出来的字符串传出到其他函数可能不能正确分割函数
 因此可以使用strtok_r来保存字符串 它不会破坏全局状态
+```c
+char *strtok_r(char *str, const char *delim, char **saveptr);
+```
+
 - pipe
 ```c
 int pipe(int fds[2]);
@@ -210,3 +214,18 @@ int chdir(const char *path);
 >> 是追加内容
 > 是覆盖原有内容
 ```
+
+## 线程
+是允许应用程序并发执行多个任务的一种机制  
+同一程序中的线程共享一份全局内存
+在多线程程序中，每个线程都有属于自己的 errno
+- 创建线程
+函数 pthread_create()负责创建一条新线程
+- 终止线程
+pthread_exit()函数将终止调用线程，且其返回值可由另一线程通过调用 pthread_join()来获取
+- 线程ID
+进程内部的每个线程都有一个唯一标识，称为线程 ID。线程 ID 会返回给 pthread_create()
+的调用者，一个线程可以通过 pthread_self()来获取自己的线程 ID
+函数 pthread_equal()可检查两个线程的 ID 是否相同
+函数 pthread_join()等待由 thread 标识的线程终止。（如果线程已经终止，pthread_join()会
+立即返回）。这种操作被称为连接(joining)。(若向其传入一个已经连接的线程ID会出现一些问题)
