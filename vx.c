@@ -12,7 +12,7 @@
 #include <signal.h>
 #include "uthash.h"
 #include <fcntl.h>
-
+#include <time.h>
 // typedef int (*Predicate)(int);
 // int *filter(int *array, int length, Predicate predicate,
 //             int *resultLength){
@@ -3441,50 +3441,70 @@
 //     return 0;
 // }
 
-#define MAXLEN 101  
+// #define MAXLEN 101  
 
-void cxzl(char *s, char *op) {
-    char test[MAXLEN]; 
-    int right = strlen(s);
-    strcpy(test, s); 
-    int len = right; 
-    char *token = strtok(op, " "); 
-    while (token) {
-        if (strcmp(token, "LEFT") == 0) {
-            if (right > 0) right--; 
-        } else if (strcmp(token, "RIGHT") == 0) {
-            if (right < len) right++; 
-        } else if (strcmp(token, "CTRL") == 0) {
-            token = strtok(NULL, " "); 
-            if (!token) break;
-            if (strcmp(token, "S") == 0) {
-                test[len] = '\0';  
-                printf("%s\n", test);
-            } else if (token[0] == 'D') {
-                int x = atoi(token + 1); 
-                if (right > 0) { 
-                    char ch = test[right - 1];
-                    memmove(test + right + x, test + right, len - right + 1);
-                    for (int i = 0; i < x; i++) {
-                        test[right + i] = ch;
-                    }
-                    right += x; 
-                    len += x;    
-                }
-            }
-        }
-        token = strtok(NULL, " "); 
-    }
-    test[len] = '\0';  
-    printf("%s\n", test); 
+// void cxzl(char *s, char *op) {
+//     char test[MAXLEN]; 
+//     int right = strlen(s);
+//     strcpy(test, s); 
+//     int len = right; 
+//     char *token = strtok(op, " "); 
+//     while (token) {
+//         if (strcmp(token, "LEFT") == 0) {
+//             if (right > 0) right--; 
+//         } else if (strcmp(token, "RIGHT") == 0) {
+//             if (right < len) right++; 
+//         } else if (strcmp(token, "CTRL") == 0) {
+//             token = strtok(NULL, " "); 
+//             if (!token) break;
+//             if (strcmp(token, "S") == 0) {
+//                 test[len] = '\0';  
+//                 printf("%s\n", test);
+//             } else if (token[0] == 'D') {
+//                 int x = atoi(token + 1); 
+//                 if (right > 0) { 
+//                     char ch = test[right - 1];
+//                     memmove(test + right + x, test + right, len - right + 1);
+//                     for (int i = 0; i < x; i++) {
+//                         test[right + i] = ch;
+//                     }
+//                     right += x; 
+//                     len += x;    
+//                 }
+//             }
+//         }
+//         token = strtok(NULL, " "); 
+//     }
+//     test[len] = '\0';  
+//     printf("%s\n", test); 
+// }
+// int main() {
+//     char s[MAXLEN];  
+//     char op[100001];  
+//     fgets(s, sizeof(s), stdin); 
+//     fgets(op, sizeof(op), stdin); 
+//     s[strcspn(s, "\n")] = 0; 
+//     op[strcspn(op, "\n")] = 0;
+//     cxzl(s, op); 
+//     return 0;
+// }
+
+int cmp(const void *a,const void *b){
+    return *(int *)a-*(int *)b;
 }
-int main() {
-    char s[MAXLEN];  
-    char op[100001];  
-    fgets(s, sizeof(s), stdin); 
-    fgets(op, sizeof(op), stdin); 
-    s[strcspn(s, "\n")] = 0; 
-    op[strcspn(op, "\n")] = 0;
-    cxzl(s, op); 
+int main(){
+    int num;
+    int aln[10];
+    printf("原数组：");
+    for(int i=0;i<10;i++){
+        aln[i]=random()%101;
+        printf("%d ",aln[i]);
+    }
+    printf("\n");
+    qsort(aln,10,sizeof(int),cmp);
+    printf("排序后：");
+    for(int i=0;i<10;i++){
+        printf("%d ",aln[i]);
+    }
     return 0;
 }
