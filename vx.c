@@ -3489,22 +3489,44 @@
 //     return 0;
 // }
 
-int cmp(const void *a,const void *b){
-    return *(int *)a-*(int *)b;
-}
+// int cmp(const void *a,const void *b){
+//     return *(int *)a-*(int *)b;
+// }
+// int main(){
+//     int num;
+//     int aln[10];
+//     printf("原数组：");
+//     for(int i=0;i<10;i++){
+//         aln[i]=random()%101;
+//         printf("%d ",aln[i]);
+//     }
+//     printf("\n");
+//     qsort(aln,10,sizeof(int),cmp);
+//     printf("排序后：");
+//     for(int i=0;i<10;i++){
+//         printf("%d ",aln[i]);
+//     }
+//     return 0;
+// }
+
 int main(){
-    int num;
-    int aln[10];
-    printf("原数组：");
-    for(int i=0;i<10;i++){
-        aln[i]=random()%101;
-        printf("%d ",aln[i]);
+    int *ans;
+    ans=(int *)malloc(sizeof(int)*5);
+    for(int i=0;i<5;i++){
+        ans[i]=i;
     }
-    printf("\n");
-    qsort(aln,10,sizeof(int),cmp);
-    printf("排序后：");
-    for(int i=0;i<10;i++){
-        printf("%d ",aln[i]);
+    int aln[5]={1,2,3,4,5};
+    int *temp;
+    temp=(int *)realloc(ans,sizeof(int)*10);
+    if(temp==NULL){
+        free(ans);
+        printf("fail");
     }
+    ans=temp;
+    memmove(ans+5,aln,sizeof(int)*5);
+    for(int i=0;i<10;i++){
+        printf("%d ",ans[i]);
+    }
+    free(ans);
     return 0;
 }
