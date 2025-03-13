@@ -13,6 +13,7 @@
 #include "uthash.h"
 #include <fcntl.h>
 #include <time.h>
+#include <limits.h>
 // typedef int (*Predicate)(int);
 // int *filter(int *array, int length, Predicate predicate,
 //             int *resultLength){
@@ -3509,24 +3510,67 @@
 //     return 0;
 // }
 
+// int main(){
+//     int *ans;
+//     ans=(int *)malloc(sizeof(int)*5);
+//     for(int i=0;i<5;i++){
+//         ans[i]=i;
+//     }
+//     int aln[5]={1,2,3,4,5};
+//     int *temp;
+//     temp=(int *)realloc(ans,sizeof(int)*10);
+//     if(temp==NULL){
+//         free(ans);
+//         printf("fail");
+//     }
+//     ans=temp;
+//     memmove(ans+5,aln,sizeof(int)*5);
+//     for(int i=0;i<10;i++){
+//         printf("%d ",ans[i]);
+//     }
+//     free(ans);
+//     return 0;
+// }
+
+void fen(int *arr,int start,int end);
+void zhi(int *arr,int start,int mid,int end);
 int main(){
-    int *ans;
-    ans=(int *)malloc(sizeof(int)*5);
-    for(int i=0;i<5;i++){
-        ans[i]=i;
+    int arr[10]={5, 1, 8, 4, 7, 2, 3, 9, 0, 6};
+    int len=sizeof(arr)/sizeof(arr[0]);
+    fen(arr,0,len-1);
+    for(int i=0;i<len;i++){
+        printf("%d ",arr[i]);
     }
-    int aln[5]={1,2,3,4,5};
-    int *temp;
-    temp=(int *)realloc(ans,sizeof(int)*10);
-    if(temp==NULL){
-        free(ans);
-        printf("fail");
-    }
-    ans=temp;
-    memmove(ans+5,aln,sizeof(int)*5);
-    for(int i=0;i<10;i++){
-        printf("%d ",ans[i]);
-    }
-    free(ans);
     return 0;
+}
+void fen(int *arr,int start,int end){
+    int mid=start+(end-start)/2;
+    if(start>=end){
+        return;
+    }
+    fen(arr,start,mid);
+    fen(arr,mid+1,end);
+    zhi(arr,start,mid,end);
+}
+void zhi(int *arr,int start,int mid,int end){
+    int *aln=(int *)malloc(sizeof(int)*(end-start+1));
+    int i=start;
+    int j=mid+1,k=0;
+    while(i<=mid&&j<=end){
+        if(arr[i]<=arr[j]){
+            aln[k++]=arr[i++];
+        }else{
+            aln[k++]=arr[j++];
+        }
+    }
+    while(i<=mid){
+        aln[k++]=arr[i++];
+    }
+    while(j<=end){
+        aln[k++]=arr[j++];
+    }
+    for(int i=0;i<k;i++){
+        arr[start+i]=aln[i];
+    }
+    free(aln);
 }
