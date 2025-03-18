@@ -7,7 +7,7 @@
 #include <limits.h>
 
 
-#define len 100000
+#define len 10000000
 #define minnum 5000  //当小数组里面数量少时,直接排序
 static pthread_mutex_t mtx=PTHREAD_MUTEX_INITIALIZER; //互斥量的初始化
 static pthread_cond_t cond=PTHREAD_COND_INITIALIZER; //条件变量的初始化
