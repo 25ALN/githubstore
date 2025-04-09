@@ -16,6 +16,11 @@
 编译文件 例：gcc test.c -o test.o
 运行文件 ./test.o (此处可传入命令行参数)
 在编译时加入 -fsanitize=address 可检查内存泄露 如 gcc -fsanitize=address test.c -o test
+### 编译c++
+在编译c++时就尽量不要用gcc来编译，gcc会把.cpp默认为.c来处理
+因此使用g++来编译是最好的
+例如：
+g++ -fsanitize=address -g new.cpp -o new
 
 ## 文件
 - 文件句柄
