@@ -3532,45 +3532,53 @@
 //     return 0;
 // }
 
-void fen(int *arr,int start,int end);
-void zhi(int *arr,int start,int mid,int end);
+// void fen(int *arr,int start,int end);
+// void zhi(int *arr,int start,int mid,int end);
+// int main(){
+//     int arr[10]={5, 1, 8, 4, 7, 2, 3, 9, 0, 6};
+//     int len=sizeof(arr)/sizeof(arr[0]);
+//     fen(arr,0,len-1);
+//     for(int i=0;i<len;i++){
+//         printf("%d ",arr[i]);
+//     }
+//     return 0;
+// }
+// void fen(int *arr,int start,int end){
+//     int mid=start+(end-start)/2;
+//     if(start>=end){
+//         return;
+//     }
+//     fen(arr,start,mid);
+//     fen(arr,mid+1,end);
+//     zhi(arr,start,mid,end);
+// }
+// void zhi(int *arr,int start,int mid,int end){
+//     int *aln=(int *)malloc(sizeof(int)*(end-start+1));
+//     int i=start;
+//     int j=mid+1,k=0;
+//     while(i<=mid&&j<=end){
+//         if(arr[i]<=arr[j]){
+//             aln[k++]=arr[i++];
+//         }else{
+//             aln[k++]=arr[j++];
+//         }
+//     }
+//     while(i<=mid){
+//         aln[k++]=arr[i++];
+//     }
+//     while(j<=end){
+//         aln[k++]=arr[j++];
+//     }
+//     for(int i=0;i<k;i++){
+//         arr[start+i]=aln[i];
+//     }
+//     free(aln);
+// }
+
 int main(){
-    int arr[10]={5, 1, 8, 4, 7, 2, 3, 9, 0, 6};
-    int len=sizeof(arr)/sizeof(arr[0]);
-    fen(arr,0,len-1);
-    for(int i=0;i<len;i++){
-        printf("%d ",arr[i]);
-    }
+    char buf1[100];
+    char buf2[100]="hello";
+    printf("%d\n",strlen(buf2));
+    printf("%d",sizeof(buf2));
     return 0;
-}
-void fen(int *arr,int start,int end){
-    int mid=start+(end-start)/2;
-    if(start>=end){
-        return;
-    }
-    fen(arr,start,mid);
-    fen(arr,mid+1,end);
-    zhi(arr,start,mid,end);
-}
-void zhi(int *arr,int start,int mid,int end){
-    int *aln=(int *)malloc(sizeof(int)*(end-start+1));
-    int i=start;
-    int j=mid+1,k=0;
-    while(i<=mid&&j<=end){
-        if(arr[i]<=arr[j]){
-            aln[k++]=arr[i++];
-        }else{
-            aln[k++]=arr[j++];
-        }
-    }
-    while(i<=mid){
-        aln[k++]=arr[i++];
-    }
-    while(j<=end){
-        aln[k++]=arr[j++];
-    }
-    for(int i=0;i<k;i++){
-        arr[start+i]=aln[i];
-    }
-    free(aln);
 }
