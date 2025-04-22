@@ -2346,15 +2346,15 @@
 
 // void findmax( int *px, int *py, int *pmax );
 // int main()
-// {    
-//     int max, x, y; 
+// {
+//     int max, x, y;
 
 //     scanf("%d %d", &x, &y);
 //     findmax( &x, &y, &max );
 //     printf("%d\n", max);
 
 //     return 0;
-//     } 
+//     }
 // void findmax( int *px, int *py, int *pmax ){
 //     *pmax=(*px>*py?*px:*py);
 // }
@@ -2392,7 +2392,6 @@
 //     return head;
 // }
 
-
 // int main(){
 //     int p=0,a,b,sum=0;
 //     scanf("%d %d",&a,&b);
@@ -2429,13 +2428,13 @@
 //         for (int j = 0; j < n; j++) {
 //             printf("%d ", temp[j]);
 //         }
-//         printf("\n");  
+//         printf("\n");
 //     }
 //     return 0;
 // }
 
 // void factorize(long int N) {
-//     int first = 1;  
+//     int first = 1;
 //     if (N % 2 == 0) {
 //         int count = 0;
 //         while (N % 2 == 0) {
@@ -2478,9 +2477,9 @@
 // }
 // int main() {
 //     long int N;
-//     scanf("%ld", &N);  
+//     scanf("%ld", &N);
 //     printf("%ld=",N);
-//     factorize(N); 
+//     factorize(N);
 //     return 0;
 // }
 
@@ -2582,7 +2581,7 @@
 //     int num,a;
 //     struct Stack *stack;
 //     creatstack(stack);
-//     if(!stackempty(stack)) 
+//     if(!stackempty(stack))
 //     printf("stack is empty");
 //     if(!stackfull(stack))
 //     printf("stack is full");
@@ -2630,7 +2629,7 @@
 //     return num;
 // }
 
-//栈
+// 栈
 
 // struct Stack{
 //     int capacity;
@@ -2654,7 +2653,7 @@
 //         printf("%d ",stackout(&stack));
 //     }
 //     stackdestroy(&stack);
-//     return 0;   
+//     return 0;
 // }
 // int stackempty(struct Stack *s){
 //     return s->top==0;
@@ -2712,7 +2711,7 @@
 //     return 0;
 // }
 
-//队列
+// 队列
 
 // #define qmax 10
 // typedef struct{
@@ -2776,7 +2775,7 @@
 //     return (s->rear+1)%qmax-s->front==0;
 // }
 
-//环形链表
+// 环形链表
 
 // typedef struct list{
 //     int val;
@@ -2864,7 +2863,7 @@
 // void listfree(struct Listnode *head){
 //     struct Listnode *f=head;
 //     if(f!=NULL){
-//         struct Listnode *Next=f->next; 
+//         struct Listnode *Next=f->next;
 //         free(f);
 //         f=Next;
 //     }
@@ -2959,8 +2958,6 @@
 //     printf("%d",j(5));
 //     return 0;
 // }
-
-
 
 // int main(){
 //     int aln[5]={};
@@ -3109,8 +3106,7 @@
 //     return 0;
 // }
 
-
-//链式二叉树
+// 链式二叉树
 
 // typedef struct ecs{
 //     char data;
@@ -3119,7 +3115,7 @@
 // }tree,node;
 // char str[24] = {19, 'A','B','D','G','#','#','H','#','#','#','C','E','#','I','#','#','F','#','#'}; //用作测试
 // int index=1;
-// // 前序遍历 
+// // 前序遍历
 // // 规则:二叉树为空，则返回，否则先访问根结点，然后前序遍历左子树，再前序遍历右子树
 
 // void fronttravel(tree *T){
@@ -3163,7 +3159,6 @@
 //         (*T)=NULL;
 //     }
 // }
-
 
 // struct list{
 //     int val;
@@ -3263,7 +3258,6 @@
 //     return 0;
 // }
 
-
 // int main(){
 //     int x,y;
 //     scanf("%d %d",&x,&y);
@@ -3275,7 +3269,7 @@
 //         scanf("%s",s);
 //         for( j=x-1;j>=0;j--)
 // 		{
-//             if (s[j]=='n') 
+//             if (s[j]=='n')
 // 			sum+=zhi;
 //             zhi*=2;
 //         }
@@ -3284,7 +3278,6 @@
 //     }
 //     return 0;
 // }
-
 
 // void canshujiexi(char *buf,char **out){
 //     char *ch=strtok(buf," ");
@@ -3317,21 +3310,20 @@
 //     return 0;
 // }
 
-
 // void can(char *buf,int *num);
 // int main() {
 //     int cnt=0;
 //     char zjml[1024];
 //     char str[] = "ls -a | wc -l | ls -l";
-//     char *token = strtok(str, "|");  
+//     char *token = strtok(str, "|");
 //     while (token != NULL) {
 //         printf("%s\n", token);
 //         cnt++;
 //         strncpy(zjml,token,strlen(token));
 //         printf("tnow = %s\n",token);
 //         can(zjml,&cnt);
-//         token = strtok(NULL, "|");  
-        
+//         token = strtok(NULL, "|");
+
 //     }
 //     return 0;
 // }
@@ -3345,12 +3337,11 @@
 //     }
 // }
 
-
 // void can(char *buf, int *num);
 
 // int main() {
 //     int cnt = 0;
-//     char str[] = "ls -a | wc -l | ls -l";  
+//     char str[] = "ls -a | wc -l | ls -l";
 //     char *token;
 //     char *saveptr;
 //     token = strtok_r(str, "|", &saveptr);
@@ -3358,9 +3349,9 @@
 //         cnt++;
 //         char zjml[1024];
 //         strncpy(zjml, token, sizeof(zjml) - 1);
-//         zjml[sizeof(zjml) - 1] = '\0';  
+//         zjml[sizeof(zjml) - 1] = '\0';
 //         can(zjml, &cnt);
-//         token = strtok_r(NULL, "|", &saveptr); 
+//         token = strtok_r(NULL, "|", &saveptr);
 //     }
 //     return 0;
 // }
@@ -3413,28 +3404,28 @@
 
 // int main() {
 //     char s[1024] = "ls -a | wc -l";
-//     char *out[100]; 
+//     char *out[100];
 //     int cnt=0;
 //     int left=0,right=0,len=strlen(s);
 //     while (left<len) {
 //         while (left<len&&s[left]==' ') left++;
 //         if (left>=len) break;
 //         if (s[left]=='\'') {
-//             left++; 
+//             left++;
 //             right=left;
-//             while (right<len&&s[right]!='\'') right++; 
+//             while (right<len&&s[right]!='\'') right++;
 //             if (right>=len) {
 //                 return 1;
 //             }
-//             s[right++]= '\0'; 
+//             s[right++]= '\0';
 //         }
 //         else {
 //             right=left;
-//             while (right<len&&s[right]!=' ') right++;  
-//             if (right<len) s[right++]= '\0';  
+//             while (right<len&&s[right]!=' ') right++;
+//             if (right<len) s[right++]= '\0';
 //         }
 //         out[cnt++]=s+left;
-//         left=right;  
+//         left=right;
 //     }
 //     for (int i = 0; i < cnt; i++) {
 //         printf("Arg %d: %s\n", i, out[i]);
@@ -3442,51 +3433,51 @@
 //     return 0;
 // }
 
-// #define MAXLEN 101  
+// #define MAXLEN 101
 
 // void cxzl(char *s, char *op) {
-//     char test[MAXLEN]; 
+//     char test[MAXLEN];
 //     int right = strlen(s);
-//     strcpy(test, s); 
-//     int len = right; 
-//     char *token = strtok(op, " "); 
+//     strcpy(test, s);
+//     int len = right;
+//     char *token = strtok(op, " ");
 //     while (token) {
 //         if (strcmp(token, "LEFT") == 0) {
-//             if (right > 0) right--; 
+//             if (right > 0) right--;
 //         } else if (strcmp(token, "RIGHT") == 0) {
-//             if (right < len) right++; 
+//             if (right < len) right++;
 //         } else if (strcmp(token, "CTRL") == 0) {
-//             token = strtok(NULL, " "); 
+//             token = strtok(NULL, " ");
 //             if (!token) break;
 //             if (strcmp(token, "S") == 0) {
-//                 test[len] = '\0';  
+//                 test[len] = '\0';
 //                 printf("%s\n", test);
 //             } else if (token[0] == 'D') {
-//                 int x = atoi(token + 1); 
-//                 if (right > 0) { 
+//                 int x = atoi(token + 1);
+//                 if (right > 0) {
 //                     char ch = test[right - 1];
 //                     memmove(test + right + x, test + right, len - right + 1);
 //                     for (int i = 0; i < x; i++) {
 //                         test[right + i] = ch;
 //                     }
-//                     right += x; 
-//                     len += x;    
+//                     right += x;
+//                     len += x;
 //                 }
 //             }
 //         }
-//         token = strtok(NULL, " "); 
+//         token = strtok(NULL, " ");
 //     }
-//     test[len] = '\0';  
-//     printf("%s\n", test); 
+//     test[len] = '\0';
+//     printf("%s\n", test);
 // }
 // int main() {
-//     char s[MAXLEN];  
-//     char op[100001];  
-//     fgets(s, sizeof(s), stdin); 
-//     fgets(op, sizeof(op), stdin); 
-//     s[strcspn(s, "\n")] = 0; 
+//     char s[MAXLEN];
+//     char op[100001];
+//     fgets(s, sizeof(s), stdin);
+//     fgets(op, sizeof(op), stdin);
+//     s[strcspn(s, "\n")] = 0;
 //     op[strcspn(op, "\n")] = 0;
-//     cxzl(s, op); 
+//     cxzl(s, op);
 //     return 0;
 // }
 
@@ -3575,10 +3566,33 @@
 //     free(aln);
 // }
 
-int main(){
-    char buf1[100];
-    char buf2[100]="hello";
-    printf("%d\n",strlen(buf2));
-    printf("%d",sizeof(buf2));
+// int main(){
+//     char buf1[100];
+//     char buf2[100]="hello";
+//     printf("%d\n",strlen(buf2));
+//     printf("%d",sizeof(buf2));
+//     return 0;
+// }
+
+int func(int n)
+{
+    int sum = 0, i;
+    for (i = 1; i <= 100; i++)
+    {
+        sum += i;
+    }
+    return sum;
+}
+
+int main()
+{
+    int i;
+    int result = 0;
+    for (i = 1; i <= 100; i++)
+    {
+        result += i;
+    }
+    printf("result=%d\n", result);
+    printf("fun=%d", func(250));
     return 0;
 }
