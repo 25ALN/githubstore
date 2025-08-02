@@ -220,11 +220,11 @@ void chatclient::deal_login_mu(char *a){
     memset(account,'\0',sizeof(account));
     memset(password,'\0',sizeof(password));
     memset(name,'\0',sizeof(name));
-    std::cout<<"请输入账号(10位):";
+    std::cout<<"请输入账号(6位):";
     std::cin.getline(account,sizeof(account));
     std::string actemp=account;
     int failtimes=0;
-    while(actemp.size()!=10&&!std::all_of(actemp.begin(),actemp.end(),::isdigit)){
+    while(actemp.size()!=6&&!std::all_of(actemp.begin(),actemp.end(),::isdigit)){
         if(failtimes==3){
             std::cout<<"错误次数过多请稍后重试"<<std::endl;
             return;
@@ -252,8 +252,11 @@ void chatclient::deal_login_mu(char *a){
     }
     char reponse[1024];
     memset(reponse,'\0',sizeof(reponse));
-    usleep(2000);
     int n=Recv(client_fd,reponse,sizeof(reponse),0);
+    while(n==0||reponse[0]==0x06){
+        n=Recv(client_fd,reponse,sizeof(reponse),0);
+    }
+    
     reponse[n]='\0';
     std::cout<<"server reponse:"<<reponse<<std::endl;
     if(n<=0){
@@ -355,8 +358,10 @@ void chatclient::deal_else_gn(){
     if(choose[0]=='8'){
         char server_repon[1024];
         memset(server_repon,'\0',1024);
-        usleep(2000);
         int n=Recv(client_fd,server_repon,sizeof(server_repon),0);
+        while(n==0||server_repon[0]==0x06){
+            n=Recv(client_fd,server_repon,sizeof(server_repon),0);
+        }
         std::cout<<"n="<<n<<std::endl;
         std::cout<<"server reponse:"<<server_repon<<std::endl;
         if_login=false;
@@ -575,8 +580,10 @@ void chatclient::deal_apply_mes(int client_fd,std::string message){
     Send(client_fd,mes.c_str(),mes.size(),0);
     char buf[100];
     memset(buf,'\0',sizeof(buf));
-    usleep(2000);
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n=Recv(client_fd,buf,sizeof(buf),0);
+    while(n==0||buf[0]==0x06){
+        n=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::string temp=buf;
     std::cout<<"identify="<<temp<<std::endl;
     if(temp.find("find")!=std::string::npos){
@@ -714,8 +721,10 @@ void chatclient::create_group(int client_fd,int choose){
     }
     char buf[100];
     memset(buf,'\0',sizeof(buf));
-    usleep(2000);
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n2=Recv(client_fd,buf,sizeof(buf),0);
+    while(n2==0||buf[0]==0x06){
+        n2=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::cout<<"server response:"<<buf<<std::endl;
     groups(client_fd);
 }
@@ -734,8 +743,10 @@ void chatclient::disband_group(int client_fd,int choose){
     }
     char buf[100];
     memset(buf,'\0',sizeof(buf));
-    usleep(2000);
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n2=Recv(client_fd,buf,sizeof(buf),0);
+    while(n2==0||buf[0]==0x06){
+        n2=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::cout<<"server response:"<<buf<<std::endl;
     groups(client_fd);
 }
@@ -750,8 +761,10 @@ void chatclient::look_enter_group(int client_fd,int choose){
     if(n<0){
         perror("look enter send");
     }
-    usleep(2000);
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n2=Recv(client_fd,buf,sizeof(buf),0);
+    while(n2==0||buf[0]==0x06){
+        n2=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::string temp=buf;
     if(temp.find("你还未加入任何群聊")==std::string::npos){
         std::cout<<"   群ID      群名      群主ID"<<std::endl;
@@ -772,8 +785,10 @@ void chatclient::apply_enter_group(int client_fd,int choose){
 
     char buf[100];
     memset(buf,'\0',sizeof(buf));
-    usleep(2000);
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n=Recv(client_fd,buf,sizeof(buf),0);
+    while(n==0||buf[0]==0x06){
+        n=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::cout<<"server response:"<<buf<<std::endl;
     groups(client_fd);
 }
@@ -790,8 +805,10 @@ void chatclient::groups_chat(int client_fd,int choose){
     Send(client_fd,all_message.c_str(),all_message.size(),0);
     char buf[100];
     memset(buf,'\0',sizeof(buf));
-    usleep(2000);
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n=Recv(client_fd,buf,sizeof(buf),0);
+    while(n==0||buf[0]==0x06){
+        n=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::cout<<"server response:"<<buf<<std::endl;
     std::string temp=buf;
     static int group_chatfd;
@@ -924,8 +941,10 @@ void chatclient::look_groups_history(int client_fd,int choose){
     Send(client_fd,all_message.c_str(),all_message.size(),0);
     char buf[1000000];
     memset(buf,'\0',sizeof(buf));
-    usleep(2000);
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n=Recv(client_fd,buf,sizeof(buf),0);
+    while(n==0||buf[0]==0x06){
+        n=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::cout<<buf<<std::endl;
     groups(client_fd);
 }
@@ -939,10 +958,12 @@ void chatclient::quit_one_group(int client_fd,int choose){
     std::string all_message=std::to_string(group_number)+"(group)";
     all_message.insert(0,chose);
     Send(client_fd,all_message.c_str(),all_message.size(),0);
-    usleep(2000);
     char buf[100];
     memset(buf,'\0',sizeof(buf));
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n=Recv(client_fd,buf,sizeof(buf),0);
+    while(n==0||buf[0]==0x06){
+        n=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::cout<<buf<<std::endl;
     groups(client_fd);
 }
@@ -958,10 +979,9 @@ void chatclient::look_group_members(int client_fd,int choose){
     Send(client_fd,all_message.c_str(),all_message.size(),0);
     char buf[1024];
     memset(buf,'\0',sizeof(buf));
-    usleep(2000);
     int n=Recv(client_fd,buf,sizeof(buf),0);
-    if(n<0){
-        perror("look member recv");
+    while(n==0||buf[0]==0x06){
+        n=Recv(client_fd,buf,sizeof(buf),0);
     }
     std::string check=buf;
     std::cout<<buf<<std::endl;
@@ -978,8 +998,10 @@ void chatclient::owner_charger_right(int client_fd,int choose){
     }
     char buf[100];
     memset(buf,'\0',sizeof(buf));
-    usleep(1000);
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n2=Recv(client_fd,buf,sizeof(buf),0);
+    while(n2==0||buf[0]==0x06){
+        n2=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::string check_identity=buf;
     std::cout<<"identify="<<check_identity<<std::endl;
     if(check_identity.find("成员")!=std::string::npos||check_identity.empty()){
@@ -1033,7 +1055,7 @@ void chatclient::move_someone_outgroup(int client_fd,std::string xz,std::string 
     //最后应该进行10位账号的验证 
     std::getline(std::cin,account);
     int failtimes=0;
-    while(account.size()!=10&&!std::all_of(account.begin(),account.end(),::isdigit)){
+    while(account.size()!=6&&!std::all_of(account.begin(),account.end(),::isdigit)){
         if(failtimes==3){
             std::cout<<"错误次数过多请稍后重试"<<std::endl;
             break;
@@ -1050,8 +1072,10 @@ void chatclient::move_someone_outgroup(int client_fd,std::string xz,std::string 
     Send(client_fd,account.c_str(),account.size(),0);
     char buf[100];
     memset(buf,'\0',sizeof(buf));
-    usleep(2000);
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n=Recv(client_fd,buf,sizeof(buf),0);
+    while(n==0||buf[0]==0x06){
+        n=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::cout<<"server response:"<<buf<<std::endl;
 }
 
@@ -1079,8 +1103,10 @@ void chatclient::add_group_charger(int client_fd,std::string xz,std::string grou
     Send(client_fd,account.c_str(),account.size(),0);
     char buf[100];
     memset(buf,'\0',sizeof(buf));
-    usleep(1500);
-    Recv(client_fd,buf,sizeof(buf),0);
+    int n=Recv(client_fd,buf,sizeof(buf),0);
+    while(n==0||buf[0]==0x06){
+        n=Recv(client_fd,buf,sizeof(buf),0);
+    }
     std::cout<<"server response:"<<buf<<std::endl;
 }
 
@@ -1133,9 +1159,11 @@ void chatclient::ingore_someone(int client_fd){
             return;
         }
         char reponse[1024];
-        usleep(2000);
         memset(reponse,'\0',sizeof(reponse));
-        Recv(client_fd,reponse,sizeof(reponse),0);
+        int n2=Recv(client_fd,reponse,sizeof(reponse),0);
+        while(n2==0||reponse[0]==0x06){
+            n2=Recv(client_fd,reponse,sizeof(reponse),0);
+        }
         std::cout<<"server reponse:"<<reponse<<std::endl;
     }else if(choose=="2"){
         std::cout<<"请输入你想要解除屏蔽的账号:";
@@ -1143,10 +1171,12 @@ void chatclient::ingore_someone(int client_fd){
         std::getline(std::cin,account);
         account+="K";
         Send(client_fd,account.c_str(),account.size(),0);
-        usleep(2000);
         char response[100];
         memset(response,'\0',sizeof(response));
-        Recv(client_fd,response,sizeof(response),0);
+        int n=Recv(client_fd,response,sizeof(response),0);
+        while(n<=0||response[0]==0x06){
+            n=Recv(client_fd,response,sizeof(response),0);
+        }
         std::cout<<"server response:"<<response<<std::endl;
     }else{
         times++;
@@ -1173,8 +1203,10 @@ void chatclient::delete_friends(int client_fd){
     }
     char reponse[1024];
     memset(reponse,'\0',sizeof(reponse));
-    usleep(1000);
     n=Recv(client_fd,reponse,sizeof(reponse),0);
+    while(n==0||reponse[0]==0x06){
+        n=Recv(client_fd,reponse,sizeof(reponse),0);
+    }
     if(n<0){
         perror("delete recv");
         close(client_fd);
@@ -1191,8 +1223,10 @@ void chatclient::look_history(int client_fd){
 
     char buf[10000];
     memset(buf,'\0',sizeof(buf));
-    usleep(1000);
     int n=Recv(client_fd,buf,sizeof(buf),0);
+    while(n==0||buf[0]==0x06){
+        n=Recv(client_fd,buf,sizeof(buf),0);
+    }
     if(n<0){
         perror("look recv");
         close(client_fd);
@@ -1242,8 +1276,10 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
         Send(client_fd,account,strlen(account),0);
         char ensure[100];
         memset(ensure,'\0',sizeof(ensure));
-        usleep(2000);
-        Recv(client_fd,ensure,sizeof(ensure),0);
+        int n=Recv(client_fd,ensure,sizeof(ensure),0);
+        while(n==0||ensure[0]==0x06){
+            n=Recv(client_fd,ensure,sizeof(ensure),0);
+        }
         std::string ifzx=ensure;
         std::cout<<"ensure message:"<<ifzx<<std::endl;
         if(ifzx.find("可以向该好友发送消息了")!=std::string::npos){
@@ -1334,8 +1370,10 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
 void chatclient::show_friends(int client_fd){
     char friends[4096];
     memset(friends,'\0',sizeof(friends));
-    usleep(2000);
     int n=Recv(client_fd,friends,sizeof(friends),0);
+    while(n==0||friends[0]==0x06){
+        n=Recv(client_fd,friends,sizeof(friends),0);
+    }
     if(n<=0){
         perror("show recv");
         close(client_fd);
@@ -1367,8 +1405,10 @@ void chatclient::add_friends(int client_fd,std::string buf){
         
         char reponse[100];
         memset(reponse,'\0',sizeof(reponse));
-        usleep(1000);
-        Recv(client_fd,reponse,sizeof(reponse),0);
+        int n2=Recv(client_fd,reponse,sizeof(reponse),0);
+        while(n2==0||reponse[0]==0x06){
+            n2=Recv(client_fd,reponse,sizeof(reponse),0);
+        }
         std::cout<<"server response:"<<reponse<<std::endl;
         return;
     }
@@ -1433,7 +1473,6 @@ chatclient::~chatclient(){
 int Recv(int fd,char *buf,int len,int flag){
     int reallen=0;
     fd_set set;
-    struct timeval timeout;
     while(reallen<len){
         int temp = recv(fd, buf + reallen, len - reallen, flag);
         if (temp > 0) {

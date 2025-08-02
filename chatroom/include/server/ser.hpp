@@ -557,7 +557,8 @@ void chatserver::deal_friends_part(int client_fd,std::string data){
         x.state=0;
         x.cur_user.clear();
         const char *temp="已退出登陆状态";
-        Send(client_fd,temp,strlen(temp),0);
+        int n=Send(client_fd,temp,strlen(temp),0);
+        std::cout<<"quit n="<<n<<std::endl;
         return;
     }
     if(acout.empty()&&choose[0]!='1'){
@@ -1542,6 +1543,7 @@ void chatserver::ingore_someone(int client_fd,std::string account){
         int pos=account.find("B");
         account.erase(pos,1);
     }else if(account.find("K")!=std::string::npos){
+        std::cout<<"ready jc pb"<<std::endl;
         mark="K";
         int pos=account.find("K");
         account.erase(pos,1);
@@ -1575,12 +1577,15 @@ void chatserver::ingore_someone(int client_fd,std::string account){
         redisReply *jcpb=(redisReply *)redisCommand(conn,"SREM %s %s",jc_key.c_str(),account.c_str());
         if(jcpb&&jcpb->integer==1){
             response="已成功解除对"+account+"用户的屏蔽";
+        }else{
+            response="解除屏蔽失败";
         }
         freeReplyObject(jcpb);
     }
     freeReplyObject(reply);
 
     int n=Send(client_fd,response.c_str(),response.size(),0);
+    std::cout<<"ingore num="<<n<<std::endl;
     if(n<0){
         perror("ingore send");
         close(client_fd);
