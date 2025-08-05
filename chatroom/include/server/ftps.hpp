@@ -100,12 +100,13 @@ int ftpserver::connect_init(){
 }
 
 void ftpserver::deal_new_connect(int ser_fd,int epoll_fd){
+    std::cout<<"have new message"<<std::endl;
     struct sockaddr_in client_mes;
     socklen_t mes_len = sizeof(client_mes);
     while (true) {
         int client_fd = accept(ser_fd, (struct sockaddr*)&client_mes, &mes_len);
         if (client_fd < 0) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) break;
+            if (errno == EAGAIN||errno == EWOULDBLOCK) break;
             else error_report("accept", client_fd);
         }
         // 获取服务端本地IP地址
@@ -261,7 +262,7 @@ void ftpserver::deal_RETR_data(std::shared_ptr<client_data> client,std::string f
         int pos=x.find('\n');
         x=x.substr(0,pos);
     }
-    int file_fd=open(filename.c_str(),O_RDONLY);
+    int file_fd=open(x.c_str(),O_RDONLY);
     if(file_fd < 0){
         perror("open");
         return;

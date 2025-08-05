@@ -6,7 +6,7 @@ void error_report(const std::string &x,int fd);
 static int mark=1;
 class ftpclient{
     public:
-    void start(std::string message);
+    void start(std::string message,std::string serip);
     ~ftpclient();
     
     private:
@@ -27,7 +27,8 @@ class ftpclient{
     void send_command(int fd,const std::string &cmd);
 };
 
-void ftpclient::start(std::string message){
+void ftpclient::start(std::string message,std::string serip){
+    IP=serip;
     connect_init();
     if (client_fd<0){
         error_report("socket", client_fd);
@@ -61,6 +62,7 @@ void ftpclient::start(std::string message){
 void ftpclient::start_PASV_mode(int fd,std::string first_m){
     if (!first_m.empty()){
         int n=fcSend(fd, first_m.c_str(), first_m.size(), 0);
+        std::cout<<"reday start PASV"<<std::endl;
     }
 }
 void ftpclient::deal_willsend_message(int fd, char m[1024]){
@@ -112,7 +114,9 @@ void ftpclient::connect_init(){
     struct sockaddr_in client_mess;
     client_mess.sin_family = AF_INET;
     client_mess.sin_port = htons(first_port);
-    client_mess.sin_addr.s_addr = htonl(INADDR_ANY);
+    // client_mess.sin_addr.s_addr = htonl(INADDR_ANY);
+    inet_pton(AF_INET, IP.c_str(), &client_mess.sin_addr);
+    
     int flags = fcntl(client_fd,F_GETFL,0);
     if (fcntl(client_fd,F_SETFL,flags|O_NONBLOCK) < 0){
         error_report("fcntl",client_fd);
@@ -311,7 +315,6 @@ void ftpclient::deal_up_file(std::string filename, int control_fd)
     shutdown(data_fd, SHUT_WR);
     close(data_fd);
     close(file_fd);
-    //fclose(fp);
 }
 
 int fcRecv(int fd, char *buf, int len, int flags)

@@ -1,6 +1,5 @@
 #include "../common.hpp"
 #include "ftpc.hpp"
-const int port=6666;
 static bool recv_chatting=true;
 static bool send_chatting=true;
 int Send(int fd, const char *buf, int len, int flags);
@@ -24,7 +23,7 @@ struct clientmessage{
 
 class chatclient{
     public:
-    
+    chatclient(const std::string &tempip,int tempport);
     void start();
     ~chatclient();
     private:
@@ -65,6 +64,8 @@ class chatclient{
     void move_someone_outgroup(int client_fd,std::string xz,std::string group_number);
     void add_group_charger(int client_fd,std::string xz,std::string group_number);
 
+    void la_people_in_group(int client_fd,int choose);
+    void deal_la_apply(int client_fd,std::string message);
     void deal_apply_mes(int client_fd,std::string message);
 
     long long group_number_get(long long a);
@@ -80,7 +81,13 @@ class chatclient{
     std::unordered_map<int,clientmessage> clientmes;
     
     std::set<std::string> recv_message;  
+    std::string client_ip;
+    int client_port;
 };
+
+chatclient::chatclient(const std::string &tempip,int tempport):client_ip(tempip),client_port(tempport){
+
+}
 
 void chatclient::start(){
     connect_init();
@@ -103,8 +110,8 @@ void chatclient::connect_init(){
     }    
     struct sockaddr_in clmes;
     clmes.sin_family=AF_INET;
-    clmes.sin_port=htons(port);
-    inet_pton(AF_INET,"10.30.0.117",&clmes.sin_addr);//小组网络
+    clmes.sin_port=htons(client_port);
+    inet_pton(AF_INET,client_ip.c_str(),&clmes.sin_addr);//小组网络
     //inet_pton(AF_INET,"192.168.110.68",&clmes.sin_addr);//寝室网络
     //inet_pton(AF_INET,"192.168.20.143",&clmes.sin_addr);//手机热点
     int len=sizeof(clmes);
@@ -116,7 +123,6 @@ void chatclient::connect_init(){
     }
     int flag=fcntl(client_fd,F_GETFL,0);
     fcntl(client_fd,F_SETFL,flag|O_NONBLOCK);
-    clientmes[client_fd].ip="10.30.0.152";
     clientmes[client_fd].data_fd=-1;
     std::cout<<"已成功连接到服务端!"<<std::endl;
 
@@ -216,6 +222,7 @@ void chatclient::caidan(){
 
 void chatclient::deal_login_mu(char *a){
     auto &x=clientmes[client_fd];
+    x.ip=client_ip;
     char account[1024],password[1024],name[100];
     memset(account,'\0',sizeof(account));
     memset(password,'\0',sizeof(password));
@@ -291,26 +298,26 @@ void chatclient::deal_else_gn(){
         while(true){
             int new_messize=0;
             new_messize=check_if_newmes(client_fd);
+            if(new_messize==0) continue;
         }
     }); 
     getm.detach();
     std::mutex recv_mutex;
-    static bool mesmark=false;
+    static std::atomic<bool>mesmark=false;
     std::thread message_out([&]{
         while(true){
-            std::unique_lock<std::mutex> lock(recv_mutex);
-            if(!recv_message.empty()&&recv_message.size()!=0&&mesmark==false&&client.if_enter_group==0){
-                std::cout<<"        |      9.处理/查看"<<recv_message.size()<<"条新消息 |  "<<std::endl<<std::flush;
-                lock.unlock();
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                mesmark=true; 
-                break;
-            }else if(!recv_message.empty()&&recv_message.size()!=0&&mesmark==false&&client.if_enter_group==1){
-                std::cout<<"收到新消息请稍后退出群聊后查看"<<std::endl;
-                mesmark=true; 
-                break;
+            {
+                std::unique_lock<std::mutex> lock(recv_mutex);
+                if(!recv_message.empty()&&recv_message.size()!=0&&mesmark==false&&client.if_enter_group==0){
+                    std::cout<<"        |      9.处理/查看"<<recv_message.size()<<"条新消息 |  "<<std::endl<<std::flush;
+                    mesmark=true; 
+                    break;
+                }else if(!recv_message.empty()&&recv_message.size()!=0&&mesmark==false&&client.if_enter_group==1){
+                    std::cout<<"收到新消息请稍后退出群聊后查看"<<std::endl;
+                    mesmark=true; 
+                    break;
+                }
             }
-            lock.unlock();
             std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
         }
     });
@@ -372,7 +379,6 @@ void chatclient::deal_else_gn(){
     memset(buf,'\0',sizeof(buf));
     int len=Recv(client_fd,buf,sizeof(buf),0);
     //下面这一行测试使用，之后应记得删除
-    //std::cout<<"test buf="<<buf<<std::endl;
     if(buf[strlen(buf)]==' '||buf[strlen(buf)]=='\n'){
         buf[strlen(buf)]='\0';
     }
@@ -412,52 +418,64 @@ int chatclient::check_if_newmes(int client_fd){
     char buf[1024];
     memset(buf,'\0',sizeof(buf));
     static int stopmark=0;
+    static std::mutex recv_lock;
+    std::unique_lock<std::mutex> x(recv_lock);
     if(stopmark==0){
         Recv(client_fd,buf,sizeof(buf),MSG_PEEK);
-        if(strlen(buf)>0&&buf[0]!=0x06){
+        // if(strlen(buf)>0&&buf[0]!=0x06){
+        //     return 0;
+        // }
+        if(strlen(buf)<=1){
             return 0;
         }
     }
     //MSG_PEEK只查看不接收
+    char real_buf[1024];
+    memset(real_buf,'\0',sizeof(real_buf));
+    Recv(client_fd,real_buf,sizeof(real_buf),0);
+    //flush_recv_buffer(client_fd);
     if(strlen(buf)>0){
         std::string temp=buf;
         std::string markmes='('+client.own_account+')';
-        std::mutex recv_lock;
-        std::unique_lock<std::mutex> x(recv_lock);
         for(int i=0;i<temp.size();i++){
-            if(temp[i]==0x05||temp[i]==0x06){
+            if(temp[i]==0x05||static_cast<int>(temp[i])==6||temp[i]=='\n'||temp[i]==' '){
                 temp.erase(i,1);
             }
         }
         if(temp.find("群聊")!=std::string::npos&&temp.find(markmes)!=std::string::npos&&temp.find("已被")
-        ==std::string::npos&&temp.find("已成功加入")==std::string::npos){
+        ==std::string::npos&&temp.find("已成功加入")==std::string::npos&&temp.find("已拉你进入")==std::string::npos){
             return 0;
         }
         if(((temp.find("群聊")!=std::string::npos||temp.find("你们现在是好友了")!=std::string::npos||
         temp.find("好友请求")!=std::string::npos)&&temp.find(markmes)!=std::string::npos)||
         (temp.find("群聊")!=std::string::npos&&temp.find(markmes)==std::string::npos)){
-            flush_recv_buffer(client_fd);
             stopmark=1;
-            char real_buf[1024];
-            memset(real_buf,'\0',sizeof(real_buf));
-            Recv(client_fd,real_buf,sizeof(real_buf),0);
+            for(int i=0;i<temp.size();i++){
+                if(static_cast<int>(temp[i])==6){
+                    temp.erase(i,1);
+                }
+            }
             if(temp.find("好友请求被拒绝")!=std::string::npos||temp.find("你们现在是好友了")!=std::string::npos||temp.find("已被")!=std::string::npos
-            ||temp.find("已成功加入")!=std::string::npos){
-                std::string outmes=temp.substr(temp.find('['),temp.find(']')+1);
+            ||temp.find("已成功加入")!=std::string::npos||temp.find("已拉你进入")!=std::string::npos){
+                std::string outmes=temp.substr(0,temp.find('(')-1);
                 std::cout<<outmes<<std::endl;
+                stopmark=0;
                 flush_recv_buffer(client_fd);
                 return 0;
             }
-            int pos=temp.find('(');
+            for(int j=0;j<temp.size();j++){
+                if(temp[j]==0x05||static_cast<int>(temp[j])==6||temp[j]==' '||temp[j]=='\n'){
+                    temp.erase(j,1);
+                }
+            }
+            int pos=temp.find("(");
             temp=temp.substr(0,pos);
             if(!recv_message.count(temp)){
                 recv_message.insert(temp);
-            }else{
+                temp.clear();
                 flush_recv_buffer(client_fd);
             }
         }
-        x.unlock();
-        std::this_thread::sleep_for(std::chrono::milliseconds(300)); 
         stopmark=0;
     }
     return recv_message.size();
@@ -477,13 +495,13 @@ void chatclient::new_message_show(int client_fd){
         if(i.find('[')==std::string::npos) continue;
         std::string checkmes=i;
         checkmes=checkmes.substr(checkmes.find('['),checkmes.find(']')+1);
-        if(cnt-1>1){
+        if(cnt-1>=1){
             if(temp[cnt-1].find(checkmes)!=std::string::npos){
                 continue;
             }
         }
         std::cout<<std::to_string(cnt)<<"."<<checkmes<<std::endl;
-        temp[cnt]=i;
+        temp[cnt]=checkmes;
         cnt++;
     }
     slock.unlock();
@@ -524,7 +542,7 @@ void chatclient::new_message_show(int client_fd){
 }
 
 void chatclient::flush_recv_buffer(int sockfd){
-    char buffer[1024];
+    char buffer[4096];
     while (true) {
         ssize_t bytes = recv(sockfd, buffer, sizeof(buffer),0);
         if (bytes <= 0) {
@@ -543,11 +561,14 @@ void chatclient::deal_new_message(int client_fd,std::string message){
     }else if(message.find("加入群聊")!=std::string::npos){
         deal_apply_mes(client_fd,message);
         recv_message.erase(message);
+    }else if(message.find("想拉你进入")!=std::string::npos){
+        deal_la_apply(client_fd,message);
+        recv_message.erase(message);
     }else{
         recv_message.erase(message);
     }
     std::string next_choose;
-    if(!recv_message.empty()){
+    if(!recv_message.empty()&&!recv_message.count(message)){
         std::cout<<"是否继续处理消息？(1继续0退出)";
         std::getline(std::cin,next_choose);
         int failtime=1;
@@ -626,7 +647,8 @@ void chatclient::groups(int client_fd){
     std::cout<<"        |      7.查看群聊历史聊天记录 |      "<<std::endl;
     std::cout<<"        |      8.查看群组成员         |      "<<std::endl;
     std::cout<<"        |      9.群主/管理员特权      |     "<<std::endl;
-    std::cout<<"        |      10.返回                |      "<<std::endl;
+    std::cout<<"        |      10.拉人进群            |     "<<std::endl;
+    std::cout<<"        |      11.返回                |      "<<std::endl;
     std::cout<<"        -----------------------------       "<<std::endl;
     int choose=0;
     int fail_times=0;
@@ -643,7 +665,7 @@ void chatclient::groups(int client_fd){
             }
             continue;
         }
-        if(choose>=1&&choose<=10){
+        if(choose>=1&&choose<=11){
             break;
         }else{
             fail_times++;
@@ -655,8 +677,8 @@ void chatclient::groups(int client_fd){
         }
     }
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
-    if(choose==10){
-        Send(client_fd,"10t",3,0);
+    if(choose==11){
+        Send(client_fd,"11t",3,0);
         auto&client=clientmes[client_fd];
         client.if_enter_group=0;
         return;
@@ -688,6 +710,10 @@ void chatclient::groups(int client_fd){
         break;
     case 9:
         owner_charger_right(client_fd,choose);
+        break;
+    case 10:
+        la_people_in_group(client_fd,choose);
+        break;
     default:
         break;
     }
@@ -858,7 +884,6 @@ void chatclient::groups_chat(int client_fd,int choose){
         std::thread recv_thread([&]{
             while(grecv_chat){
                 memset(gbuf,'\0',sizeof(gbuf));
-                usleep(500);
                 int n=Recv(group_chatfd,gbuf,sizeof(gbuf),0);
                 if(n<0){
                     continue;
@@ -898,7 +923,7 @@ void chatclient::groups_chat(int client_fd,int choose){
                 if(message.find("STOR ")!=std::string::npos||message.find("RETR ")!=std::string::npos){
                     int pos=message.find("\n*g*(group)");
                     message.erase(pos,message.size()-pos);
-                    client.fptc.start(message);
+                    client.fptc.start(message,client.ip);
                 }
                 message.clear();
                 if(gsend_chat==false) break;
@@ -1048,10 +1073,70 @@ void chatclient::owner_charger_right(int client_fd,int choose){
     groups(client_fd);
 }
 
+void chatclient::la_people_in_group(int client_fd,int choose){
+    auto&client=clientmes[client_fd];
+    std::string account;
+    std::cout<<"请输入你想要邀请的用户的账号(6位):";
+    std::getline(std::cin,account);
+    int failtimes=0;
+    while(account.size()!=6&&!std::all_of(account.begin(),account.end(),::isdigit)){
+        if(failtimes==3){
+            std::cout<<"错误次数过多请稍后重试"<<std::endl;
+            break;
+        }
+        std::cout<<"账号格式不规范请重新输入:";
+        failtimes++;
+        std::getline(std::cin,account);
+    }
+    std::string group_number;
+    std::cout<<"请输入你想要拉该用户进去的群号:";
+    long long temp=group_number_get(temp);
+    group_number=std::to_string(temp);
+    std::string message=std::to_string(choose)+" "+account+"^^"+group_number+"(group)";
+    Send(client_fd,message.c_str(),message.size(),0);
+    char buf[1024];
+    memset(buf,'\0',sizeof(buf));
+    int n=Recv(client_fd,buf,sizeof(buf),0);
+    while(n==0||buf[0]==0x06){
+        n=Recv(client_fd,buf,sizeof(buf),0);
+    }
+    std::cout<<"response:"<<buf<<std::endl;
+    groups(client_fd);
+}
+
+void chatclient::deal_la_apply(int client_fd,std::string message){
+    auto&client=clientmes[client_fd];
+    std::string account=client.own_account;
+    int pos1=message.find("入");
+    int pos2=message.find("群");
+    std::string group_number=message.substr(pos1+3,pos2-pos1-3);
+    std::cout<<"是否同意入群(输入1或0,1是同意):";
+    std::string choose;
+    std::getline(std::cin,choose);
+    while(choose.size()!=1||(choose!="1"&&choose!="0")){
+        std::cout<<"输入格式有误!请重新按照格式进行输入:";
+        std::getline(std::cin,choose);
+    }
+    if(choose=="0"){
+        std::cout<<"已成功拒绝对方的邀请"<<std::endl;
+        return;
+    }else{
+        std::string message=client.own_account+" "+group_number+"(group)(application)";
+        Send(client_fd,message.c_str(),message.size(),0);
+        char buf[1024];
+        memset(buf,'\0',sizeof(buf));
+        int n=Recv(client_fd,buf,sizeof(buf),0);
+        while(n==0||buf[0]==0x06){
+            n=Recv(client_fd,buf,sizeof(buf),0);
+        }
+        std::cout<<"server response:"<<buf<<std::endl;
+    }
+}
+
 void chatclient::move_someone_outgroup(int client_fd,std::string xz,std::string group_number){
     auto&client=clientmes[client_fd];
     std::string account;
-    std::cout<<"请输入你想要移除的群成员账号(10位):";
+    std::cout<<"请输入你想要移除的群成员账号(6位):";
     //最后应该进行10位账号的验证 
     std::getline(std::cin,account);
     int failtimes=0;
@@ -1250,10 +1335,11 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
             int tail=request.find(')');
             std::string getaccout=request.substr(pos+1,tail-pos-1);
             std::string ensure_state="enter chat state("+getaccout+")";
-            std::cout<<"state mess:"<<ensure_state<<std::endl;
             Send(client_fd,ensure_state.c_str(),ensure_state.size(),0);
             client.if_getchat_account=1;
-            recv_message.erase(request);
+            if(recv_message.count(request)){
+                recv_message.erase(request);
+            }
         }else{
             return;
         }
@@ -1296,7 +1382,6 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
         }
         client.if_getchat_account=1;
     }else{
-        std::cout<<"request_size="<<request.size()<<std::endl;
         std::cout<<request<<std::endl;
     }
     std::signal(SIGINT,own_chat_end);
@@ -1305,7 +1390,7 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
         while (recv_chatting) {
             char msg[4096];
             memset(msg,'\0',sizeof(msg));
-            usleep(500);
+            //usleep(500);
             int n=Recv(client_fd, msg, sizeof(msg),0);
             if(n<0){
                 continue;
@@ -1344,7 +1429,7 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
             if(temp.find("STOR ")!=std::string::npos||temp.find("RETR ")!=std::string::npos){
                 int pos=temp.find('*');
                 temp.erase(pos,temp.size()-pos);
-                client.fptc.start(temp);
+                client.fptc.start(temp,client.ip);
             }
         }
     });
@@ -1393,12 +1478,18 @@ void chatclient::show_friends(int client_fd){
 
 void chatclient::add_friends(int client_fd,std::string buf){
     if(buf.find("好友请求")!=std::string::npos){
-        std::cout<<"请输入同意或拒绝:"<<std::endl;
+        std::cout<<"请输入1(同意)或0(拒绝):"<<std::endl;
         std::string re;
-        std::getline(std::cin,re);
-        while(re!="同意"&&re!="拒绝"){
-            std::cout<<"输入有误！请重新按照格式输入:";
-            std::getline(std::cin,re);
+        std::string choose;
+        std::getline(std::cin,choose);
+        while(choose.size()!=1||(choose!="1"&&choose!="0")){
+            std::cout<<"输入格式有误!请重新按照格式进行输入:";
+            std::getline(std::cin,choose);
+        }
+        if(choose=="0"){
+            re="拒绝";
+        }else{
+            re="同意";
         }
         flush_recv_buffer(client_fd);
         int n=Send(client_fd,re.c_str(),re.size(),0);
@@ -1426,18 +1517,11 @@ void chatclient::add_friends(int client_fd,std::string buf){
     }
     char reponse[1024];
     memset(reponse,'\0',sizeof(reponse));
-
-    int retry = 0;
-    while (retry < 10) { // 最多尝试10次
-        usleep(1000);
-        int n=Recv(client_fd, reponse, sizeof(reponse), 0);
-        if (n > 0) {
-            std::cout << "server reponse:" << reponse << std::endl;
-            return;
-        } 
-        usleep(100000); // 等待100ms
-        retry++;
+    int n2=Recv(client_fd,reponse,sizeof(reponse),0);
+    while(n2==0||reponse[0]==0x06){
+        n2=Recv(client_fd,reponse,sizeof(reponse),0);
     }
+    std::cout<<reponse<<std::endl;
 }
 
 std::string chatclient::check_set(std::string temp){

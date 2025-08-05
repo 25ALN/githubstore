@@ -13,6 +13,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
+#include <sys/sendfile.h>
 #include <grp.h>
 #include <pwd.h>
 #include <time.h>
