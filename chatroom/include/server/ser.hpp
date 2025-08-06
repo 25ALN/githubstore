@@ -1,6 +1,8 @@
 #include "../common.hpp"
 #include "login_re.hpp"
 #include "ftps.hpp"
+#include "threadpool.hpp"
+
 int Recv(int fd,char *buf,int len,int flag);
 int Send(int fd, const char *buf, int len, int flags);
 struct clientmessage{
@@ -28,6 +30,7 @@ struct clientmessage{
     time_t last_heart_time;
     std::string request;
     char new_choose;
+    
 };
 
 class chatserver{
@@ -36,7 +39,8 @@ class chatserver{
     void start();
     ~chatserver();
     private:
-
+    std::mutex client_lock;
+    threadpool pool;
     void connect_init();
     void deal_new_connect();
     void deal_client_mes(int client_fd);
@@ -113,9 +117,10 @@ void chatserver::heart_check(){
     }
 }
 
-chatserver::chatserver(const std::string &ip,int port):server_ip(ip),server_port(port){
+chatserver::chatserver(const std::string &ip,int port):server_ip(ip),server_port(port),
+    pool(std::thread::hardware_concurrency()){
 
-}
+};
 
 void chatserver::start(){
     connect_init();
@@ -197,8 +202,8 @@ void chatserver::connect_init(){
 }
 
 void chatserver::deal_client_mes(int client_fd){
-    char buf[1024];
-    memset(buf,'\0',1024);
+    char buf[5000];
+    memset(buf,'\0',sizeof(buf));
     auto &client=clientm[client_fd];
     int n=Recv(client_fd,buf,sizeof(buf),0);
     if(n==1&&static_cast<unsigned char>(buf[0])==0x05){
@@ -207,17 +212,15 @@ void chatserver::deal_client_mes(int client_fd){
         Send(client_fd,&heart_cmd,1,0);
         return;
     }
-    if (n<0) {
-        if(errno == EAGAIN || errno == EWOULDBLOCK){
+    if(n<0){
+        if(errno==EAGAIN||errno==EWOULDBLOCK){
             // 连接关闭或暂时无数据
             close(client_fd);
             clientm.erase(client_fd);
         }
         return;
     }
-
     std::string temp(buf,n);
-    std::cout<<"test state="<<client.state<<std::endl;
     if(client.state==0){
         if(client.login_step==0){
             client.mark=buf[0];
@@ -288,7 +291,10 @@ void chatserver::deal_client_mes(int client_fd){
                 }
             }
         }
-        deal_friends_part(client_fd,temp);
+        pool.queuetasks([this,client_fd,temp]{
+            deal_friends_part(client_fd,temp);
+        });
+        //deal_friends_part(client_fd,temp);
     }
 }
 
@@ -947,6 +953,21 @@ void chatserver::groups_chat(int client_fd){
         }
         if(response.empty()){
             response="可以在该群中发送消息了";
+            std::string mes="[收到"+group_number+"群聊中"+client.cur_user+"的新消息]("+client.cur_user+')';
+            std::string g_memkey=group_number+":member";
+            redisReply *getmem=(redisReply *)redisCommand(conn,"SMEMBERS %s",g_memkey.c_str());
+            for(int i=0;i<getmem->elements;i++){
+                std::string temp=getmem->element[i]->str;
+                if(temp.find(client.cur_user)!=std::string::npos) continue;
+                std::string gaccount=temp.substr(temp.find(' ')+1,6);
+                for(auto&[fd,x]:clientm){
+                    if(x.cur_user==gaccount){
+                        Send(fd,mes.c_str(),mes.size(),0);
+                        break;
+                    }
+                }
+            }
+
             client.group_chat_num=group_number;
             client.if_begin_group_chat=1;
         }
@@ -1867,13 +1888,18 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
             }
             client.if_begin_chat=0;
         }
+        std::string savemess;
         if(chat_people!=-1){
+            savemess=data;
+            data+=" ("+account+")0x01";
             n=Send(chat_people,data.c_str(),data.size(),0);
         }
         if(chat_people==-1||(n>0&&data.find("ownexit")==std::string::npos)){
             long long key_num=std::stoll(account)+std::stoll(client.cur_user);
+            std::cout<<"history key="<<key_num<<":end size:"<<std::endl;
             std::string his_key=std::to_string(key_num)+":history";
-            redisReply *history=(redisReply *)redisCommand(conn,"RPUSH %s %s",his_key.c_str(),data.c_str());
+            std::cout<<"size:"<<his_key.size()<<std::endl;
+            redisReply *history=(redisReply *)redisCommand(conn,"RPUSH %s %s",his_key.c_str(),savemess.c_str());
             freeReplyObject(history);
         }
     }
@@ -1907,6 +1933,15 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
             }
         }
         int n=Send(client_fd,response.c_str(),response.size(),0);
+        if(response.find("可以向")!=std::string::npos){
+            std::string mes="["+client.cur_user+"好友向你发送了私聊消息]("+account+')';
+            for(auto&[fd,a]:clientm){
+                if(a.cur_user==account&&a.if_begin_chat==0){
+                    Send(fd,mes.c_str(),mes.size(),0);
+                    break;
+                }
+            }
+        }
         if(n<0){
             perror("chat send");
             close(client_fd);

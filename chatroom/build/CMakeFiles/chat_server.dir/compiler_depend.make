@@ -7,6 +7,7 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
   /home/aln/桌面/chatroom/include/server/ftps.hpp \
   /home/aln/桌面/chatroom/include/server/login_re.hpp \
   /home/aln/桌面/chatroom/include/server/ser.hpp \
+  /home/aln/桌面/chatroom/include/server/threadpool.hpp \
   /usr/include/alloca.h \
   /usr/include/arpa/inet.h \
   /usr/include/asm-generic/bitsperlong.h \
@@ -18,6 +19,7 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
   /usr/include/asm-generic/sockios.h \
   /usr/include/asm-generic/types.h \
   /usr/include/c++/13/algorithm \
+  /usr/include/c++/13/array \
   /usr/include/c++/13/atomic \
   /usr/include/c++/13/backward/auto_ptr.h \
   /usr/include/c++/13/backward/binders.h \
@@ -28,6 +30,7 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
   /usr/include/c++/13/bits/allocated_ptr.h \
   /usr/include/c++/13/bits/allocator.h \
   /usr/include/c++/13/bits/atomic_base.h \
+  /usr/include/c++/13/bits/atomic_futex.h \
   /usr/include/c++/13/bits/atomic_lockfree_defines.h \
   /usr/include/c++/13/bits/basic_ios.h \
   /usr/include/c++/13/bits/basic_ios.tcc \
@@ -114,6 +117,7 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
   /usr/include/c++/13/bits/stl_pair.h \
   /usr/include/c++/13/bits/stl_queue.h \
   /usr/include/c++/13/bits/stl_raw_storage_iter.h \
+  /usr/include/c++/13/bits/stl_relops.h \
   /usr/include/c++/13/bits/stl_set.h \
   /usr/include/c++/13/bits/stl_stack.h \
   /usr/include/c++/13/bits/stl_tempbuf.h \
@@ -138,6 +142,8 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
   /usr/include/c++/13/cctype \
   /usr/include/c++/13/cerrno \
   /usr/include/c++/13/clocale \
+  /usr/include/c++/13/compare \
+  /usr/include/c++/13/condition_variable \
   /usr/include/c++/13/csignal \
   /usr/include/c++/13/cstddef \
   /usr/include/c++/13/cstdint \
@@ -158,6 +164,8 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
   /usr/include/c++/13/ext/numeric_traits.h \
   /usr/include/c++/13/ext/string_conversions.h \
   /usr/include/c++/13/ext/type_traits.h \
+  /usr/include/c++/13/functional \
+  /usr/include/c++/13/future \
   /usr/include/c++/13/initializer_list \
   /usr/include/c++/13/iomanip \
   /usr/include/c++/13/ios \
@@ -191,6 +199,7 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
   /usr/include/c++/13/typeinfo \
   /usr/include/c++/13/unordered_map \
   /usr/include/c++/13/unordered_set \
+  /usr/include/c++/13/utility \
   /usr/include/c++/13/vector \
   /usr/include/ctype.h \
   /usr/include/dirent.h \
@@ -442,8 +451,6 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/x86_64-linux-gnu/bits/unistd_ext.h:
 
-/usr/include/x86_64-linux-gnu/bits/unistd.h:
-
 /usr/include/x86_64-linux-gnu/bits/unistd-decl.h:
 
 /usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
@@ -495,8 +502,6 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 /usr/include/x86_64-linux-gnu/bits/string_fortified.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdlib.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
 
@@ -564,11 +569,15 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
+/usr/include/x86_64-linux-gnu/bits/posix_opt.h:
 
-/usr/include/c++/13/bits/unique_ptr.h:
+/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
 
-/usr/include/c++/13/bits/align.h:
+/usr/include/x86_64-linux-gnu/bits/locale.h:
+
+/usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
+
+/usr/include/x86_64-linux-gnu/bits/getopt_core.h:
 
 /usr/include/c++/13/bits/streambuf.tcc:
 
@@ -583,8 +592,6 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 /usr/include/asm-generic/errno.h:
 
 /usr/include/c++/13/bits/functexcept.h:
-
-/usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
 
 /usr/include/c++/13/bits/stl_bvector.h:
 
@@ -604,12 +611,6 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/c++/13/bits/erase_if.h:
 
-/usr/include/c++/13/bits/stringfwd.h:
-
-/usr/include/c++/13/bits/stl_stack.h:
-
-/usr/include/c++/13/bits/this_thread_sleep.h:
-
 /usr/include/c++/13/bits/shared_ptr.h:
 
 /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
@@ -619,6 +620,10 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 /usr/include/c++/13/bits/stl_deque.h:
 
 /usr/include/c++/13/bits/regex_executor.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/local_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/dirent_ext.h:
 
 /usr/include/c++/13/bits/postypes.h:
 
@@ -652,8 +657,6 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/c++/13/bits/uses_allocator_args.h:
 
-/usr/include/c++/13/bits/exception_ptr.h:
-
 /usr/include/c++/13/bits/regex.tcc:
 
 /usr/include/x86_64-linux-gnu/sys/epoll.h:
@@ -663,8 +666,6 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 /usr/include/libintl.h:
 
 /usr/include/c++/13/bits/refwrap.h:
-
-/usr/include/c++/13/bits/stl_heap.h:
 
 /usr/include/c++/13/bits/std_abs.h:
 
@@ -692,23 +693,17 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/c++/13/bits/locale_facets_nonio.tcc:
 
+/usr/include/c++/13/bits/stl_heap.h:
+
+/usr/include/c++/13/utility:
+
 /usr/include/x86_64-linux-gnu/bits/dirent.h:
 
-/usr/include/c++/13/bits/stl_queue.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/epoll.h:
-
-/usr/include/c++/13/bits/requires_hosted.h:
-
-/usr/include/x86_64-linux-gnu/bits/floatn-common.h:
-
-/usr/include/c++/13/bits/atomic_lockfree_defines.h:
-
-/usr/include/x86_64-linux-gnu/asm/errno.h:
-
 /usr/include/c++/13/bits/locale_facets.h:
+
+/usr/include/c++/13/bits/stringfwd.h:
+
+/usr/include/c++/13/bits/stl_stack.h:
 
 /usr/include/c++/13/bits/regex.h:
 
@@ -724,13 +719,17 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/c++/13/bits/range_access.h:
 
-/usr/include/c++/13/system_error:
-
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
 
 /usr/include/c++/13/bits/algorithmfwd.h:
 
 /usr/include/c++/13/bits/memoryfwd.h:
+
+/usr/include/x86_64-linux-gnu/bits/setjmp.h:
+
+/usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
+
+/usr/include/time.h:
 
 /home/aln/桌面/chatroom/src/server/server.cpp:
 
@@ -746,17 +745,41 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/c++/13/bits/predefined_ops.h:
 
+/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
+
+/usr/include/c++/13/condition_variable:
+
 /usr/include/x86_64-linux-gnu/bits/signum-generic.h:
 
 /usr/include/c++/13/iosfwd:
+
+/usr/include/c++/13/bits/align.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
+
+/usr/include/c++/13/bits/unique_ptr.h:
 
 /usr/include/asm-generic/posix_types.h:
 
 /usr/include/stdc-predef.h:
 
-/usr/include/c++/13/bits/unique_lock.h:
+/usr/include/c++/13/bits/enable_special_members.h:
 
-/usr/include/c++/13/mutex:
+/usr/include/c++/13/bits/stl_queue.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/epoll.h:
+
+/usr/include/c++/13/bits/requires_hosted.h:
+
+/usr/include/x86_64-linux-gnu/bits/floatn-common.h:
+
+/usr/include/c++/13/bits/atomic_lockfree_defines.h:
+
+/usr/include/x86_64-linux-gnu/asm/errno.h:
+
+/usr/include/c++/13/bits/basic_string.tcc:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -764,27 +787,11 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/c++/13/cstdio:
 
-/usr/include/c++/13/bits/basic_string.tcc:
-
-/usr/include/c++/13/bits/enable_special_members.h:
-
 /usr/local/include/hiredis/alloc.h:
 
 /usr/include/c++/13/bits/stl_raw_storage_iter.h:
 
 /usr/include/c++/13/algorithm:
-
-/usr/include/wchar.h:
-
-/usr/include/c++/13/bits/shared_ptr_base.h:
-
-/usr/include/x86_64-linux-gnu/bits/sigthread.h:
-
-/home/aln/桌面/chatroom/include/ftpser.hpp:
-
-/usr/include/fcntl.h:
-
-/home/aln/桌面/chatroom/include/server/login_re.hpp:
 
 /usr/include/x86_64-linux-gnu/sys/wait.h:
 
@@ -794,29 +801,11 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/asm-generic/socket.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
-
-/usr/include/asm-generic/types.h:
-
-/usr/include/asm-generic/bitsperlong.h:
-
-/usr/include/c++/13/cctype:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
-
-/usr/include/c++/13/ext/atomicity.h:
-
-/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
-
-/usr/include/x86_64-linux-gnu/bits/types.h:
-
-/home/aln/桌面/chatroom/include/common.hpp:
-
-/usr/include/stdlib.h:
-
 /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h:
 
 /usr/include/c++/13/atomic:
+
+/usr/include/c++/13/bits/this_thread_sleep.h:
 
 /home/aln/桌面/chatroom/include/server/ser.hpp:
 
@@ -834,6 +823,36 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/c++/13/backward/auto_ptr.h:
 
+/usr/include/x86_64-linux-gnu/bits/types.h:
+
+/home/aln/桌面/chatroom/include/common.hpp:
+
+/usr/include/stdlib.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
+
+/usr/include/asm-generic/types.h:
+
+/usr/include/asm-generic/bitsperlong.h:
+
+/usr/include/c++/13/cctype:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+
+/usr/include/c++/13/ext/atomicity.h:
+
+/usr/include/x86_64-linux-gnu/bits/sigthread.h:
+
+/home/aln/桌面/chatroom/include/ftpser.hpp:
+
+/usr/include/fcntl.h:
+
+/home/aln/桌面/chatroom/include/server/login_re.hpp:
+
+/usr/include/wchar.h:
+
+/usr/include/c++/13/bits/shared_ptr_base.h:
+
 /usr/include/c++/13/bit:
 
 /usr/include/c++/13/bits/allocated_ptr.h:
@@ -846,7 +865,13 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/linux/stddef.h:
 
+/usr/include/c++/13/array:
+
 /usr/include/c++/13/bits/hash_bytes.h:
+
+/usr/include/x86_64-linux-gnu/bits/unistd.h:
+
+/home/aln/桌面/chatroom/include/server/threadpool.hpp:
 
 /usr/include/alloca.h:
 
@@ -870,9 +895,13 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/x86_64-linux-gnu/bits/endian.h:
 
+/usr/include/c++/13/bits/locale_conv.h:
+
 /usr/include/c++/13/bits/istream.tcc:
 
-/usr/include/c++/13/bits/locale_conv.h:
+/usr/include/c++/13/bits/exception_ptr.h:
+
+/usr/include/c++/13/bits/atomic_futex.h:
 
 /usr/include/c++/13/bits/hashtable_policy.h:
 
@@ -924,12 +953,6 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/c++/13/typeinfo:
 
-/usr/include/x86_64-linux-gnu/bits/setjmp.h:
-
-/usr/include/time.h:
-
-/usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
-
 /usr/include/c++/13/bits/exception.h:
 
 /usr/include/c++/13/bits/memory_resource.h:
@@ -941,6 +964,8 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 /usr/include/c++/13/bits/regex_error.h:
 
 /usr/include/c++/13/bits/functional_hash.h:
+
+/usr/include/c++/13/bits/stl_relops.h:
 
 /usr/include/c++/13/stack:
 
@@ -956,6 +981,10 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/c++/13/bits/locale_classes.tcc:
 
+/usr/include/c++/13/bits/unique_lock.h:
+
+/usr/include/c++/13/mutex:
+
 /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h:
 
 /usr/include/c++/13/bits/unordered_set.h:
@@ -967,6 +996,10 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 /usr/include/c++/13/type_traits:
 
 /usr/include/c++/13/cerrno:
+
+/usr/include/c++/13/system_error:
+
+/usr/include/c++/13/compare:
 
 /usr/include/c++/13/csignal:
 
@@ -1010,6 +1043,10 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/c++/13/pstl/glue_algorithm_defs.h:
 
+/usr/include/x86_64-linux-gnu/bits/in.h:
+
+/usr/include/linux/falloc.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
 
 /usr/include/c++/13/bits/stl_iterator.h:
@@ -1019,6 +1056,8 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 /usr/include/c++/13/ext/string_conversions.h:
 
 /usr/include/c++/13/ext/type_traits.h:
+
+/usr/include/c++/13/functional:
 
 /usr/local/include/hiredis/hiredis.h:
 
@@ -1094,6 +1133,8 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 
 /usr/include/dirent.h:
 
+/usr/include/c++/13/future:
+
 /usr/include/features.h:
 
 /usr/include/grp.h:
@@ -1149,17 +1190,3 @@ CMakeFiles/chat_server.dir/src/server/server.cpp.o: /home/aln/桌面/chatroom/sr
 /usr/include/x86_64-linux-gnu/asm/posix_types_64.h:
 
 /usr/include/x86_64-linux-gnu/bits/cpu-set.h:
-
-/usr/include/x86_64-linux-gnu/bits/getopt_core.h:
-
-/usr/include/linux/falloc.h:
-
-/usr/include/x86_64-linux-gnu/bits/in.h:
-
-/usr/include/x86_64-linux-gnu/bits/dirent_ext.h:
-
-/usr/include/x86_64-linux-gnu/bits/local_lim.h:
-
-/usr/include/x86_64-linux-gnu/bits/locale.h:
-
-/usr/include/x86_64-linux-gnu/bits/posix_opt.h:

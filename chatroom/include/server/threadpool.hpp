@@ -9,7 +9,6 @@
 #include <queue>
 #include <utility>
 
-//using return_type=std::vector<std::vector<double>>;
 
 class threadpool{
 public:
@@ -50,9 +49,9 @@ public:
             std::unique_lock<std::mutex> lock(qmutex);
             tasks.emplace([task](){
             std::thread::id threadid=std::this_thread::get_id();
-            std::cout<<"thread "<<threadid<<" start working"<<std::endl;
+            //std::cout<<"thread "<<threadid<<" start working"<<std::endl;
             (*task)();
-            std::cout<<"thread "<<threadid<<" finsh tasks"<<std::endl;
+            //std::cout<<"thread "<<threadid<<" finsh tasks"<<std::endl;
             });
         }
         qc.notify_one();
@@ -76,6 +75,3 @@ private:
     std::condition_variable qc;
     std::queue<std::function<void()> > tasks;
 };
-
-// return_type work(const return_type&A,const return_type&B);
-// return_type break_jz(std::vector<return_type> m);
