@@ -202,7 +202,7 @@ void chatserver::connect_init(){
 }
 
 void chatserver::deal_client_mes(int client_fd){
-    char buf[5000];
+    char buf[1000000];
     memset(buf,'\0',sizeof(buf));
     auto &client=clientm[client_fd];
     int n=Recv(client_fd,buf,sizeof(buf),0);
@@ -221,15 +221,23 @@ void chatserver::deal_client_mes(int client_fd){
         return;
     }
     std::string temp(buf,n);
+    for(int i=0;i<temp.size();i++){
+        if(temp[i]==0x05){
+            temp.erase(i,1);
+        }
+    }
     if(client.state==0){
         if(client.login_step==0){
             client.mark=buf[0];
             client.login_step=1;
         }else if(client.login_step==1){
-            client.zh=temp;
+            std::cout<<"size="<<temp.size()<<std::endl;
+            client.zh=temp.substr(temp.find("(zh)")+4,6);
             client.login_step=2;
         }else if(client.login_step==2){
-            client.mm=temp;
+            int pos1=temp.find("(mm)");
+            int pos2=temp.find("(MM)");
+            client.mm=temp.substr(pos1+4,pos2-pos1-4);
             if(client.mark[0]=='2'){
                 client.login_step=3;
             }else{
@@ -238,7 +246,9 @@ void chatserver::deal_client_mes(int client_fd){
                 client.login_step=0;
             }
         }else if(client.login_step==3){
-            client.name=temp;
+            int pos1=temp.find("(name)");
+            int pos2=temp.find("(NAME)");
+            client.name=temp.substr(pos1+6,pos2-pos1-6);
             deal_login_in(client_fd);
             client.login_step=0;
         }
@@ -342,6 +352,9 @@ void chatserver::deal_login_in(int client_fd){
     }
     std::cout<<"reponse="<<response<<std::endl;
     std::cout<<"state="<<client.state<<std::endl;
+    if(response.find("登录成功")!=std::string::npos||response.find("注册成功")!=std::string::npos){
+        response+=("(login success)");
+    }
     int n=Send(client_fd, response.c_str(), response.size(),0);
     if(n<=0){
         perror("send");
@@ -564,7 +577,17 @@ void chatserver::deal_friends_part(int client_fd,std::string data){
     }
     freeReplyObject(reply);
 
-    
+    if(data.find(")refuse")!=std::string::npos&&data.find("被拒绝")!=std::string::npos){
+        int pos=data.find('(');
+        std::string sendaccount=data.substr(pos+1,6);
+        std::string mes="[你的入群申请已被拒绝]("+sendaccount+')';
+        for(auto&[fd,a]:clientm){
+            if(a.cur_user==sendaccount){
+                Send(fd,mes.c_str(),mes.size(),0);
+                break;
+            }
+        }
+    }
     if(data.find("agree enter)")!=std::string::npos&&data.size()>20){
         add_user_enterg(client_fd,data);
         return;
@@ -806,6 +829,29 @@ void chatserver::disband_groups(int client_fd){
     if(response.empty()){
         redisReply *disband=(redisReply *)redisCommand(conn,"DEL %s",key.c_str());
         std::string member_key=group_num+":member";
+        //通知群已被解散了
+        int online=0;
+        redisReply *getmember=(redisReply *)redisCommand(conn,"SMEMBERS %s",member_key.c_str());
+        std::string mes=group_num+"群已被解散";
+        mes+=0x07;
+        for(int i=0;i<getmember->elements;i++){
+            std::string temp=getmember->element[i]->str;
+            std::string account=temp.substr(temp.find(' ')+1,6);
+            for(auto&[fd,a]:clientm){
+                if(a.cur_user==account){
+                    Send(fd,group_num.c_str(),group_num.size(),0);
+                    online=1;
+                    break;
+                }
+            }
+            if(online==0){
+                std::string newmes="new message:message";
+                mes+='('+account+')';
+                redisReply *savemes=(redisReply *)redisCommand(conn,"SADD %s %s",newmes.c_str(),mes.c_str());
+                freeReplyObject(savemes);
+            }
+        }
+        freeReplyObject(getmember);
         redisReply *delmembers=(redisReply *)redisCommand(conn,"DEL %s",member_key.c_str());
         if(disband->integer==1){
             response="已成功解散该群聊";
@@ -860,6 +906,7 @@ void chatserver::look_enter_groups(int client_fd){
         response="你还未加入任何群";
     }
     std::cout<<"look enter response:"<<response<<std::endl;
+    response+="(look enter group)";
     Send(client_fd,response.c_str(),response.size(),0);
     client.group_message.clear();
     return;
@@ -905,6 +952,7 @@ void chatserver::apply_enter_group(int client_fd){
         redisReply *save_message=(redisReply *)redisCommand(conn,"SADD %s %s",apply_save.c_str(),to_charge.c_str());
         freeReplyObject(save_message);
         response="已成功发送加群申请,等待管理员审核";
+        response+=0x07;
         std::cout<<"message="<<to_charge<<std::endl;
         int mark=send_group_apply_mess(client_fd,to_charge);
         if(mark==1){
@@ -953,24 +1001,13 @@ void chatserver::groups_chat(int client_fd){
         }
         if(response.empty()){
             response="可以在该群中发送消息了";
-            std::string mes="[收到"+group_number+"群聊中"+client.cur_user+"的新消息]("+client.cur_user+')';
-            std::string g_memkey=group_number+":member";
-            redisReply *getmem=(redisReply *)redisCommand(conn,"SMEMBERS %s",g_memkey.c_str());
-            for(int i=0;i<getmem->elements;i++){
-                std::string temp=getmem->element[i]->str;
-                if(temp.find(client.cur_user)!=std::string::npos) continue;
-                std::string gaccount=temp.substr(temp.find(' ')+1,6);
-                for(auto&[fd,x]:clientm){
-                    if(x.cur_user==gaccount){
-                        Send(fd,mes.c_str(),mes.size(),0);
-                        break;
-                    }
-                }
-            }
-
             client.group_chat_num=group_number;
             client.if_begin_group_chat=1;
         }
+        if(response=="可以在该群中发送消息了"){
+            response+="(group chat begin)";
+        }
+        std::cout<<"response="<<response<<std::endl;
         int n=Send(client_fd,response.c_str(),response.size(),0);
         if(n<0){
             perror("gchat send");
@@ -984,7 +1021,7 @@ void chatserver::groups_chat(int client_fd){
     }
     static int groups_chatfd;
     static struct sockaddr_in dbaddr;
-    if(message.find("/gexit/")!=std::string::npos){
+    if(message.find("/gexit/")!=std::string::npos&&message.size()<30){
         std::cout<<"清空准备信息"<<std::endl;
         //成功进入，但消息还是客户端的群聊消息
         client.if_begin_group_chat=0;
@@ -1022,38 +1059,87 @@ void chatserver::groups_chat(int client_fd){
         client.group_message.clear();
         return;
     }
-    std::string name;
-    std::string get_namekey="user:"+client.cur_user;
-    redisReply *getn=(redisReply *)redisCommand(conn,"HGET %s name",get_namekey.c_str());
-    name=getn->str;
-    freeReplyObject(getn);
-    name+="]:";
-    name.insert(0,"[");
-    message.insert(0,name);
-    
-    int n=sendto(groups_chatfd,message.c_str(),message.size(),0,(struct sockaddr*)&dbaddr,sizeof(dbaddr));
-    
-    std::string save_message=message;
-    int pos1=save_message.find("$?");
-    int pos2=save_message.find("^!");
-    if(!save_message.empty()&&pos1!=-1&&pos2!=-1){
-        save_message.erase(pos1,pos2-pos1+2);
-        int pos=save_message.find("*g*(group)");
-        if(pos!=-1){
-            message.erase(pos,10);
+    while(!message.empty()){
+        int pos=message.find('d');
+        int pos2=message.find(' ');
+        std::string meslen=message.substr(pos+1,pos2-pos-1);
+        int len=std::stoi(meslen)-10;
+
+        int pos3=message.find("$?");
+        int pos4=message.find("^!");
+
+        std::string tempmes=message.substr(pos2+1,pos3-pos2-1);
+        std::string account=message.substr(pos3+2,6);
+        std::cout<<"account="<<account<<std::endl;
+        message.erase(0,pos4+2);
+        
+        std::string name;
+        std::string get_namekey="user:"+client.cur_user;
+        redisReply *getn=(redisReply *)redisCommand(conn,"HGET %s name",get_namekey.c_str());
+        name=getn->str;
+        freeReplyObject(getn);
+        name+="]:";
+        name.insert(0,"[");
+        //message.insert(0,name);
+        tempmes.insert(0,name);
+        std::string save_message=tempmes;
+        //message+=0x02;
+        tempmes+="$?"+account+"^!";
+        tempmes+=0x02;
+        std::string g_key="group:"+client.group_chat_num;
+        redisReply *greply=(redisReply *)redisCommand(conn,"EXISTS %s",g_key.c_str());
+        if(greply->integer!=1){
+            tempmes="该群已被解散，不允许继续发送消息";
+            tempmes+=0x02;
         }
-        if(save_message.find("]:")+2!=save_message.size()){
-            std::string grouphistory=client.group_chat_num+":ghistory";
-            redisReply *reply=(redisReply *)redisCommand(conn,"RPUSH %s %s",grouphistory.c_str(),save_message.c_str());
-            freeReplyObject(reply);
+        freeReplyObject(greply);
+        
+        std::cout<<"tempmes="<<tempmes<<std::endl;
+        int n=sendto(groups_chatfd,tempmes.c_str(),tempmes.size(),0,(struct sockaddr*)&dbaddr,sizeof(dbaddr));
+        
+        if(tempmes.find("解散")==std::string::npos){
+            std::string mes=client.group_chat_num+"群中有新消息";
+            mes+=0x07;
+            std::string memkey=client.group_chat_num+":member";
+            redisReply *getmember=(redisReply *)redisCommand(conn,"SMEMBERS %s",memkey.c_str());
+            int online=0;
+            for(int i=0;i<getmember->elements;i++){
+                std::string temp=getmember->element[i]->str;
+                std::string account2=temp.substr(temp.find(' ')+1,6);
+                if(account2==client.cur_user) continue;
+                for(auto&[fd,a]:clientm){
+                    if(a.cur_user==account2&&a.if_begin_group_chat==0){
+                        Send(fd,mes.c_str(),mes.size(),0);
+                        online=1;
+                        break;
+                    }
+                }
+                if(online==0){
+                    std::string newmes="new message:message";
+                    mes+='('+account2+')';
+                    redisReply *savemes=(redisReply *)redisCommand(conn,"SADD %s %s",newmes.c_str(),mes.c_str());
+                    freeReplyObject(savemes);
+                }
+            }
+            freeReplyObject(getmember);
         }
+        if(!save_message.empty()){
+            if(save_message.find("]:")+2!=save_message.size()){
+                if(save_message.find("*g*(group)")!=std::string::npos&&save_message[save_message.size()-1]==')'){
+                    save_message.erase(save_message.find("*g*(group)"),10);
+                }
+                std::string grouphistory=client.group_chat_num+":ghistory";
+                redisReply *reply=(redisReply *)redisCommand(conn,"RPUSH %s %s",grouphistory.c_str(),save_message.c_str());
+                freeReplyObject(reply);
+            }
+        }
+        std::cout<<"had send n:"<<n<<std::endl;
+        if(n<0){
+            perror("sendto");
+            close(groups_chatfd);
+        }
+        client.group_message.clear();
     }
-    std::cout<<"had send n:"<<n<<std::endl;
-    if(n<0){
-        perror("sendto");
-        close(groups_chatfd);
-    }
-    client.group_message.clear();
 }
 
 void chatserver::look_groups_history(int client_fd){
@@ -1089,6 +1175,7 @@ void chatserver::look_groups_history(int client_fd){
         for(int i=0;i<gethis->elements;i++){
             if(gethis->type==REDIS_REPLY_ARRAY){
                 response+=gethis->element[i]->str;
+                response+='\n';
             }
         }
         freeReplyObject(gethis);
@@ -1351,10 +1438,12 @@ void chatserver::own_charger_right(int client_fd){
                 std::string mes=checkc->element[j]->str;
                 if(mes.find(client.cur_user)!=std::string::npos&&mes.find("管理员")!=std::string::npos){
                     response="管理员";
+                    response+=("(identify)");
                     client.if_charger=1;
                     break;
                 }else if(mes.find(client.cur_user)!=std::string::npos&&mes.find("群主")!=std::string::npos){
                     response="群主";
+                    response+=("(identify)");
                     client.if_charger=1;
                     break;
                 }
@@ -1364,6 +1453,7 @@ void chatserver::own_charger_right(int client_fd){
         freeReplyObject(reply);
         if(response.empty()){
             response="成员";
+            response+=("(identify)");
         }
         std::cout<<"will response:"<<response<<std::endl;
         Send(client_fd,response.c_str(),response.size(),0);
@@ -1409,6 +1499,7 @@ void chatserver::own_charger_right(int client_fd){
                 for(auto&[fd,a]:clientm){
                     if(a.cur_user==account){
                         std::string buf="[你已被踢出"+group_number+"群聊]("+account+')';
+                        buf+=0x07;
                         Send(fd,buf.c_str(),buf.size(),0);
                         if_found=1;
                         break;
@@ -1417,6 +1508,7 @@ void chatserver::own_charger_right(int client_fd){
                 if(if_found==0){
                     std::string  key="new message:messages";
                     std::string mes="[你已被踢出"+group_number+"群聊]("+account+')';
+                    mes+=0x07;
                     redisReply *savemes=(redisReply *)redisCommand(conn,"SADD %s %s",key.c_str(),mes.c_str());
                     freeReplyObject(savemes);
                 }
@@ -1715,6 +1807,7 @@ void chatserver::look_history(int client_fd,std::string account){
         if(history->type==REDIS_REPLY_ARRAY){
             for(int i=0;i<history->elements;i++){
                 response+=history->element[i]->str;
+                response+='\n';
             }
         }
         freeReplyObject(history);
@@ -1800,17 +1893,17 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
     if(client.if_begin_chat==0){
         redisReply *reply=(redisReply *)redisCommand(conn,"EXISTS %s",key.c_str());
         if(reply->integer!=1){
-            response="该账号不存在";
+            response="该账号不存在(no own chat)";
             freeReplyObject(reply);
         }else{
             freeReplyObject(reply);
             if(client.cur_user==account){
-                response="不允许与自己私聊!";
+                response="不允许与自己私聊!(no own chat)";
             }else{            
                 std::string friend_key=client.cur_user+":friends";
                 redisReply *r=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",friend_key.c_str(),account.c_str());
                 if(r->integer!=1){
-                    response="你们还不是好友，不允许进行私聊!";
+                    response="你们还不是好友，不允许进行私聊!(no own chat)";
                 }
                 freeReplyObject(r);
                 if(response.empty()){
@@ -1819,9 +1912,9 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
                     std::string own_pb_key=client.cur_user+":hmd_account";
                     redisReply *ownhmd=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",own_pb_key.c_str(),account.c_str());
                     if(pbcz->integer==1){
-                        response="你已被该用户屏蔽";
+                        response="你已被该用户屏蔽(no own chat)";
                     }else if(ownhmd->integer==1){
-                        response="该用户已被你屏蔽";
+                        response="该用户已被你屏蔽(no own chat)";
                     }else{
                         int ensure_fd=-1;
                         for(auto&[fd,x]:clientm){
@@ -1843,105 +1936,91 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
             }
         }
     }else if(data.find("*c*")!=std::string::npos){
-        int pos=data.find("*c*");
-        data.erase(pos,data.size()-pos);
-        std::cout<<"ready send account="<<client.cur_user<<std::endl;
-        std::string own_key="user:"+client.cur_user;
-        redisReply *getname=(redisReply *)redisCommand(conn,"HGET %s name",own_key.c_str());
-        std::string mh="]:";
-        std::string own_name="[";
-        own_name+=getname->str;
-        own_name+=mh;
-        std::cout<<"own_name:"<<own_name<<std::endl;
-        freeReplyObject(getname);
-        std::string other_name;
-        int chat_people=-1;
-        for(auto &[fd,a]:clientm){
-           if(a.cur_user==account){
-                chat_people=fd;
-                break;
-            }
-        }
-        data.insert(0,own_name);
-        std::cout<<"data message:"<<data<<std::endl;
-        int n=0;
-        //验证是否突然被删或被屏蔽
-        int mark_specail=0;
-        std::string checkpb_key=account+":hmd_account";
-        redisReply *cpbcz=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",checkpb_key.c_str(),client.cur_user.c_str());
-        if(cpbcz->integer==1){
-            mark_specail=1;
-        }   
-        freeReplyObject(cpbcz);
+        while(!data.empty()){
+            int pos=data.find("*c*");
+            int pos1=data.find(' ');
+            int pos2=data.find('d');
+            std::string len=data.substr(data.find("head")+4,pos1-pos2);
+            int meslen=std::stoi(len);
+            std::string tempmes=data.substr(pos1+1,meslen-3);
+            data.erase(0,pos+3);
 
-        std::string friend_key=client.cur_user+":friends";
-        redisReply *r=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",friend_key.c_str(),account.c_str());
-        if(r->integer!=1){
-            mark_specail=2;
-        }
-        freeReplyObject(r);
-        if(mark_specail==1||mark_specail==2){
-            if(mark_specail==1){
-                data="你已被对方屏蔽，无法继续发送消息";
-            }else{
-                data="你已被对方删除，无法继续发送消息";
+            std::cout<<"ready send account="<<client.cur_user<<std::endl;
+            std::string own_key="user:"+client.cur_user;
+            redisReply *getname=(redisReply *)redisCommand(conn,"HGET %s name",own_key.c_str());
+            std::string mh="]:";
+            std::string own_name="[";
+            own_name+=getname->str;
+            own_name+=mh;
+            freeReplyObject(getname);
+            std::string other_name;
+            int chat_people=-1;
+            int if_enter_chat=0;
+            for(auto &[fd,a]:clientm){
+            if(a.cur_user==account){
+                    chat_people=fd;
+                    if_enter_chat=a.if_begin_chat;
+                    break;
+                }
             }
-            client.if_begin_chat=0;
+            tempmes.insert(0,own_name);
+            std::cout<<"data message:"<<tempmes<<std::endl;
+            int n=0;
+            //验证是否突然被删或被屏蔽
+            int mark_specail=0;
+            std::string checkpb_key=account+":hmd_account";
+            redisReply *cpbcz=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",checkpb_key.c_str(),client.cur_user.c_str());
+            if(cpbcz->integer==1){
+                mark_specail=1;
+            }   
+            freeReplyObject(cpbcz);
+
+            std::string friend_key=client.cur_user+":friends";
+            redisReply *r=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",friend_key.c_str(),account.c_str());
+            if(r->integer!=1){
+                mark_specail=2;
+            }
+            freeReplyObject(r);
+            std::string willsendmes=tempmes;
+            if(mark_specail==1||mark_specail==2){
+                if(mark_specail==1){
+                    willsendmes="你已被对方屏蔽，无法继续发送消息";
+                }else{
+                    willsendmes="你已被对方删除，无法继续发送消息";
+                }
+                client.if_begin_chat=0;
+            }
+            std::string savemess=tempmes;
+            if(chat_people!=-1){
+                willsendmes+=" ("+account+")0x01";
+                if(if_enter_chat==0){
+                    willsendmes=own_name+"用户向你发送了一条私聊消息";
+                }
+                n=Send(chat_people,willsendmes.c_str(),willsendmes.size(),0);
+                std::cout<<"chat n="<<n<<std::endl;
+            }
+            if(chat_people==-1||(n>0&&data.find("ownexit")==std::string::npos)){
+                long long key_num=std::stoll(account)+std::stoll(client.cur_user);
+                std::string his_key=std::to_string(key_num)+":history";
+                int pos=savemess.find(':');
+                pos+=1;
+                if(savemess.substr(pos,4)=="STOR"||savemess.substr(pos,4)=="RETR"){
+                    if(savemess.substr(pos,4)=="STOR"){
+                        savemess.erase(pos,4);
+                        savemess.insert(pos,"上传文件");
+                    }else{
+                        savemess.erase(pos,4);
+                        savemess.insert(pos,"下载文件");
+                    }
+                }
+                redisReply *history=(redisReply *)redisCommand(conn,"RPUSH %s %s",his_key.c_str(),savemess.c_str());
+                freeReplyObject(history);
+            }
         }
-        std::string savemess;
-        if(chat_people!=-1){
-            savemess=data;
-            data+=" ("+account+")0x01";
-            n=Send(chat_people,data.c_str(),data.size(),0);
-        }
-        if(chat_people==-1||(n>0&&data.find("ownexit")==std::string::npos)){
-            long long key_num=std::stoll(account)+std::stoll(client.cur_user);
-            std::cout<<"history key="<<key_num<<":end size:"<<std::endl;
-            std::string his_key=std::to_string(key_num)+":history";
-            std::cout<<"size:"<<his_key.size()<<std::endl;
-            redisReply *history=(redisReply *)redisCommand(conn,"RPUSH %s %s",his_key.c_str(),savemess.c_str());
-            freeReplyObject(history);
-        }
+        data.clear();
     }
     if(!response.empty()){
-        if(response.find("屏蔽")==std::string::npos){
-            int if_found=0;
-            for(auto &[fd,a]:clientm){
-                if(a.cur_user==account){
-                    if_found=1;
-                    std::string temp="user:"+client.cur_user;
-                    redisReply *getothname=(redisReply *)redisCommand(conn,"HGET %s name",temp.c_str());
-                    std::string tempname=getothname->str;
-                    freeReplyObject(getothname);
-                    std::cout<<"tempname="<<tempname<<std::endl;
-                    std::string message="来自"+tempname+"用户的私聊消息 ("+client.cur_user+")";
-                    std::cout<<"message_size="<<message.size()<<std::endl;
-                    Send(fd,message.c_str(),message.size(),0);
-                    break;
-                }
-            }
-            if(if_found==0){
-                std::cout<<"message has been saved"<<std::endl;
-                std::string name_key="user:"+client.cur_user;
-                redisReply *getname=(redisReply *)redisCommand(conn,"HGET %s name",name_key.c_str());
-                std::string name=getname->str;
-                freeReplyObject(getname);
-                std::string message="[来自"+name+"用户的私聊消息]("+client.cur_user+')';
-                std::string temp="new message:messages";
-                redisReply *savemessage=(redisReply *)redisCommand(conn,"SADD %s %s",temp.c_str(),message.c_str());
-                freeReplyObject(savemessage);
-            }
-        }
         int n=Send(client_fd,response.c_str(),response.size(),0);
-        if(response.find("可以向")!=std::string::npos){
-            std::string mes="["+client.cur_user+"好友向你发送了私聊消息]("+account+')';
-            for(auto&[fd,a]:clientm){
-                if(a.cur_user==account&&a.if_begin_chat==0){
-                    Send(fd,mes.c_str(),mes.size(),0);
-                    break;
-                }
-            }
-        }
         if(n<0){
             perror("chat send");
             close(client_fd);
@@ -1962,7 +2041,7 @@ void chatserver::delete_friends(int client_fd,std::string account){
 
     if(!reply||reply->type != REDIS_REPLY_INTEGER||reply->integer != 1) {
         response="你还没有添加任何好友！";
-        if (reply) freeReplyObject(reply);
+        freeReplyObject(reply);
     }else{
         freeReplyObject(reply); 
         // 获取好友列表
@@ -1990,16 +2069,22 @@ void chatserver::delete_friends(int client_fd,std::string account){
                     break;
                 }
             }
+            if(found){
+                long long temp=std::stoll(account)+std::stoll(client.cur_user);
+                std::string history_key=std::to_string(temp)+":history";
+                redisReply *delhistory=(redisReply *)redisCommand(conn,"DEL %s",history_key.c_str());
+                freeReplyObject(delhistory);
+            }
         if(!found){
             response="该用户不是你的好友！";
         }
         freeReplyObject(del);
         }
-        int n=Send(client_fd,response.c_str(),response.size(),0);
-        if(n<0){
-            perror("delete send");
-            close(client_fd);
-        }
+    }
+    int n=Send(client_fd,response.c_str(),response.size(),0);
+    if(n<0){
+        perror("delete send");
+        close(client_fd);
     }
 }
 
@@ -2030,6 +2115,7 @@ std::string chatserver::deal_add_friends(int client_fd,std::string account){
     reply=(redisReply*)redisCommand(conn,"SISMEMBER %s %s",friendsKey.c_str(), account.c_str());
     if (reply->integer==1){
         std::string temp="你们已经是好友了！";
+        temp+=0x07;
         Send(client_fd,temp.c_str(),temp.size(), 0);
         freeReplyObject(reply);
         return "0";
@@ -2090,6 +2176,7 @@ void chatserver::deal_friends_add_hf(int client_fd, const std::string& response,
         redisCommand(conn, "SADD %s %s", theirFriends.c_str(), own_account.c_str());
 
         std::string msg="[你们现在是好友了!]";
+        msg+=0x07;
         Send(client_fd,msg.c_str(),msg.size(), 0);
         //向对方发送好友消息
         int if_online=0;
@@ -2109,6 +2196,7 @@ void chatserver::deal_friends_add_hf(int client_fd, const std::string& response,
         }
     }else{
         std::string msg="已拒绝好友请求";
+        msg+=0x07;
         int n=Send(client_fd, msg.c_str(), msg.size(), 0);
         std::cout<<"refuse mess n="<<n<<std::endl;
         if(n<0){
@@ -2119,6 +2207,7 @@ void chatserver::deal_friends_add_hf(int client_fd, const std::string& response,
             if (a.cur_user==own_account){
                 if_online=1;
                 std::string message="[好友请求被拒绝]("+own_account+')';
+                message+=0x07;
                 Send(fd,message.c_str(),message.size(),0);
                 break;
             }

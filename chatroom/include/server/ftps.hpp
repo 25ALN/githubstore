@@ -88,6 +88,8 @@ int ftpserver::connect_init(){
     ser.sin_family=AF_INET;
     ser.sin_port=htons(first_port);
     ser.sin_addr.s_addr=htonl(INADDR_ANY);
+    std::string serip="0.0.0.0";
+    //ser.sin_addr.s_addr=htonl(serip.c_str());
     int bind_fd=bind(fd,(struct sockaddr*)&ser,sizeof(ser));
     if(bind_fd<0){
         error_report("bind",fd);
@@ -113,8 +115,9 @@ void ftpserver::deal_new_connect(int ser_fd,int epoll_fd){
         struct sockaddr_in server_side_addr;
         socklen_t addr_len = sizeof(server_side_addr);
         getsockname(client_fd, (struct sockaddr*)&server_side_addr, &addr_len);
-        std::string server_ip = inet_ntoa(server_side_addr.sin_addr);
-        std::string client_ip = inet_ntoa(client_mes.sin_addr);
+        //std::string server_ip = inet_ntoa(server_side_addr.sin_addr);
+        std::string server_ip=inet_ntoa(client_mes.sin_addr);
+        std::string client_ip=inet_ntoa(client_mes.sin_addr);
         auto client = std::make_shared<client_data>(client_fd, client_ip);
         client->server_ip = server_ip; 
         client_message[client_fd] = client;

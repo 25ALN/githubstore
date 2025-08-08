@@ -24,7 +24,6 @@ class ftpclient{
     void deal_send_message(int fd,std::string m);
     void deal_get_file(std::string filename,int fd);
     void deal_up_file(std::string filename,int fd);
-    void send_command(int fd,const std::string &cmd);
 };
 
 void ftpclient::start(std::string message,std::string serip){
@@ -116,7 +115,7 @@ void ftpclient::connect_init(){
     client_mess.sin_port = htons(first_port);
     // client_mess.sin_addr.s_addr = htonl(INADDR_ANY);
     inet_pton(AF_INET, IP.c_str(), &client_mess.sin_addr);
-    
+    std::cout<<"IP="<<IP<<std::endl;
     int flags = fcntl(client_fd,F_GETFL,0);
     if (fcntl(client_fd,F_SETFL,flags|O_NONBLOCK) < 0){
         error_report("fcntl",client_fd);
@@ -159,6 +158,7 @@ void ftpclient::get_ip_port(std::string ser_mesage){
         }
     }
     IP=ip;
+    std::cout<<"server IP"<<IP<<std::endl;
     data_port=std::stoi(p2)*256+std::stoi(p1);
 }
 
@@ -179,6 +179,7 @@ void ftpclient::deal_get_file(std::string filename,int fd){
         std::cout<<"inet_pton fail"<<std::endl;
         return;
     }
+    std::cout<<"IP="<<IP<<std::endl;
     int m=connect(data_fd,(struct sockaddr *)&filedata,sizeof(filedata));
     if(m<0&&errno!=EINPROGRESS){
         std::cout<<"connect fail" << std::endl;
@@ -248,7 +249,7 @@ void ftpclient::deal_up_file(std::string filename, int control_fd)
     data_addr.sin_family = AF_INET;
     data_addr.sin_port = htons(data_port);
     inet_pton(AF_INET, IP.c_str(), &data_addr.sin_addr);
-
+    std::cout<<"IP="<<IP<<std::endl;
     // 发起非阻塞连接
     int connect_ret = connect(data_fd, (struct sockaddr *)&data_addr, sizeof(data_addr));
     if (connect_ret < 0 && errno != EINPROGRESS)
