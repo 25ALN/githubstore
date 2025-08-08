@@ -36,6 +36,9 @@ void ftpclient::start(std::string message,std::string serip){
     char repose[1024];
     memset(repose, '\0', sizeof(repose));
     int n=fcRecv(client_fd,repose,sizeof(repose),0);
+    while(n<=0){
+        fcRecv(client_fd,repose,sizeof(repose),0);
+    }
     if (n<=0){
         perror("init recv");
         return;
@@ -115,7 +118,6 @@ void ftpclient::connect_init(){
     client_mess.sin_port = htons(first_port);
     // client_mess.sin_addr.s_addr = htonl(INADDR_ANY);
     inet_pton(AF_INET, IP.c_str(), &client_mess.sin_addr);
-    std::cout<<"IP="<<IP<<std::endl;
     int flags = fcntl(client_fd,F_GETFL,0);
     if (fcntl(client_fd,F_SETFL,flags|O_NONBLOCK) < 0){
         error_report("fcntl",client_fd);

@@ -102,7 +102,7 @@ int ftpserver::connect_init(){
 }
 
 void ftpserver::deal_new_connect(int ser_fd,int epoll_fd){
-    std::cout<<"have new message"<<std::endl;
+    std::cout<<"ftp have new message"<<std::endl;
     struct sockaddr_in client_mes;
     socklen_t mes_len = sizeof(client_mes);
     while (true) {
@@ -115,8 +115,7 @@ void ftpserver::deal_new_connect(int ser_fd,int epoll_fd){
         struct sockaddr_in server_side_addr;
         socklen_t addr_len = sizeof(server_side_addr);
         getsockname(client_fd, (struct sockaddr*)&server_side_addr, &addr_len);
-        //std::string server_ip = inet_ntoa(server_side_addr.sin_addr);
-        std::string server_ip=inet_ntoa(client_mes.sin_addr);
+        std::string server_ip = inet_ntoa(server_side_addr.sin_addr);
         std::string client_ip=inet_ntoa(client_mes.sin_addr);
         auto client = std::make_shared<client_data>(client_fd, client_ip);
         client->server_ip = server_ip; 
@@ -136,7 +135,11 @@ void ftpserver::deal_client_data(int data_fd){
     char ensure[1024];
     memset(ensure,'\0',sizeof(ensure));
     int n=fsRecv(data_fd,ensure,sizeof(ensure),0);
+    while(n<=0){
+        fsRecv(data_fd,ensure,sizeof(ensure),0);
+    }
     if(n<0){
+        
         std::cout<<"recv error"<<std::endl;
         close(data_fd);
         return;

@@ -126,6 +126,7 @@ void chatclient::connect_init(){
     }
     int flag=fcntl(client_fd,F_GETFL,0);
     fcntl(client_fd,F_SETFL,flag|O_NONBLOCK);
+
     clientmes[client_fd].data_fd=-1;
     std::cout<<"已成功连接到服务端!"<<std::endl;
 
@@ -187,7 +188,7 @@ void chatclient::caidan(){
             if(stopmark==0){
                 static std::mutex recv_lock;
                 std::unique_lock<std::mutex> x(recv_lock);
-                char buf[4500];
+                char buf[1000000];
                 memset(buf,'\0',sizeof(buf));
                 int n=Recv(client_fd,buf,sizeof(buf),0);
                 if(n==-1){
@@ -197,6 +198,7 @@ void chatclient::caidan(){
                     if_login=false;
                     exit(0);
                 }
+                if(n==0) continue;
                 std::string temp=buf;
                 if(temp[0]==0x06||temp.size()<=0){
                     continue;
@@ -1355,10 +1357,18 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
 
             std::string temp=allbuf;
             Send(client_fd,allbuf.c_str(),allbuf.size(),0);
-            if(temp.substr(0,5)==("STOR ")||temp.substr(0,5)==("RETR ")){
-                int pos=temp.find('*');
-                temp.erase(pos,temp.size()-pos);
-                client.fptc.start(temp,client.ip);
+            if(temp.find("STOR ")!=std::string::npos||temp.find("RETR ")!=std::string::npos){
+                std::string filemes;
+                int pos2=temp.find("*c*");
+                if(temp.find("STOR ")!=std::string::npos){
+                    int pos=temp.find("STOR ");
+                    filemes=temp.substr(pos,pos2-pos);
+                }else{
+                    int pos=temp.find("RETR ");
+                    filemes=temp.substr(pos,pos2-pos);
+                }
+                std::cout<<"filenmae="<<filemes<<std::endl;
+                client.fptc.start(filemes,client_ip);
             }
             allbuf.clear();
         }

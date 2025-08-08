@@ -1985,7 +1985,7 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
             if(mark_specail==1||mark_specail==2){
                 if(mark_specail==1){
                     willsendmes="你已被对方屏蔽，无法继续发送消息";
-                }else{
+                }else if(mark_specail==2){
                     willsendmes="你已被对方删除，无法继续发送消息";
                 }
                 client.if_begin_chat=0;
