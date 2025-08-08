@@ -202,10 +202,13 @@ void chatserver::connect_init(){
 }
 
 void chatserver::deal_client_mes(int client_fd){
-    char buf[1000000];
+    std::mutex savemeslock;
+    std::unique_lock<std::mutex> saveLock(savemeslock);
+    char buf[5000000];
     memset(buf,'\0',sizeof(buf));
     auto &client=clientm[client_fd];
     int n=Recv(client_fd,buf,sizeof(buf),0);
+
     if(n==1&&static_cast<unsigned char>(buf[0])==0x05){
         client.last_heart_time=time(nullptr);
         const char heart_cmd=0x06;

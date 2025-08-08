@@ -188,7 +188,7 @@ void chatclient::caidan(){
             if(stopmark==0){
                 static std::mutex recv_lock;
                 std::unique_lock<std::mutex> x(recv_lock);
-                char buf[1000000];
+                char buf[5000000];
                 memset(buf,'\0',sizeof(buf));
                 int n=Recv(client_fd,buf,sizeof(buf),0);
                 if(n==-1){
@@ -895,7 +895,7 @@ void chatclient::groups_chat(int client_fd,int choose){
 
         std::thread recv_thread([&]{
             while(grecv_chat){
-                char gbuf[1000000];
+                char gbuf[5000000];
                 memset(gbuf,'\0',sizeof(gbuf));
                 int n=Recv(group_chatfd,gbuf,sizeof(gbuf),0);
                 if(n<0){
@@ -1371,6 +1371,7 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
                 client.fptc.start(filemes,client_ip);
             }
             allbuf.clear();
+            temp.clear();
         }
     });
 
