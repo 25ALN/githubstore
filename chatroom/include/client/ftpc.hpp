@@ -64,7 +64,6 @@ void ftpclient::start(std::string message,std::string serip){
 void ftpclient::start_PASV_mode(int fd,std::string first_m){
     if (!first_m.empty()){
         int n=fcSend(fd, first_m.c_str(), first_m.size(), 0);
-        std::cout<<"reday start PASV"<<std::endl;
     }
 }
 void ftpclient::deal_willsend_message(int fd, char m[1024]){
@@ -75,7 +74,10 @@ void ftpclient::deal_willsend_message(int fd, char m[1024]){
         });
         x.detach();
     }else if (mes.find("STOR") != std::string::npos){
-        std::string stor_command = "STOR " + mes.substr(5) + "\r\n";
+        std::string savemakr=mes.substr(0,3);
+        mes.erase(0,3);
+        std::string stor_command = "STOR " + mes.substr(5)+"\r\n";
+        stor_command.insert(0,savemakr);
         fcSend(fd, stor_command.c_str(), stor_command.size(), 0);
         // 启动线程处理文件传输
         std::thread xo([this,fd, mes](){
@@ -83,7 +85,10 @@ void ftpclient::deal_willsend_message(int fd, char m[1024]){
         });
         xo.detach();
     }else if (mes.find("RETR") != std::string::npos){
+        std::string savemakr=mes.substr(0,3);
+        mes.erase(0,3);
         std::string retr_command = "RETR " + mes.substr(5) + "\r\n";
+        retr_command.insert(0,savemakr);
         fcSend(fd, retr_command.c_str(), retr_command.size(), 0);
         std::thread xo([this,fd, mes](){ 
             deal_get_file(mes.substr(5), fd);
@@ -160,7 +165,6 @@ void ftpclient::get_ip_port(std::string ser_mesage){
         }
     }
     IP=ip;
-    std::cout<<"server IP"<<IP<<std::endl;
     data_port=std::stoi(p2)*256+std::stoi(p1);
 }
 
@@ -181,7 +185,6 @@ void ftpclient::deal_get_file(std::string filename,int fd){
         std::cout<<"inet_pton fail"<<std::endl;
         return;
     }
-    std::cout<<"IP="<<IP<<std::endl;
     int m=connect(data_fd,(struct sockaddr *)&filedata,sizeof(filedata));
     if(m<0&&errno!=EINPROGRESS){
         std::cout<<"connect fail" << std::endl;
@@ -206,7 +209,18 @@ void ftpclient::deal_get_file(std::string filename,int fd){
         int pos=filename.find('\n');
         filename=filename.substr(0,pos);
     }
-    FILE *fp=fopen(filename.c_str(),"wb");
+    char c[1024];
+    memset(c,'\0',sizeof(c));
+    getcwd(c,sizeof(c));
+    std::string path=c;
+    path.erase(path.find("bin"),3);
+    path+="downlodetest/";
+    int n=mkdir(path.c_str(),0755);
+    path+=filename;
+    std::cout<<"path="<<path<<std::endl;
+    std::cout<<"filename="<<filename<<std::endl;
+    FILE *fp=fopen(path.c_str(),"wb");
+
     if(fp==nullptr){
         std::cout<<"file open fail"<< std::endl;
         shutdown(fd, SHUT_RDWR);
@@ -251,7 +265,6 @@ void ftpclient::deal_up_file(std::string filename, int control_fd)
     data_addr.sin_family = AF_INET;
     data_addr.sin_port = htons(data_port);
     inet_pton(AF_INET, IP.c_str(), &data_addr.sin_addr);
-    std::cout<<"IP="<<IP<<std::endl;
     // 发起非阻塞连接
     int connect_ret = connect(data_fd, (struct sockaddr *)&data_addr, sizeof(data_addr));
     if (connect_ret < 0 && errno != EINPROGRESS)
@@ -280,7 +293,6 @@ void ftpclient::deal_up_file(std::string filename, int control_fd)
         int pos=filename.find('\n');
         filename=filename.substr(0,pos);
     }
-    std::cout<<"filename="<<filename<<":end"<<std::endl;
     int file_fd=open(filename.c_str(),O_RDONLY);
     if(file_fd < 0){
         perror("open");
@@ -310,7 +322,9 @@ void ftpclient::deal_up_file(std::string filename, int control_fd)
             }
         }
     }
-    std::cout << "文件上传完毕" << std::endl;
+    if(offset>=total_size){
+        std::cout << "文件上传完毕" << std::endl;
+    }
     close(file_fd);
 
     mark=1;

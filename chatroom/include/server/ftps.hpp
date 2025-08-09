@@ -139,7 +139,6 @@ void ftpserver::deal_client_data(int data_fd){
         fsRecv(data_fd,ensure,sizeof(ensure),0);
     }
     if(n<0){
-        
         std::cout<<"recv error"<<std::endl;
         close(data_fd);
         return;
@@ -158,12 +157,11 @@ void ftpserver::deal_client_data(int data_fd){
         deal_pasv_data(data_fd);
     }else if(command.find("STOR")!=std::string::npos){
         std::cout<<"begin STOR"<<std::endl;
-        deal_STOR_data(client,command.substr(5)); //从第六个字节开始读取文件名称
+        deal_STOR_data(client,command); //从第六个字节开始读取文件名称
     }else if(command.find("RETR")!=std::string::npos){
         std::cout<<"begin RETR"<<std::endl;
-        deal_RETR_data(client,command.substr(5));
+        deal_RETR_data(client,command);
     }else if(command.find("quit")!=std::string::npos){
-        std::cout<<"server quit connect"<<std::endl;
         return;
     }
     else{
@@ -258,9 +256,28 @@ void ftpserver::deal_RETR_data(std::shared_ptr<client_data> client,std::string f
         return;
     }
     client->data_fd=data_fd;
-    char c[1024];
-    getcwd(c,sizeof(c));
-    std::string x=(std::string)c+"/"+filename;
+
+    std::string savemark=filename.substr(0,3);
+    filename.erase(0,8);
+    std::string filepath;
+    if(savemark=="own"){
+        const char* dir = "./../downlode/ownfile"; 
+        char abs_path[PATH_MAX];
+        if (realpath(dir, abs_path) != NULL) {
+        } else {
+            perror("realpath failed");
+        }
+        filepath=abs_path;
+    }else{
+        const char* dir = "./../downlode/groupfile"; 
+        char abs_path[PATH_MAX];
+        if (realpath(dir, abs_path) != NULL) {
+        } else {
+            perror("realpath failed");
+        }
+        filepath=abs_path;
+    }
+    std::string x=filepath+"/"+filename;
     if(x.find("\r\n")!=std::string::npos){
         int pos=x.find("\r\n");
         x=x.substr(0,pos);
@@ -268,6 +285,7 @@ void ftpserver::deal_RETR_data(std::shared_ptr<client_data> client,std::string f
         int pos=x.find('\n');
         x=x.substr(0,pos);
     }
+    std::cout<<"x="<<x<<std::endl;
     int file_fd=open(x.c_str(),O_RDONLY);
     if(file_fd < 0){
         perror("open");
@@ -305,6 +323,8 @@ void ftpserver::deal_RETR_data(std::shared_ptr<client_data> client,std::string f
 }
 
 void ftpserver::deal_STOR_data(std::shared_ptr<client_data> client, std::string filename) {
+    std::string savemark=filename.substr(0,3);
+    filename.erase(0,8);
     // 1. 发送150响应
     std::string response = "150 Opening data connection\r\n";
     fsSend(client->client_fd, const_cast<char*>(response.c_str()), response.size(), 0);
@@ -316,7 +336,11 @@ void ftpserver::deal_STOR_data(std::shared_ptr<client_data> client, std::string 
         int pos=filename.find('\n');
         filename=filename.substr(0,pos);
     }
-    std::cout<<"filename="<<filename<<":end"<<std::endl;
+    for(int i=0;i<filename.size();i++){
+        if(filename[i]=='/'){
+            filename.erase(i,1);
+        }
+    }
     while (true) {
         data_fd = accept(client->listen_fd, (struct sockaddr*)&clmes, &len);
         if (data_fd < 0) {
@@ -333,9 +357,28 @@ void ftpserver::deal_STOR_data(std::shared_ptr<client_data> client, std::string 
         }
     }
     client->data_fd = data_fd;
-
+    std::string filepath;
+    if(savemark=="own"){
+        const char* dir = "./../downlode/ownfile"; 
+        char abs_path[PATH_MAX];
+        if (realpath(dir, abs_path) != NULL) {
+        } else {
+            perror("realpath failed");
+        }
+        filepath=abs_path;
+    }else{
+        const char* dir = "./../downlode/groupfile"; 
+        char abs_path[PATH_MAX];
+        if (realpath(dir, abs_path) != NULL) {
+        } else {
+            perror("realpath failed");
+        }
+        filepath=abs_path;
+    }
+    filepath+='/'+filename;
     // 3. 接收文件数据
-    FILE* fp = fopen(filename.c_str(), "wb");
+    std::cout<<"filepath:"<<filepath<<std::endl;
+    FILE* fp = fopen(filepath.c_str(), "wb");
     if (!fp) {
         perror("fopen failed");
         close(data_fd);
@@ -348,10 +391,10 @@ void ftpserver::deal_STOR_data(std::shared_ptr<client_data> client, std::string 
         if (n > 0) {
             fwrite(buf, 1, n, fp);
             total += n;
-        } else if (n == 0) {
-            break; // 连接关闭
         } else if (errno == EAGAIN) {
-            continue; // 非阻塞模式下重试
+            continue; 
+        } else if (n == 0) {
+            break; 
         } else {
             perror("recv error");
             break;

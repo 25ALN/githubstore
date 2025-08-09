@@ -50,7 +50,6 @@ class chatserver{
     std::string deal_add_friends(int client_fd,std::string account);
     void deal_friends_add_hf(int client_fd, const std::string& response, const std::string& requester,std::string own_account);
     void delete_friends(int client_fd,std::string account);
-    void look_history(int client_fd,std::string account);
     void chat_with_friends(int client_fd,std::string account,std::string data);
     void show_friends(int client_fd);
     void ingore_someone(int client_fd,std::string account);
@@ -66,7 +65,6 @@ class chatserver{
     void add_user_enterg(int client_fd,std::string mes);
 
     void groups_chat(int client_fd);
-    void look_groups_history(int client_fd);
     void look_enter_groups(int client_fd);
     void quit_one_group(int client_fd);
     void look_group_members(int client_fd);
@@ -507,13 +505,13 @@ void chatserver::deal_friends_part(int client_fd,std::string data){
     if(data.size()==1&&data=="6"&&x.if_begin_chat!=1){
         x.if_enter_group=1;
     }
-    if(data.size()==3&&data=="11t"&&x.if_begin_chat!=1){
+    if(data.size()==3&&data=="10t"&&x.if_begin_chat!=1){
         x.if_enter_group=0;
         return;
     }
     int n=data.size();
     std::cout<<"n="<<n<<" friends_part buf="<<data<<std::endl;
-    if(data=="ownexit*c*"){
+    if(data.find("/exit*c*")!=std::string::npos){
         x.if_begin_chat=0;
         return;
     }
@@ -595,6 +593,29 @@ void chatserver::deal_friends_part(int client_fd,std::string data){
         add_user_enterg(client_fd,data);
         return;
     }
+    if(data.find("ownhmd")!=std::string::npos&&data.size()==12){
+        std::string hmdlist;
+        std::string hmdac=data.substr(0,6);
+        std::cout<<"hmdac="<<hmdac<<std::endl;
+        std::string hmdkey=hmdac+":hmd_account";
+        redisReply *gethmd=(redisReply *)redisCommand(conn,"SMEMBERS %s",hmdkey.c_str());
+        for(int i=0;i<gethmd->elements;i++){
+            std::string getname=(std::string)gethmd->element[i]->str;
+            std::string pbac=getname;
+            getname.insert(0,"user:");
+            std::cout<<"getname:"<<getname<<std::endl;
+            redisReply *q=(redisReply *)redisCommand(conn,"HGET %s name",getname.c_str());
+            hmdlist+=(std::string)q->str+' '+pbac+'\n';
+            freeReplyObject(q);
+        }
+        freeReplyObject(gethmd);
+        if(hmdlist.empty()){
+            hmdlist="当前还没有用户被你屏蔽";
+        }
+        hmdlist+="(pblist)";
+        Send(client_fd,hmdlist.c_str(),hmdlist.size(),0);
+        return;
+    }
     if(data.find("need to save")!=std::string::npos){
         int pos=data.find('(');
         int tail=data.find(')');
@@ -634,7 +655,7 @@ void chatserver::deal_friends_part(int client_fd,std::string data){
         acout.erase(acout.size()-1);
         std::cout<<"acount_size="<<acout.size()<<std::endl;
     }
-    if(data=="8"){
+    if(data=="7"){
         std::cout<<"客户端"<<client_fd<<"已请求退出"<<std::endl;
         x.login_step=0;
         x.state=0;
@@ -698,9 +719,6 @@ void chatserver::deal_friends_part(int client_fd,std::string data){
     case '6':
         groups(client_fd);
         break;
-    case '7':
-        look_history(client_fd,acout);
-        break;
     default:
         break;
     }
@@ -745,15 +763,12 @@ void chatserver::groups(int client_fd){
         quit_one_group(client_fd);
         break;
     case 7:
-        look_groups_history(client_fd);
-        break;
-    case 8:
         look_group_members(client_fd);
         break;
-    case 9:
+    case 8:
         own_charger_right(client_fd);
         break;
-    case 10:
+    case 9:
         la_people_in_group(client_fd);
         break;
     default:
@@ -941,7 +956,7 @@ void chatserver::apply_enter_group(int client_fd){
             }
         }
         if(if_find==1){
-            response="你已经加入该群聊了";
+            response="你已经在该群聊中了";
         }
         freeReplyObject(r);
     }
@@ -1008,10 +1023,25 @@ void chatserver::groups_chat(int client_fd){
             client.if_begin_group_chat=1;
         }
         if(response=="可以在该群中发送消息了"){
+            std::string historymes="前50条历史消息记录:\n";
+            std::string h_key=group_number+":ghistory";
+            redisReply *gethistory=(redisReply *)redisCommand(conn,"LRANGE %s -50 -1",h_key.c_str());
+            if(gethistory->type==REDIS_REPLY_ARRAY){
+                for(int i=0;i<gethistory->elements;i++){
+                    historymes+=gethistory->element[i]->str;
+                    historymes+='\n';
+                }
+            }
+            freeReplyObject(gethistory);
+            response.insert(0,historymes);
             response+="(group chat begin)";
         }
         std::cout<<"response="<<response<<std::endl;
         int n=Send(client_fd,response.c_str(),response.size(),0);
+        if(response.find("可以在")==std::string::npos){
+            client.group_message.clear();
+            return;
+        }
         if(n<0){
             perror("gchat send");
         }
@@ -1143,54 +1173,6 @@ void chatserver::groups_chat(int client_fd){
         }
         client.group_message.clear();
     }
-}
-
-void chatserver::look_groups_history(int client_fd){
-    auto&client=clientm[client_fd];
-    std::string response;
-    std::string group_number=client.group_message.substr(0,9);
-    std::string existskey="group:"+group_number;
-    redisReply *reply=(redisReply *)redisCommand(conn,"EXISTS %s",existskey.c_str());
-    if(reply->integer!=1){
-        response="该群聊账号不存在";
-    }
-    freeReplyObject(reply);
-    if(response.empty()){
-        std::string join_key=client.cur_user+":joined_groups";
-        redisReply *joined=(redisReply  *)redisCommand(conn,"SMEMBERS %s",join_key.c_str());
-        int if_find=0;
-        for(int i=0;i<joined->elements;i++){
-            std::string temp=joined->element[i]->str;
-            if(temp.find('(')==std::string::npos) continue;
-            if(temp.substr(0,9)==group_number){
-                if_find=1;
-                break;
-            }
-        }
-        freeReplyObject(joined);
-        if(if_find==0){
-            response="你还未加入该群聊无权查看历史记录";
-        }
-    }
-    if(response.empty()){
-        std::string history_key=group_number+":ghistory";
-        redisReply *gethis=(redisReply *)redisCommand(conn,"LRANGE %s 0 -1",history_key.c_str());
-        for(int i=0;i<gethis->elements;i++){
-            if(gethis->type==REDIS_REPLY_ARRAY){
-                response+=gethis->element[i]->str;
-                response+='\n';
-            }
-        }
-        freeReplyObject(gethis);
-        if(response.empty()){
-            response="暂无历史聊天记录";
-        }
-    }
-    int n=Send(client_fd,response.c_str(),response.size(),0);
-    if(n<0){
-        perror("ghistory send");
-    }
-    client.group_message.clear();
 }
 
 void chatserver::check_identify(int client_fd,std::string mes){
@@ -1783,48 +1765,6 @@ int chatserver::check_acount_ifexists(int client_fd,std::string acout,std::strin
     return mark;
 }
 
-
-void chatserver::look_history(int client_fd,std::string account){
-    auto &client=clientm[client_fd];
-    std::string key="user:"+account;
-    std::string response;
-    redisReply *reply=(redisReply *)redisCommand(conn,"EXISTS %s",key.c_str());
-    if(reply->integer!=1){
-        response="该账号不存在";
-    }
-    freeReplyObject(reply);
-    if(response.empty()){
-        std::string friends_key=client.cur_user+":friends";
-        redisReply *r=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",friends_key.c_str(),account.c_str());
-        if(r->integer!=1){
-            response="该用户不是你的好友";
-        }
-        freeReplyObject(r);
-    }
-
-    if(response.empty()){
-        long long temp=std::stoll(account)+std::stoll(client.cur_user);
-        std::string his_key=std::to_string(temp);
-        his_key+=":history";
-        redisReply *history=(redisReply *)redisCommand(conn,"LRANGE %s 0 -1",his_key.c_str());
-        if(history->type==REDIS_REPLY_ARRAY){
-            for(int i=0;i<history->elements;i++){
-                response+=history->element[i]->str;
-                response+='\n';
-            }
-        }
-        freeReplyObject(history);
-    }
-    if(response.empty()){
-        response="当前暂无聊天记录";
-    }
-    int n=Send(client_fd,response.c_str(),response.size(),0);
-    if(n<0){
-        perror("look send");
-
-    }
-}
-
 void chatserver::ingore_someone(int client_fd,std::string account){
     auto &client=clientm[client_fd];
     if(account.back()==' '||account.back()=='\n'){
@@ -1836,7 +1776,6 @@ void chatserver::ingore_someone(int client_fd,std::string account){
         int pos=account.find("B");
         account.erase(pos,1);
     }else if(account.find("K")!=std::string::npos){
-        std::cout<<"ready jc pb"<<std::endl;
         mark="K";
         int pos=account.find("K");
         account.erase(pos,1);
@@ -1991,6 +1930,10 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
                 }else if(mark_specail==2){
                     willsendmes="你已被对方删除，无法继续发送消息";
                 }
+                std::string delmes=willsendmes+" ("+client.cur_user+")0x01";
+                if(client.if_begin_chat==1){
+                    Send(client_fd,delmes.c_str(),delmes.size(),0);
+                }
                 client.if_begin_chat=0;
             }
             std::string savemess=tempmes;
@@ -2002,7 +1945,7 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
                 n=Send(chat_people,willsendmes.c_str(),willsendmes.size(),0);
                 std::cout<<"chat n="<<n<<std::endl;
             }
-            if(chat_people==-1||(n>0&&data.find("ownexit")==std::string::npos)){
+            if(chat_people==-1||(n>0&&data.find("/exit")==std::string::npos)){
                 long long key_num=std::stoll(account)+std::stoll(client.cur_user);
                 std::string his_key=std::to_string(key_num)+":history";
                 int pos=savemess.find(':');
@@ -2023,6 +1966,20 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
         data.clear();
     }
     if(!response.empty()){
+        //发出前50条聊天记录
+        std::string history_key=std::to_string(std::stoi(account)+std::stoi(client.cur_user))+":history";
+        std::string chatmes="最近的前50条聊天记录\n";
+        redisReply *gethistory=(redisReply *)redisCommand(conn,"LRANGE %s -50 -1",history_key.c_str());
+        if(gethistory->type==REDIS_REPLY_ARRAY){
+            for(int i=0;i<gethistory->elements;i++){
+                chatmes+=gethistory->element[i]->str;
+                chatmes+='\n';
+            }
+        }
+        freeReplyObject(gethistory);
+        if(response.find("可以向")!=std::string::npos){
+            response.insert(0,chatmes);
+        }
         int n=Send(client_fd,response.c_str(),response.size(),0);
         if(n<0){
             perror("chat send");
@@ -2198,7 +2155,7 @@ void chatserver::deal_friends_add_hf(int client_fd, const std::string& response,
             freeReplyObject(reply);
         }
     }else{
-        std::string msg="已拒绝好友请求";
+        std::string msg="已拒绝对方的好友申请";
         msg+=0x07;
         int n=Send(client_fd, msg.c_str(), msg.size(), 0);
         std::cout<<"refuse mess n="<<n<<std::endl;
@@ -2209,15 +2166,16 @@ void chatserver::deal_friends_add_hf(int client_fd, const std::string& response,
         for(auto&[fd,a]:clientm) {
             if (a.cur_user==own_account){
                 if_online=1;
-                std::string message="[好友请求被拒绝]("+own_account+')';
+                std::string message="[好友申请被拒绝]("+own_account+')';
                 message+=0x07;
                 Send(fd,message.c_str(),message.size(),0);
+                std::cout<<"df refuse mess"<<std::endl;
                 break;
             }
         }
         if(if_online==0){
             std::string key="new message:messages";
-            std::string mess="[好友请求被拒绝](";
+            std::string mess="[好友申请被拒绝](";
             mess+=own_account+')';
             redisReply *reply=(redisReply *)redisCommand(conn,"SADD %s %s",key.c_str(),mess.c_str());
             freeReplyObject(reply);
