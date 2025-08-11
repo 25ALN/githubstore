@@ -200,12 +200,13 @@ void chatserver::connect_init(){
 }
 
 void chatserver::deal_client_mes(int client_fd){
-    std::mutex savemeslock;
-    std::unique_lock<std::mutex> saveLock(savemeslock);
+    
     char buf[5000000];
     memset(buf,'\0',sizeof(buf));
     auto &client=clientm[client_fd];
     int n=Recv(client_fd,buf,sizeof(buf),0);
+    int recvBufSize = 8 * 1024 * 1024; // 8MB
+    setsockopt(client_fd, SOL_SOCKET, SO_RCVBUF, &recvBufSize, sizeof(recvBufSize));
 
     if(n==1&&static_cast<unsigned char>(buf[0])==0x05){
         client.last_heart_time=time(nullptr);
@@ -232,7 +233,6 @@ void chatserver::deal_client_mes(int client_fd){
             client.mark=buf[0];
             client.login_step=1;
         }else if(client.login_step==1){
-            std::cout<<"size="<<temp.size()<<std::endl;
             client.zh=temp.substr(temp.find("(zh)")+4,6);
             client.login_step=2;
         }else if(client.login_step==2){
@@ -242,7 +242,6 @@ void chatserver::deal_client_mes(int client_fd){
             if(client.mark[0]=='2'){
                 client.login_step=3;
             }else{
-                std::cout<<"mark="<<client.mark<<std::endl;
                 deal_login_in(client_fd);
                 client.login_step=0;
             }
@@ -1054,7 +1053,7 @@ void chatserver::groups_chat(int client_fd){
     }
     static int groups_chatfd;
     static struct sockaddr_in dbaddr;
-    if(message.find("/gexit/")!=std::string::npos&&message.size()<30){
+    if(message.find("/gexit")!=std::string::npos&&message.size()<50){
         std::cout<<"清空准备信息"<<std::endl;
         //成功进入，但消息还是客户端的群聊消息
         client.if_begin_group_chat=0;
@@ -1113,20 +1112,24 @@ void chatserver::groups_chat(int client_fd){
         freeReplyObject(getn);
         name+="]:";
         name.insert(0,"[");
-        //message.insert(0,name);
         tempmes.insert(0,name);
         std::string save_message=tempmes;
-        //message+=0x02;
         tempmes+="$?"+account+"^!";
         tempmes+=0x02;
         std::string g_key="group:"+client.group_chat_num;
+        std::mutex savemeslock;
+        std::unique_lock<std::mutex> saveLock(savemeslock);
         redisReply *greply=(redisReply *)redisCommand(conn,"EXISTS %s",g_key.c_str());
         if(greply->integer!=1){
             tempmes="该群已被解散，不允许继续发送消息";
+            client.if_begin_group_chat=0;
+            client.group_message.clear();
+            client.group_chat_num.clear();
+            message.clear();
             tempmes+=0x02;
         }
         freeReplyObject(greply);
-        
+        saveLock.unlock();
         std::cout<<"tempmes="<<tempmes<<std::endl;
         int n=sendto(groups_chatfd,tempmes.c_str(),tempmes.size(),0,(struct sockaddr*)&dbaddr,sizeof(dbaddr));
         
@@ -1899,16 +1902,17 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
             int chat_people=-1;
             int if_enter_chat=0;
             for(auto &[fd,a]:clientm){
-            if(a.cur_user==account){
+                if(a.cur_user==account){
                     chat_people=fd;
                     if_enter_chat=a.if_begin_chat;
                     break;
                 }
             }
             tempmes.insert(0,own_name);
-            std::cout<<"data message:"<<tempmes<<std::endl;
             int n=0;
             //验证是否突然被删或被屏蔽
+            std::mutex checklock;
+            std::unique_lock<std::mutex> checkLock(checklock);
             int mark_specail=0;
             std::string checkpb_key=account+":hmd_account";
             redisReply *cpbcz=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",checkpb_key.c_str(),client.cur_user.c_str());
@@ -1916,7 +1920,7 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
                 mark_specail=1;
             }   
             freeReplyObject(cpbcz);
-
+            
             std::string friend_key=client.cur_user+":friends";
             redisReply *r=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",friend_key.c_str(),account.c_str());
             if(r->integer!=1){
@@ -1936,6 +1940,7 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
                 }
                 client.if_begin_chat=0;
             }
+            checkLock.unlock();
             std::string savemess=tempmes;
             if(chat_people!=-1){
                 willsendmes+=" ("+account+")0x01";
@@ -2223,7 +2228,7 @@ int Recv(int fd,char *buf,int len,int flag){
         if (temp > 0) {
             reallen += temp;
         } else if (temp == 0) { // 连接关闭
-            break;
+            continue;
         } else {
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 break; // 非阻塞模式下无更多数据，退出循环

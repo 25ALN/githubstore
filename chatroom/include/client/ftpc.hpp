@@ -62,8 +62,13 @@ void ftpclient::start(std::string message,std::string serip){
 }
 
 void ftpclient::start_PASV_mode(int fd,std::string first_m){
+    std::cout<<"ready start pasv mode"<<std::endl;
+    sleep(1);
     if (!first_m.empty()){
         int n=fcSend(fd, first_m.c_str(), first_m.size(), 0);
+        if(n<0){
+            perror("start pasv send");
+        }
     }
 }
 void ftpclient::deal_willsend_message(int fd, char m[1024]){
@@ -74,6 +79,7 @@ void ftpclient::deal_willsend_message(int fd, char m[1024]){
         });
         x.detach();
     }else if (mes.find("STOR") != std::string::npos){
+        std::cout<<"reday start STOR command"<<std::endl;
         std::string savemakr=mes.substr(0,3);
         mes.erase(0,3);
         std::string stor_command = "STOR " + mes.substr(5)+"\r\n";
@@ -131,6 +137,7 @@ void ftpclient::connect_init(){
     if (connect_fd < 0&&errno!=EINPROGRESS){
         error_report("connect",client_fd);
     }
+    std::cout<<"connect init success"<<std::endl;
 }
 
 void ftpclient::get_ip_port(std::string ser_mesage){

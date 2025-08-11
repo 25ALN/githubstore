@@ -102,7 +102,7 @@ int ftpserver::connect_init(){
 }
 
 void ftpserver::deal_new_connect(int ser_fd,int epoll_fd){
-    std::cout<<"ftp have new message"<<std::endl;
+    std::cout<<"    ftp have new message"<<std::endl;
     struct sockaddr_in client_mes;
     socklen_t mes_len = sizeof(client_mes);
     while (true) {
@@ -132,6 +132,7 @@ void ftpserver::deal_new_connect(int ser_fd,int epoll_fd){
 }
 
 void ftpserver::deal_client_data(int data_fd){
+    std::cout<<"ready get new mess"<<std::endl;
     char ensure[1024];
     memset(ensure,'\0',sizeof(ensure));
     int n=fsRecv(data_fd,ensure,sizeof(ensure),0);
