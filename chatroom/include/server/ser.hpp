@@ -226,42 +226,42 @@ void chatserver::deal_client_mes(int client_fd){
         if(temp[i]==0x05){
             temp.erase(i,1);
         }
-    }
-    // if(((temp.find("head")!=std::string::npos&&temp.find("*c*")!=std::string::npos)||temp.find("ghead")!=std::string::npos)&&temp.find("list file")==std::string::npos){
-    //     if(temp.find("head")!=std::string::npos&&temp.find("*c*")!=std::string::npos){
-    //         while(temp.size()!=0){
-    //             int pos=temp.find("*c*");
-    //             int pos1=temp.find(' ');
-    //             int pos2=temp.find('d');
-    //             std::cout<<"pos="<<pos<<" pos1="<<pos1<<" pos2="<<pos2<<std::endl;
-    //             std::string len=temp.substr(temp.find("head")+4,pos1-pos2);
-    //             int meslen=std::stoi(len);
-    //             std::cout<<"meslen="<<meslen<<std::endl;
-    //             std::string tempmes=temp.substr(pos1+1,meslen-3);
-    //             temp.erase(0,pos+3);
-    //             recv_buffer.push_back(tempmes);
-    //         }
-    //     }
-    // }
-    
+    }    
     if(temp.size()>0){
-        if(temp.find("head")!=std::string::npos){
+        if(temp.find("head")!=std::string::npos&&temp.find("ghead")==std::string::npos){
             std::mutex recv_lcok;
             std::unique_lock<std::mutex> buffer_lock(recv_lcok);
             while(temp.size()!=0){
                 int pos1=temp.find(' ');
                 int pos2=temp.find('d');
-
+                if(pos2-pos1+temp.find("head")+4>temp.size()) break;
                 std::string len=temp.substr(temp.find("head")+4,pos1-pos2);
                 int meslen=std::stoi(len);
-                std::cout<<"meslen="<<meslen<<std::endl;
+                if(meslen+4+len.size()>temp.size()) break;
                 std::string tempmes=temp.substr(pos1+1,meslen);
                 temp.erase(0,meslen+4+len.size());
                 tempmes+="/test/";
                 recv_buffer.push_back(tempmes);
             }
             recv_lcok.unlock();
-        }else{
+        }else if(temp.find("ghead")!=std::string::npos){
+            
+            std::mutex recv_lcok;
+            std::unique_lock<std::mutex> buffer_lock(recv_lcok);
+            while(temp.size()!=0){
+                int pos1=temp.find(' ');
+                int pos2=temp.find('d');
+                if(pos2-pos1+temp.find("ghead")+5>temp.size()) break;
+                std::string len=temp.substr(temp.find("ghead")+5,pos1-pos2);
+                int meslen=std::stoi(len);
+                if(meslen+5+len.size()>temp.size()) break;
+                std::string tempmes=temp.substr(pos1+1,meslen);
+                temp.erase(0,meslen+5+len.size());
+                recv_buffer.push_back(tempmes);
+            }
+            recv_lcok.unlock();
+        }
+        else{
             recv_buffer.push_back(temp);
         }
     }
@@ -343,7 +343,14 @@ void chatserver::deal_client_mes(int client_fd){
         std::unique_lock<std::mutex> bufflock(recv_lock);
         for(auto&i:recv_buffer){
             if(recv_buffer.empty()) break;
-            deal_friends_part(client_fd,recv_buffer.front());
+            if(client.if_begin_chat==1&&!client.chat_with.empty()&&recv_buffer.front().find("list file")==std::string::npos){
+                chat_with_friends(client_fd,client.chat_with,recv_buffer.front());
+            }else if(client.if_begin_group_chat==1&&recv_buffer.front().find("list file")==std::string::npos){
+                client.group_message=recv_buffer.front();
+                groups_chat(client_fd);
+            }else{
+                deal_friends_part(client_fd,recv_buffer.front());
+            }
             recv_buffer.pop_front();
         }
         bufflock.unlock();
@@ -690,7 +697,7 @@ void chatserver::deal_friends_part(int client_fd,std::string data){
             allfile="当前还没有可下载的文件";
         }
         Send(client_fd,allfile.c_str(),allfile.size(),0);
-    }else if(data=="ghead29 list file*g*(group)$?123456^!"){
+    }else if(data=="list file$?123456^!"){
         std::string path="/home/aln/桌面/chatroom/downlode/groupfile";
         std::string allfile;
         for (const auto &entry :std::filesystem::directory_iterator(path)) {
@@ -1177,18 +1184,17 @@ void chatserver::groups_chat(int client_fd){
         client.group_message.clear();
         return;
     }
-    while(!message.empty()){
-        int pos=message.find('d');
-        int pos2=message.find(' ');
-        std::string meslen=message.substr(pos+1,pos2-pos-1);
-        int len=std::stoi(meslen)-10;
+    if(!message.empty()){
+        // int pos=message.find('d');
+        // int pos2=message.find(' ');
+        // std::string meslen=message.substr(pos+1,pos2-pos-1);
+        // int len=std::stoi(meslen)-10;
 
         int pos3=message.find("$?");
         int pos4=message.find("^!");
 
-        std::string tempmes=message.substr(pos2+1,pos3-pos2-1);
+        std::string tempmes=message.substr(0,pos3);
         std::string account=message.substr(pos3+2,6);
-        std::cout<<"account="<<account<<std::endl;
         message.erase(0,pos4+2);
         
         std::string name;

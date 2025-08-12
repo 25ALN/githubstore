@@ -881,8 +881,8 @@ void chatclient::groups_chat(int client_fd,int choose){
         
         int opt=1;
         int reuse_fd=setsockopt(group_chatfd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(int));
-        int recvBufSize = 8 * 1024 * 1024; // 8MB
-        setsockopt(group_chatfd, SOL_SOCKET, SO_RCVBUF, &recvBufSize, sizeof(recvBufSize));
+        // int recvBufSize = 8 * 1024 * 1024; // 8MB
+        // setsockopt(group_chatfd, SOL_SOCKET, SO_RCVBUF, &recvBufSize, sizeof(recvBufSize));
 
         if(reuse_fd<0){
             perror("reuse setsockopt");
@@ -952,7 +952,7 @@ void chatclient::groups_chat(int client_fd,int choose){
                 if(gsend_chat==false){
                     break;
                 }
-                message+="*g*(group)";
+                //message+="*g*(group)";
                 message=message+"$?"+client.own_account+"^!";
                 std::string sendmes=message;
                 std::string meslen=std::to_string(sendmes.size());
