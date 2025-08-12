@@ -83,6 +83,7 @@ class chatserver{
     int epoll_fd;
     int server_fd;
     std::unordered_map<int,clientmessage> clientm;
+    std::deque<std::string> recv_buffer;
 };
 const int maxevent=1000;
 
@@ -205,8 +206,6 @@ void chatserver::deal_client_mes(int client_fd){
     memset(buf,'\0',sizeof(buf));
     auto &client=clientm[client_fd];
     int n=Recv(client_fd,buf,sizeof(buf),0);
-    int recvBufSize = 8 * 1024 * 1024; // 8MB
-    setsockopt(client_fd, SOL_SOCKET, SO_RCVBUF, &recvBufSize, sizeof(recvBufSize));
 
     if(n==1&&static_cast<unsigned char>(buf[0])==0x05){
         client.last_heart_time=time(nullptr);
@@ -228,6 +227,45 @@ void chatserver::deal_client_mes(int client_fd){
             temp.erase(i,1);
         }
     }
+    // if(((temp.find("head")!=std::string::npos&&temp.find("*c*")!=std::string::npos)||temp.find("ghead")!=std::string::npos)&&temp.find("list file")==std::string::npos){
+    //     if(temp.find("head")!=std::string::npos&&temp.find("*c*")!=std::string::npos){
+    //         while(temp.size()!=0){
+    //             int pos=temp.find("*c*");
+    //             int pos1=temp.find(' ');
+    //             int pos2=temp.find('d');
+    //             std::cout<<"pos="<<pos<<" pos1="<<pos1<<" pos2="<<pos2<<std::endl;
+    //             std::string len=temp.substr(temp.find("head")+4,pos1-pos2);
+    //             int meslen=std::stoi(len);
+    //             std::cout<<"meslen="<<meslen<<std::endl;
+    //             std::string tempmes=temp.substr(pos1+1,meslen-3);
+    //             temp.erase(0,pos+3);
+    //             recv_buffer.push_back(tempmes);
+    //         }
+    //     }
+    // }
+    
+    if(temp.size()>0){
+        if(temp.find("head")!=std::string::npos){
+            std::mutex recv_lcok;
+            std::unique_lock<std::mutex> buffer_lock(recv_lcok);
+            while(temp.size()!=0){
+                int pos1=temp.find(' ');
+                int pos2=temp.find('d');
+
+                std::string len=temp.substr(temp.find("head")+4,pos1-pos2);
+                int meslen=std::stoi(len);
+                std::cout<<"meslen="<<meslen<<std::endl;
+                std::string tempmes=temp.substr(pos1+1,meslen);
+                temp.erase(0,meslen+4+len.size());
+                tempmes+="/test/";
+                recv_buffer.push_back(tempmes);
+            }
+            recv_lcok.unlock();
+        }else{
+            recv_buffer.push_back(temp);
+        }
+    }
+    
     if(client.state==0){
         if(client.login_step==0){
             client.mark=buf[0];
@@ -301,10 +339,24 @@ void chatserver::deal_client_mes(int client_fd){
                 }
             }
         }
-        pool.queuetasks([this,client_fd,temp]{
-            deal_friends_part(client_fd,temp);
-        });
-        //deal_friends_part(client_fd,temp);
+        std::mutex recv_lock;
+        std::unique_lock<std::mutex> bufflock(recv_lock);
+        for(auto&i:recv_buffer){
+            if(recv_buffer.empty()) break;
+            deal_friends_part(client_fd,recv_buffer.front());
+            recv_buffer.pop_front();
+        }
+        bufflock.unlock();
+        // pool.queuetasks([this,client_fd,temp]{
+        //     std::mutex recv_lock;
+        //     std::unique_lock<std::mutex> bufflock(recv_lock);
+        //     for(auto&i:recv_buffer){
+        //         if(recv_buffer.empty()) break;
+        //         deal_friends_part(client_fd,recv_buffer.front());
+        //         recv_buffer.pop_front();
+        //     }
+        //     bufflock.unlock();
+        // });
     }
 }
 
@@ -497,7 +549,7 @@ int chatserver::send_group_apply_mess(int client_fd,std::string mes){
 
 void chatserver::deal_friends_part(int client_fd,std::string data){
     auto &x=clientm[client_fd];
-    if(data.find("(group)")&&((data[data.size()-1]==')')||data.find("$?")!=std::string::npos)){
+    if(data.find("(group)")!=std::string::npos&&((data[data.size()-1]==')')||data.find("$?")!=std::string::npos)){
         std::cout<<"group data="<<data<<std::endl;
         x.group_message=data;
     }
@@ -510,7 +562,7 @@ void chatserver::deal_friends_part(int client_fd,std::string data){
     }
     int n=data.size();
     std::cout<<"n="<<n<<" friends_part buf="<<data<<std::endl;
-    if(data.find("/exit*c*")!=std::string::npos){
+    if(data.find("head5 /exit")!=std::string::npos){
         x.if_begin_chat=0;
         return;
     }
@@ -591,7 +643,19 @@ void chatserver::deal_friends_part(int client_fd,std::string data){
     if(data.find("agree enter)")!=std::string::npos&&data.size()>20){
         add_user_enterg(client_fd,data);
         return;
+    }else if(data.find(")*refuse*")!=std::string::npos){
+        int pos=data.find('(');
+        std::string account=data.substr(pos+1,6);
+        std::string refusemes=data.substr(0,pos);
+        for(auto&[fd,a]:clientm){
+            if(a.cur_user==account){
+                Send(fd,refusemes.c_str(),refusemes.size(),0);
+                break;
+            }
+        }
+        return;
     }
+    
     if(data.find("ownhmd")!=std::string::npos&&data.size()==12){
         std::string hmdlist;
         std::string hmdac=data.substr(0,6);
@@ -614,6 +678,29 @@ void chatserver::deal_friends_part(int client_fd,std::string data){
         hmdlist+="(pblist)";
         Send(client_fd,hmdlist.c_str(),hmdlist.size(),0);
         return;
+    }
+    if(data=="list file/test/"){
+        std::string path="/home/aln/桌面/chatroom/downlode/ownfile";
+        std::string allfile;
+        for (const auto &entry :std::filesystem::directory_iterator(path)) {
+            allfile+=entry.path().filename().string();
+            allfile+=' ';
+        }
+        if(allfile.empty()){
+            allfile="当前还没有可下载的文件";
+        }
+        Send(client_fd,allfile.c_str(),allfile.size(),0);
+    }else if(data=="ghead29 list file*g*(group)$?123456^!"){
+        std::string path="/home/aln/桌面/chatroom/downlode/groupfile";
+        std::string allfile;
+        for (const auto &entry :std::filesystem::directory_iterator(path)) {
+            allfile+=entry.path().filename().string();
+            allfile+=' ';
+        }
+        if(allfile.empty()){
+            allfile="当前还没有可下载的文件";
+        }
+        Send(client_fd,allfile.c_str(),allfile.size(),0);
     }
     if(data.find("need to save")!=std::string::npos){
         int pos=data.find('(');
@@ -969,7 +1056,6 @@ void chatserver::apply_enter_group(int client_fd){
         redisReply *save_message=(redisReply *)redisCommand(conn,"SADD %s %s",apply_save.c_str(),to_charge.c_str());
         freeReplyObject(save_message);
         response="已成功发送加群申请,等待管理员审核";
-        response+=0x07;
         std::cout<<"message="<<to_charge<<std::endl;
         int mark=send_group_apply_mess(client_fd,to_charge);
         if(mark==1){
@@ -1880,17 +1966,19 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
                 }
             }
         }
-    }else if(data.find("*c*")!=std::string::npos){
-        while(!data.empty()){
-            int pos=data.find("*c*");
-            int pos1=data.find(' ');
-            int pos2=data.find('d');
-            std::string len=data.substr(data.find("head")+4,pos1-pos2);
-            int meslen=std::stoi(len);
-            std::string tempmes=data.substr(pos1+1,meslen-3);
-            data.erase(0,pos+3);
+    }else if(data.find("/test/")!=std::string::npos){
+        // while(!data.empty()){
+            // int pos=data.find("*c*");
+            // int pos1=data.find(' ');
+            // int pos2=data.find('d');
+            // std::string len=data.substr(data.find("head")+4,pos1-pos2);
+            // int meslen=std::stoi(len);
+            // std::string tempmes=data.substr(pos1+1,meslen-3);
+            // data.erase(0,pos+3);
 
-            std::cout<<"ready send account="<<client.cur_user<<std::endl;
+            std::string tempmes=data.substr(0,data.find("/test/"));
+            std::cout<<"tempmes="<<tempmes<<std::endl;
+
             std::string own_key="user:"+client.cur_user;
             redisReply *getname=(redisReply *)redisCommand(conn,"HGET %s name",own_key.c_str());
             std::string mh="]:";
@@ -1911,36 +1999,38 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
             tempmes.insert(0,own_name);
             int n=0;
             //验证是否突然被删或被屏蔽
-            std::mutex checklock;
-            std::unique_lock<std::mutex> checkLock(checklock);
-            int mark_specail=0;
-            std::string checkpb_key=account+":hmd_account";
-            redisReply *cpbcz=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",checkpb_key.c_str(),client.cur_user.c_str());
-            if(cpbcz->integer==1){
-                mark_specail=1;
-            }   
-            freeReplyObject(cpbcz);
-            
-            std::string friend_key=client.cur_user+":friends";
-            redisReply *r=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",friend_key.c_str(),account.c_str());
-            if(r->integer!=1){
-                mark_specail=2;
-            }
-            freeReplyObject(r);
-            std::string willsendmes=tempmes;
-            if(mark_specail==1||mark_specail==2){
-                if(mark_specail==1){
-                    willsendmes="你已被对方屏蔽，无法继续发送消息";
-                }else if(mark_specail==2){
-                    willsendmes="你已被对方删除，无法继续发送消息";
+            std::string willsendmes;
+            static std::mutex checklock;
+            {
+                std::lock_guard <std::mutex> checkLock(checklock);
+                int mark_specail=0;
+                std::string checkpb_key=account+":hmd_account";
+                redisReply *cpbcz=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",checkpb_key.c_str(),client.cur_user.c_str());
+                if(cpbcz&&cpbcz->type==REDIS_REPLY_INTEGER&&cpbcz->integer==1){
+                    mark_specail=1;
                 }
-                std::string delmes=willsendmes+" ("+client.cur_user+")0x01";
-                if(client.if_begin_chat==1){
-                    Send(client_fd,delmes.c_str(),delmes.size(),0);
+                freeReplyObject(cpbcz);
+                
+                std::string friend_key=client.cur_user+":friends";
+                redisReply *r=(redisReply *)redisCommand(conn,"SISMEMBER %s %s",friend_key.c_str(),account.c_str());
+                if(r && r->type == REDIS_REPLY_INTEGER&&r->integer!=1){
+                    mark_specail=2;
                 }
-                client.if_begin_chat=0;
+                freeReplyObject(r);
+                willsendmes=tempmes;
+                if(mark_specail==1||mark_specail==2){
+                    if(mark_specail==1){
+                        willsendmes="你已被对方屏蔽，无法继续发送消息";
+                    }else if(mark_specail==2){
+                        willsendmes="你已被对方删除，无法继续发送消息";
+                    }
+                    std::string delmes=willsendmes+" ("+client.cur_user+")0x01";
+                    if(client.if_begin_chat==1){
+                        Send(client_fd,delmes.c_str(),delmes.size(),0);
+                    }
+                    client.if_begin_chat=0;
+                }
             }
-            checkLock.unlock();
             std::string savemess=tempmes;
             if(chat_people!=-1){
                 willsendmes+=" ("+account+")0x01";
@@ -1966,7 +2056,6 @@ void chatserver::chat_with_friends(int client_fd,std::string account,std::string
                 }
                 redisReply *history=(redisReply *)redisCommand(conn,"RPUSH %s %s",his_key.c_str(),savemess.c_str());
                 freeReplyObject(history);
-            }
         }
         data.clear();
     }
@@ -2228,7 +2317,8 @@ int Recv(int fd,char *buf,int len,int flag){
         if (temp > 0) {
             reallen += temp;
         } else if (temp == 0) { // 连接关闭
-            continue;
+            //continue;
+            break;
         } else {
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 break; // 非阻塞模式下无更多数据，退出循环

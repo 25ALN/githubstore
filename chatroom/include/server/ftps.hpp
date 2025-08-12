@@ -118,7 +118,7 @@ void ftpserver::deal_new_connect(int ser_fd,int epoll_fd){
         std::string server_ip = inet_ntoa(server_side_addr.sin_addr);
         std::string client_ip=inet_ntoa(client_mes.sin_addr);
         auto client = std::make_shared<client_data>(client_fd, client_ip);
-        client->server_ip = server_ip; 
+        client->server_ip=server_ip; 
         client_message[client_fd] = client;
         int flags=fcntl(client_fd,F_GETFL,O_NONBLOCK);
         fcntl(client_fd,F_SETFL,flags|O_NONBLOCK);
@@ -132,7 +132,6 @@ void ftpserver::deal_new_connect(int ser_fd,int epoll_fd){
 }
 
 void ftpserver::deal_client_data(int data_fd){
-    std::cout<<"ready get new mess"<<std::endl;
     char ensure[1024];
     memset(ensure,'\0',sizeof(ensure));
     int n=fsRecv(data_fd,ensure,sizeof(ensure),0);

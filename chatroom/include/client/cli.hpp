@@ -630,7 +630,7 @@ void chatclient::deal_apply_mes(int client_fd,std::string message){
     if_finshmes=false;
     auto&client=clientmes[client_fd];
     if(client.identify_check==1){
-        std::cout<<"是否同意该用户进群(1是0否,输入0或1):";
+        std::cout<<"是否同意该用户进群(1是0否,输入1或0):";
         std::string choose;
         std::getline(std::cin,choose);
         int fail_time=0;
@@ -644,8 +644,11 @@ void chatclient::deal_apply_mes(int client_fd,std::string message){
             std::getline(std::cin,choose);
         }
         if(choose=="0"){
+            int pos=account.find('[');
+            account.erase(pos,1);
             std::string tempmes="你的入群申请已被拒绝(";
-            tempmes+=account+")*refuse*";
+            tempmes+=(account+")*refuse*");
+            std::cout<<"tempmes="<<tempmes<<std::endl;
             Send(client_fd,tempmes.c_str(),tempmes.size(),0);
             std::cout<<"已拒绝该用户的入群申请"<<std::endl;
         }else{
@@ -854,6 +857,7 @@ void chatclient::groups_chat(int client_fd,int choose){
     static int group_chatfd=-1;
     if(client.if_begin_group_chat==1&&group_chatfd==-1){
         std::cout<<"/gexit 可退出群聊"<<std::endl;
+        std::cout<<"list file列出可下载的文件"<<std::endl;
         std::cout<<"STOR + 文件 上传文件"<<std::endl;
         std::cout<<"RETR + 文件 下载文件"<<std::endl;
     }
@@ -1045,7 +1049,7 @@ void chatclient::owner_charger_right(int client_fd,int choose){
     }
     if_finshmes=false;
 
-    if(client.identify_pd==1){
+    if(client.identify_pd==1||client.identify_pd==0){
         std::cout<<"你还不是任何群的群主或者管理员,无权继续操作"<<std::endl;
         client.identify_pd=0;
         return;
@@ -1384,6 +1388,7 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
         }
         client.if_getchat_account=1;
         std::cout<<"/exit 可退出私聊"<<std::endl;
+        std::cout<<"list file可列出可下载的文件"<<std::endl;
         std::cout<<"STOR + 文件 上传文件"<<std::endl;
         std::cout<<"RETR + 文件 下载文件"<<std::endl;
     }else{
@@ -1394,8 +1399,7 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
             std::string allbuf;
             std::getline(std::cin,allbuf); 
             if(allbuf.empty()) continue;  
-            allbuf+=("*c*");
-
+            int len=allbuf.size();
             std::string headlenmes="head"+std::to_string(allbuf.size())+' ';
             allbuf.insert(0,headlenmes);
 
@@ -1403,17 +1407,16 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
             Send(client_fd,allbuf.c_str(),allbuf.size(),0);
             if(temp.substr(temp.find(' ')+1,4)=="STOR"||temp.substr(temp.find(' ')+1,4)=="RETR"){
                 std::string filemes;
-                int pos2=temp.find("*c*");
                 if(temp.find("STOR ")!=std::string::npos){
                     int pos=temp.find("STOR ");
-                    filemes=temp.substr(pos,pos2-pos);
+                    filemes=temp.substr(pos,len);
                 }else{
                     int pos=temp.find("RETR ");
-                    filemes=temp.substr(pos,pos2-pos);
+                    filemes=temp.substr(pos,len);
                 }
                 filemes.insert(0,"own");
                 client.fptc.start(filemes,client_ip);
-            }else if(temp.find("/exit")!=std::string::npos){
+            }else if(temp.find("head5 /exit")!=std::string::npos){
                 send_chatting=false;
                 break;
             }
