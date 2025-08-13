@@ -295,7 +295,10 @@ void ftpclient::deal_up_file(std::string filename, int control_fd)
         int pos=filename.find('\n');
         filename=filename.substr(0,pos);
     }
+    
     int file_fd=open(filename.c_str(),O_RDONLY);
+
+    
     if(file_fd < 0){
         perror("open");
         return;

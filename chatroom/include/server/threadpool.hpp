@@ -40,7 +40,8 @@ public:
     template<typename F,typename... Args>
     //auto queuetasks(F&&f,std::vector<return_type> q){ //定义了一个参数获取回调的东西
     auto queuetasks(F&& f, Args&&... args)-> std::future<typename std::result_of<F(Args...)>::type> {
-        using return_type=typename std::result_of<F(Args...)>::type;
+        //using return_type=typename std::result_of<F(Args...)>::type;
+        using return_type = decltype(f(args...));
         auto task=std::make_shared<std::packaged_task<return_type()>>([=](){  //对任务进行封装
             return f(std::forward<Args>(args)...);
         }); 
@@ -49,9 +50,7 @@ public:
             std::unique_lock<std::mutex> lock(qmutex);
             tasks.emplace([task](){
             std::thread::id threadid=std::this_thread::get_id();
-            //std::cout<<"thread "<<threadid<<" start working"<<std::endl;
             (*task)();
-            //std::cout<<"thread "<<threadid<<" finsh tasks"<<std::endl;
             });
         }
         qc.notify_one();

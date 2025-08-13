@@ -103,6 +103,11 @@ void chatclient::start(){
 
 void chatclient::connect_init(){
     std::cout<<"开始连接服务端"<<std::endl;
+
+    struct termios t;
+    tcgetattr(STDIN_FILENO, &t);
+    t.c_cc[VEOF] = _POSIX_VDISABLE; // 禁用 EOF
+    tcsetattr(STDIN_FILENO, TCSANOW, &t);
     client_fd=socket(AF_INET,SOCK_STREAM,0);
     if(client_fd<0){
         perror("socket");
@@ -185,7 +190,7 @@ void chatclient::caidan(){
             if(stopmark==0){
                 static std::mutex recv_lock;
                 std::unique_lock<std::mutex> x(recv_lock);
-                char buf[5000000];
+                char buf[1000000];
                 memset(buf,'\0',sizeof(buf));
                 int n=Recv(client_fd,buf,sizeof(buf),0);
                 if(n==-1){
@@ -858,6 +863,7 @@ void chatclient::groups_chat(int client_fd,int choose){
     if(client.if_begin_group_chat==1&&group_chatfd==-1){
         std::cout<<"/gexit 可退出群聊"<<std::endl;
         std::cout<<"list file列出可下载的文件"<<std::endl;
+        std::cout<<"glook past查看群聊所有的历史记录"<<std::endl;
         std::cout<<"STOR + 文件 上传文件"<<std::endl;
         std::cout<<"RETR + 文件 下载文件"<<std::endl;
     }
@@ -952,17 +958,30 @@ void chatclient::groups_chat(int client_fd,int choose){
                 if(gsend_chat==false){
                     break;
                 }
-                //message+="*g*(group)";
                 message=message+"$?"+client.own_account+"^!";
                 std::string sendmes=message;
+                if(sendmes.substr(0,10)=="glook past"){
+                    sendmes.insert(0,std::to_string(group_number));
+                }
                 std::string meslen=std::to_string(sendmes.size());
                 meslen.insert(0,"ghead");
                 meslen+=' ';
                 sendmes.insert(0,meslen);
                 Send(client_fd,sendmes.c_str(),sendmes.size(),0);
                 if(message.substr(0,4)=="STOR"||message.substr(0,4)=="RETR"){
-                    int pos=message.find("*g*(group)");
+                    int pos=message.find("$?");
                     message=message.substr(0,pos);
+                    int cpos=message.find("STOR ");
+                    if(cpos!=-1){
+                        std::string checkpath=message.substr(5,message.size()-5);
+                        if (!std::filesystem::exists(checkpath)) {
+                            std::cout<<"该路径不存在"<<std::endl;
+                            continue;
+                        }else if (std::filesystem::is_directory(checkpath)) {
+                            std::cout<<"这是一个目录,不允许上传一个目录"<<std::endl;
+                            continue;
+                        }
+                    }
                     message.insert(0,"gfi");
                     client.fptc.start(message,client.ip);
                 }
@@ -1389,6 +1408,7 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
         client.if_getchat_account=1;
         std::cout<<"/exit 可退出私聊"<<std::endl;
         std::cout<<"list file可列出可下载的文件"<<std::endl;
+        std::cout<<"look past可查看以往所有的历史记录"<<std::endl;
         std::cout<<"STOR + 文件 上传文件"<<std::endl;
         std::cout<<"RETR + 文件 下载文件"<<std::endl;
     }else{
@@ -1397,7 +1417,10 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
     std::thread send_thread([&]{
         while (send_chatting) {
             std::string allbuf;
-            std::getline(std::cin,allbuf); 
+            if(!std::getline(std::cin,allbuf)){
+                std::cin.clear();
+                continue;
+            }
             if(allbuf.empty()) continue;  
             int len=allbuf.size();
             std::string headlenmes="head"+std::to_string(allbuf.size())+' ';
@@ -1410,6 +1433,14 @@ void chatclient::chat_with_friends(int client_fd,std::string request){
                 if(temp.find("STOR ")!=std::string::npos){
                     int pos=temp.find("STOR ");
                     filemes=temp.substr(pos,len);
+                    std::string checkpath=filemes.substr(5,filemes.size()-5);
+                    if (!std::filesystem::exists(checkpath)) {
+                        std::cout<<"该路径不存在"<<std::endl;
+                        continue;
+                    }else if (std::filesystem::is_directory(checkpath)) {
+                        std::cout<<"这是一个目录,不允许上传一个目录"<<std::endl;
+                        continue;
+                    }
                 }else{
                     int pos=temp.find("RETR ");
                     filemes=temp.substr(pos,len);

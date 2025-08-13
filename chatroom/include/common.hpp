@@ -30,3 +30,4 @@
 #include <unordered_set>
 #include <regex>
 #include <filesystem>
+#include <termios.h>
